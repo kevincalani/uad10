@@ -74,13 +74,17 @@ export function Sidebar() {
               : 'text-gray-600 hover:bg-gray-50'
           }`}
         >
-          <div className="flex items-center space-x-3">
+          
+          {isCollapsed? <div className="flex items-center space-x-3 pl-4">
+            {iconMap[item.id] || <FileText className="w-4 h-4" />}
+          </div>: <div className="flex items-center space-x-3">
             {iconMap[item.id] || <FileText className="w-4 h-4" />}
             {!isCollapsed && <span className="font-medium">{item.label}</span>}
-          </div>
+          </div>}
           {!isCollapsed && item.hasSubmenu && (
             isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />
           )}
+          
         </button>
 
         {!isCollapsed && item.hasSubmenu && isExpanded && item.submenuItems && (
@@ -105,11 +109,12 @@ export function Sidebar() {
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'} flex flex-col`}>
-      <div className="p-4 border-b border-gray-200">
+    <div className={`bg-#f8f9fc border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
+      <div className="p-2 border-b border-gray-200"
+            onClick={() => setIsCollapsed(!isCollapsed)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center border border-gray-200 p-1">
+            <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center border border-gray-200 p-1">
               <img 
                 src="/src/assets/logo archivos.png" 
                 alt="UMSS Archives Logo" 
@@ -124,10 +129,9 @@ export function Sidebar() {
             )}
           </div>
           <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
             className="p-1 hover:bg-gray-100 rounded"
           >
-            {isCollapsed ? <Menu className="w-4 h-4" /> : <X className="w-4 h-4" />}
+            {isCollapsed ? <div  /> : <X className="w-4 h-4" />}
           </button>
         </div>
       </div>

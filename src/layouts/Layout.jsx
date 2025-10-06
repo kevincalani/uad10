@@ -1,6 +1,7 @@
 import React from 'react';
 import  {Sidebar}  from '../components/Sidebar';
 import  {Header}  from '../components/Header';
+import { Outlet } from 'react-router-dom';
 
 export function Layout( ) {
   return (
@@ -10,8 +11,8 @@ export function Layout( ) {
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         
-        <main className="flex-1 overflow-y-auto">
-          
+        <main className=" bg-white flex-1 overflow-y-auto">
+          <Outlet></Outlet>
         </main>
       </div>
     </div>
