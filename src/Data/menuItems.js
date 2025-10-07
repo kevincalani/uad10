@@ -5,9 +5,9 @@ export const menuItems = [
     label: 'DIPLOMAS Y TÍTULOS',
     hasSubmenu: true,
     submenuItems: [
-      { id: 'listar-tomos', label: 'Listar Tomos', route: '/diplomas/tomos' },
-      { id: 'buscar-titulo', label: 'Buscar título', route: '/diplomas/buscar' },
-      { id: 'importar-titulos', label: 'Importar títulos', route: '/diplomas/importar' },
+      { id: 'listar-tomos', label: 'Listar Tomos', route: '/diplomas/listar-tomos' },
+      { id: 'buscar-titulo', label: 'Buscar título', route: '/diplomas/buscar-titulo' },
+      { id: 'importar-titulos', label: 'Importar títulos', route: '/diplomas/importar-titulos' },
       { id: 'reportes-diplomas', label: 'Reportes', route: '/diplomas/reportes' },
       { id: 'duplicados', label: 'Duplicados', route: '/diplomas/duplicados' }
     ]
@@ -17,13 +17,13 @@ export const menuItems = [
     label: 'RESOLUCIONES',
     hasSubmenu: true,
     submenuItems: [
-      { id: 'listar-tomos-res', label: 'Listar tomos', route: '/resoluciones/tomos' },
-      { id: 'listar-resoluciones', label: 'Listar resoluciones', route: '/resoluciones/listar' },
+      { id: 'listar-tomos-res', label: 'Listar tomos', route: '/resoluciones/listar-tomos' },
+      { id: 'listar-resoluciones', label: 'Listar resoluciones', route: '/resoluciones/listar-resoluciones' },
       { id: 'autoridad', label: 'Autoridad', route: '/resoluciones/autoridad' },
-      { id: 'codigo-archivado', label: 'Código de archivado', route: '/resoluciones/codigo' },
+      { id: 'codigo-archivado', label: 'Código de archivado', route: '/resoluciones/codigo-archivado' },
       { id: 'busquedas-res', label: 'Búsquedas', route: '/resoluciones/busquedas' },
       { id: 'importar-res', label: 'Importar Resoluciones', route: '/resoluciones/importar' },
-      { id: 'temas-interes', label: 'Temas de interés', route: '/resoluciones/temas' },
+      { id: 'temas-interes', label: 'Temas de interés', route: '/resoluciones/temas-interes' },
       { id: 'reportes-res', label: 'Reportes', route: '/resoluciones/reportes' }
     ]
   },
@@ -105,23 +105,23 @@ export const adminMenuItems = [
     label: 'USUARIOS',
     hasSubmenu: true,
     submenuItems: [
-      { id: 'lista-usuarios', label: 'Lista de Usuarios', route: '/admin/usuarios/lista' },
-      { id: 'reportes-usuarios', label: 'Reportes', route: '/admin/usuarios/reportes' }
+      { id: 'lista-usuarios', label: 'Lista de Usuarios', route: '/administracion/usuarios' },
+      { id: 'reportes-usuarios', label: 'Reportes', route: '/administracion/usuarios/reportes' }
     ]
   },
   {
     id: 'corregir-datos',
     label: 'CORREGIR DATOS PERSONALES',
     hasSubmenu: false,
-    route: '/admin/corregir-datos'
+    route: '/administracion/corregir-datos'
   },
   {
     id: 'programacion',
     label: 'PROGRAMACION',
     hasSubmenu: true,
     submenuItems: [
-      { id: 'actividades', label: 'Actividades', route: '/admin/programacion/actividades' },
-      { id: 'dependientes', label: 'Dependientes', route: '/admin/programacion/dependientes' }
+      { id: 'actividades', label: 'Actividades', route: '/administracion/programacion/actividades' },
+      { id: 'dependientes', label: 'Dependientes', route: '/administracion/programacion/dependientes' }
     ]
   },
   {
@@ -129,8 +129,8 @@ export const adminMenuItems = [
     label: 'REPORTE',
     hasSubmenu: true,
     submenuItems: [
-      { id: 'reporte-tareas', label: 'Reporte de Tareas', route: '/admin/reporte/tareas' },
-      { id: 'registro-periodico', label: 'Registro Periodico', route: '/admin/reporte/periodico' }
+      { id: 'reporte-tareas', label: 'Reporte de Tareas', route: '/administracion/reporte/tareas' },
+      { id: 'registro-periodico', label: 'Registro Periodico', route: '/administracion/reporte/periodico' }
     ]
   }
 ];

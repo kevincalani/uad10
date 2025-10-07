@@ -109,7 +109,7 @@ export function Sidebar() {
   };
 
   return (
-    <div className={`bg-#f8f9fc border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
+    <div className={`bg-#e4e8f4 border-r border-gray-200 transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'} flex flex-col`}>
       <div className="p-2 border-b border-gray-200"
             onClick={() => setIsCollapsed(!isCollapsed)}>
         <div className="flex items-center justify-between">

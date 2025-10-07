@@ -61,10 +61,16 @@ import Administrativos from '../pages/funcionarios/Administrativos';
 import ReporteFuncionarios from '../pages/funcionarios/Reporte'; 
 
 // ADMINISTRACIÓN
-import Usuarios from '../pages/admin/Usuarios';
 import CorregirDatos from '../pages/admin/CorregirDatos';
-import Programacion from '../pages/admin/Programacion';
-import Auditoria from '../pages/admin/Auditoria';
+// USUARIOS
+import ListaUsuarios from '../pages/admin/ListaUsuarios';
+import ReporteUsuarios from '../pages/admin/ReportesUsuarios'
+// PROGRMACIÓN
+import Actividades from '../pages/admin/Actividades';
+import Dependientes from '../pages/admin/Dependientes';
+//REPORTE
+import ReporteTareas from '../pages/admin/ReporteTareas'
+import RegistroPeriodico from '../pages/admin/RegistroPeriodico'
 
 
 export default function AppRoutes() {
@@ -90,7 +96,7 @@ export default function AppRoutes() {
 
             {/* RESOLUCIONES */}
             <Route path="/resoluciones/listar-tomos" element={<ListarTomosResoluciones />} />
-            <Route path="/resoluciones/listar" element={<ListarResoluciones />} />
+            <Route path="/resoluciones/listar-resoluciones" element={<ListarResoluciones />} />
             <Route path="/resoluciones/autoridad" element={<Autoridad />} />
             <Route path="/resoluciones/codigo-archivado" element={<CodigoArchivado />} />
             <Route path="/resoluciones/busquedas" element={<BusquedasResoluciones />} />
@@ -128,12 +134,18 @@ export default function AppRoutes() {
             <Route path="/funcionarios/Reporte" element={<ReporteFuncionarios />} />
             
             {/* ADMINISTRACIÓN */}
-            <Route path="/administracion/usuarios" element={<Usuarios />} />
             <Route path="/administracion/corregir-datos" element={<CorregirDatos />} />
-            <Route path="/administracion/programacion" element={<Programacion />} />
-            <Route path="/administracion/auditoria" element={<Auditoria />} />
+            {/* USUARIOS */}
+            <Route path="/administracion/usuarios" element={<ListaUsuarios />} />
+            <Route path="/administracion/usuarios/reportes" element={<ReporteUsuarios />} />
+            {/* PROGRAMACIÓN */}
+            <Route path="/administracion/programacion/actividades" element={<Actividades />} />
+            <Route path="/administracion/programacion/dependientes" element={<Dependientes />} />
+            {/* REPORTE */}
+            <Route path="/administracion/reporte/tareas" element={<ReporteTareas />} />
+            <Route path="/administracion/reporte/periodico" element={<RegistroPeriodico />} />
 
-            {/* FALLBACK/404 Route */}
+            {/*404 Route */}
             <Route path="*" element={<h1>404 | Página no encontrada</h1>} />
 
           </Route>
@@ -143,6 +155,3 @@ export default function AppRoutes() {
     </AuthProvider>
   );
 }
-
-// NOTE: Remember to change the 'path' attribute in your sidebar links 
-// to match these new URL structures (e.g., '/servicios/configurar-tramites').

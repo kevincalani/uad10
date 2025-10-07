@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function Usuarios() {
+export default function ListaUsuarios() {
   return (
     <div>Usuarios</div>
   )
