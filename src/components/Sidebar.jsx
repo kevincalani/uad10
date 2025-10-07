@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { menuItems, adminMenuItems } from '../data/menuItems';
+import { menuItems, adminMenuItems } from '../Constants/menuItems';
 import { 
   GraduationCap, 
   FileText, 
