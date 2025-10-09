@@ -39,3 +39,26 @@ export const TRAMITE_COLORS = {
     text: 'text-gray-500' 
   }, // btn-secondary
 };
+/**
+ * Opciones para el campo "Buscar en" en los modales de trámites.
+ */
+export const BUSCAR_EN_OPTIONS = [
+    { value: 'db', label: 'DB' },
+    { value: 'ca', label: 'CA' },
+    { value: 'da', label: 'DA' },
+    { value: 'tp', label: 'TP' },
+    { value: 'di', label: 'DI' },
+    { value: 'tpos', label: 'TPOS' },
+    { value: 're', label: 'RE' },
+    { value: 'su', label: 'SU' },
+    { value: 'res', label: 'RESOLUCION' },
+    { value: 'db-ant', label: 'DB-ANTECEDENTE' },
+    { value: 'ca-ant', label: 'CA-ANTECEDENTE' },
+    { value: 'da-ant', label: 'DA-ANTECEDENTE' },
+    { value: 'tp-ant', label: 'TP-ANTECEDENTE' },
+    { value: 'di-ant', label: 'DI-ANTECEDENTE' },
+    { value: 'tpos-ant', label: 'TPOS-ANTECEDENTE' },
+    { value: 're-ant', label: 'RE-ANTECEDENTE' },
+    { value: 'su-ant', label: 'SU-ANTECEDENTE' },
+    
+  ];

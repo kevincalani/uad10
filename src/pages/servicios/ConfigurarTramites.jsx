@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import TramiteActionButton from '../../components/TramiteActionButton'
 import {TRAMITE_COLORS} from '../../Constants/tramiteDatos'
+import AddEditTramiteModal from '../../modals/AddEditTramiteModal';
+
 
 // Datos de ejemplo para la tabla (Estado 'habilitado' controla el color de la fila)
 const initialTramites = [
@@ -26,18 +28,22 @@ export default function ConfigurarTramites() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [selectedTramiteId, setSelectedTramiteId] = useState(null);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const openModal = (type) => {
+  // Logica de Modales y Acciones
+  const openModal = (type, id = null) => {
     setModalType(type);
+    setSelectedTramiteId(id);
     setIsModalOpen(true);
   };
   
   const closeModal = () => {
     setIsModalOpen(false);
     setModalType(null);
+    setSelectedTramiteId(null);
   };
 
   const handleToggleHabilitar = (id) => {
@@ -46,17 +52,41 @@ export default function ConfigurarTramites() {
     ));
   };
   
-  const handleEliminarTramite = (id) => {
-      // Por ahora solo abre el modal de confirmación
-      openModal('eliminar'); 
+  const handleTramiteAction = (id, action) => {
+      switch (action) {
+          case 'edit':
+              // Cuando editas, buscas los datos del trámite por ID y los pasas al modal
+              const tramiteToEdit = tramites.find(t => t.id === id);
+              // Asumimos que el modal de edición es el mismo que el de añadir por ahora
+              openModal('editar-' + tramiteToEdit.tipo, id); 
+              break;
+          case 'glosa':
+              openModal('glosa', id); // Abre el modal de glosa
+              break;
+          case 'delete':
+              openModal('eliminar', id); // Abre el modal de confirmación
+              break;
+          case 'toggle_habilitar':
+              handleToggleHabilitar(id); 
+              break;
+          default:
+              console.log(`Acción no reconocida: ${action}`);
+      }
   };
-  
-  const handleEditTramite = (id) => {
-      openModal('editar');
-  };
-  
-  const handleGlosa = (id) => {
-      openModal('glosa');
+  const handleFormSubmit = (formData) => {
+      console.log('Datos enviados:', formData, 'Tipo de modal:', modalType, 'ID seleccionado:', selectedTramiteId);
+      // Aquí iría la lógica para guardar/actualizar el trámite
+      // Si modalType es 'add-Legalizacion', añades un nuevo trámite
+      // Si modalType es 'editar-Legalizacion', actualizas el trámite con selectedTramiteId
+      
+      if (modalType.startsWith('add-')) {
+          const newId = Math.max(...tramites.map(t => t.id)) + 1; // Genera un nuevo ID
+          const newTramite = { id: newId, tipo: modalType.substring(4), ...formData, habilitado: true };
+          setTramites(prev => [...prev, newTramite]);
+      } else if (modalType.startsWith('editar-')) {
+          setTramites(prev => prev.map(t => t.id === selectedTramiteId ? { ...t, ...formData } : t));
+      }
+      closeModal();
   };
 
 
@@ -69,46 +99,7 @@ export default function ConfigurarTramites() {
   const startIndex = (currentPage - 1) * rowsPerPage;
   const currentTramites = filteredTramites.slice(startIndex, startIndex + rowsPerPage);
   const totalEntries = tramites.length;
-  
 
-  // ----------------------------------------------------------------------
-  // MODAL Componente Placeholder (simplemente muestra que se abrió)
-  // ----------------------------------------------------------------------
-  const Modal = ({ isOpen, type, onClose }) => {
-      if (!isOpen) return null;
-      
-      let title = "Modal de Acción";
-      let content = `Se ha abierto el modal para la acción: ${type}`;
-      
-      if (type.startsWith('add-')) {
-          title = `Añadir Nuevo Trámite: ${type.substring(4)}`;
-          content = "Aquí se abrirá el modal de añadir trámite.";
-      } else if (type === 'eliminar') {
-          title = "Confirmación de Eliminación";
-          content = "¿Estás seguro de que deseas eliminar este trámite?";
-      } else if (type === 'editar') {
-          title = "Editar Trámite";
-          content = "Aquí se abrirá el modal para editar los datos del trámite.";
-      } else if (type === 'glosa') {
-          title = "Gestión de Glosa";
-          content = "Aquí se abrirá el modal para configurar la glosa.";
-      }
-
-      return (
-          <div className="fixed inset-0 bg-opacity-100 flex justify-center items-center z-50">
-              <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
-                  <h3 className="text-xl font-bold mb-4">{title}</h3>
-                  <p>{content}</p>
-                  <button 
-                      onClick={onClose} 
-                      className="mt-4 bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded"
-                  >
-                      Cerrar
-                  </button>
-              </div>
-          </div>
-      );
-  };
 
   // ----------------------------------------------------------------------
   // RENDERIZADO PRINCIPAL
@@ -124,8 +115,11 @@ export default function ConfigurarTramites() {
         <div className="flex flex-wrap gap-4 mb-8 justify-start">
         {['Legalizacion', 'Certificacion', 'Confrontacion', 'Busqueda', 'No atentado', 'Consejero'].map(type => (
             // PASAMOS LA FUNCIÓN 'openModal' COMO PROP 'onClick'
-            <TramiteActionButton key={type} type={type} onClick={(type) => openModal('add-' + type)} />
-        ))}
+            <TramiteActionButton 
+                key={type} 
+                type={type} 
+                onClick={(clickedType) => openModal('add-' + clickedType)} 
+            />))}
       </div>
 
         {/* 3. y 4. Cabecera y Controles de la Tabla */}
@@ -207,7 +201,7 @@ export default function ConfigurarTramites() {
                           
                           {/* 1. Editar Trámite */}
                           <button 
-                              onClick={() => handleEditTramite(tramite.id)}
+                              onClick={() => openModal('editar-' + tramite.tipo, tramite.id)}
                               className="text-blue-600 hover:text-blue-900" 
                               title="Editar Trámite"
                           >
@@ -216,7 +210,7 @@ export default function ConfigurarTramites() {
                           
                           {/* 2. Glosa */}
                           <button 
-                              onClick={() => handleGlosa(tramite.id)}
+                              onClick={() => openModal('glosa', tramite.id)}
                               className="text-purple-600 hover:text-purple-900"
                               title="Glosa"
                           >
@@ -235,7 +229,7 @@ export default function ConfigurarTramites() {
                           
                           {/* 4. Eliminar Trámite */}
                           <button 
-                              onClick={() => handleEliminarTramite(tramite.id)}
+                              onClick={() => openModal('eliminar', tramite.id)}
                               className="text-red-600 hover:text-red-800"
                               title="Eliminar Trámite"
                           >
@@ -288,9 +282,43 @@ export default function ConfigurarTramites() {
           </nav>
         </div>
 
-        {/* Modal Placeholder */}
-        <Modal isOpen={isModalOpen} type={modalType} onClose={closeModal} />
+{/* Modal de Añadir o Editar Trámite (AddEditTramiteModal) */}
+        {isModalOpen && (modalType.startsWith('add-') || modalType.startsWith('editar-')) && (
+            <AddEditTramiteModal
+              isOpen={isModalOpen}
+              onClose={closeModal}
+              // El tipo de trámite se extrae del modalType (e.g., 'add-Legalizacion' -> 'Legalizacion')
+              type={modalType.startsWith('add-') ? modalType.substring(4) : modalType.substring(7)}
+              // Determina el título
+              title={modalType.startsWith('add-') ? `Añadir Trámite: ${modalType.substring(4)}` : `Editar Trámite: ${modalType.substring(7)}`}
+              // Si es edición, se le pasan los datos del trámite seleccionado
+              initialData={selectedTramiteId ? tramites.find(t => t.id === selectedTramiteId) : {}}
+              onSubmit={handleFormSubmit}
+            />
+        )}
         
+        {/* Placeholder para Modal de Glosa */}
+        {isModalOpen && modalType === 'glosa' && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
+                    <h3 className="text-xl font-bold mb-4">Modal de Glosa para ID: {selectedTramiteId}</h3>
+                    <button onClick={closeModal} className="mt-4 bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded">Cerrar</button>
+                </div>
+            </div>
+        )}
+        
+        {/* Placeholder para Modal de Eliminar */}
+        {isModalOpen && modalType === 'eliminar' && (
+            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
+                <div className="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full">
+                    <h3 className="text-xl font-bold mb-4">¿Seguro que quieres eliminar el trámite {selectedTramiteId}?</h3>
+                    <div className='flex justify-end space-x-2'>
+                        <button onClick={closeModal} className="bg-gray-400 text-white py-2 px-4 rounded">Cancelar</button>
+                        <button onClick={() => { /* Lógica de eliminación */ closeModal(); }} className="bg-red-600 text-white py-2 px-4 rounded">Eliminar</button>
+                    </div>
+                </div>
+            </div>
+        )}        
       </div>
   </div>
   );
