@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import TramiteActionButton from '../../components/TramiteActionButton'
-import {TRAMITE_COLORS} from '../../Constants/tramiteDatos'
+import {TRAMITE_COLORS, GLOSAS_MOCK_DATA} from '../../Constants/tramiteDatos'
 import AddEditTramiteModal from '../../modals/AddEditTramiteModal';
+import GlosaModal from '../../modals/GlosaModal';
+import DeleteConfirmModal from '../../modals/DeleteConfirmModal';
 
 
 // Datos de ejemplo para la tabla (Estado 'habilitado' controla el color de la fila)
@@ -32,6 +34,13 @@ export default function ConfigurarTramites() {
   const [currentPage, setCurrentPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
+  const [glosasData, setGlosasData] = useState(GLOSAS_MOCK_DATA);
+
+  const selectedTramite = tramites.find(t => t.id === selectedTramiteId);
+  
+   // 🚨 SIMULACIÓN DE LÓGICA DE PROTECCIÓN (Se verifica al renderizar el modal)
+  // Usaremos un ID fijo para la prueba, pero esto vendría de una verificación de datos real.
+  const isTramiteProtected = selectedTramiteId === 1; 
 
   // Logica de Modales y Acciones
   const openModal = (type, id = null) => {
@@ -52,27 +61,6 @@ export default function ConfigurarTramites() {
     ));
   };
   
-  const handleTramiteAction = (id, action) => {
-      switch (action) {
-          case 'edit':
-              // Cuando editas, buscas los datos del trámite por ID y los pasas al modal
-              const tramiteToEdit = tramites.find(t => t.id === id);
-              // Asumimos que el modal de edición es el mismo que el de añadir por ahora
-              openModal('editar-' + tramiteToEdit.tipo, id); 
-              break;
-          case 'glosa':
-              openModal('glosa', id); // Abre el modal de glosa
-              break;
-          case 'delete':
-              openModal('eliminar', id); // Abre el modal de confirmación
-              break;
-          case 'toggle_habilitar':
-              handleToggleHabilitar(id); 
-              break;
-          default:
-              console.log(`Acción no reconocida: ${action}`);
-      }
-  };
   const handleFormSubmit = (formData) => {
       console.log('Datos enviados:', formData, 'Tipo de modal:', modalType, 'ID seleccionado:', selectedTramiteId);
       // Aquí iría la lógica para guardar/actualizar el trámite
@@ -89,6 +77,19 @@ export default function ConfigurarTramites() {
       closeModal();
   };
 
+  // 🚨 FUNCIÓN FALTANTE: Confirma la eliminación de un Trámite
+    const handleConfirmDeleteTramite = () => {
+        if (!selectedTramiteId) return;
+
+        // 1. Lógica de Eliminación (simulación de actualización de estado)
+        setTramites(prev => prev.filter(t => t.id !== selectedTramiteId));
+
+        // 2. Cierra el modal
+        closeModal();
+        
+        // Aquí iría tu llamada a la API o cualquier otra acción de limpieza
+        console.log(`Trámite ID: ${selectedTramiteId} eliminado del estado.`);
+    };
 
   // Lógica de filtrado y paginación
   const filteredTramites = tramites.filter(tramite => 
@@ -297,27 +298,36 @@ export default function ConfigurarTramites() {
             />
         )}
         
-        {/* Placeholder para Modal de Glosa */}
-        {isModalOpen && modalType === 'glosa' && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                <div className="bg-white p-6 rounded-lg shadow-xl max-w-lg w-full">
-                    <h3 className="text-xl font-bold mb-4">Modal de Glosa para ID: {selectedTramiteId}</h3>
-                    <button onClick={closeModal} className="mt-4 bg-gray-200 hover:bg-gray-300 py-2 px-4 rounded">Cerrar</button>
-                </div>
-            </div>
+        {/* Renderizado del AddEditTramiteModal (Añadir/Editar Trámite) */}
+        {isModalOpen && (modalType.startsWith('add-') || modalType.startsWith('editar-')) && (
+            <AddEditTramiteModal
+              // ... (Props de Añadir/Editar Trámite) ...
+            />
+        )}
+        
+        {/* Renderizado del GlosaMainModal (Configuración de Glosas) */}
+        {isModalOpen && modalType === 'glosa' && selectedTramite && (
+            <GlosaModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                tramite={selectedTramite} // Le pasamos el objeto completo del trámite
+                glosasData={glosasData}    // Datos actuales de las glosas
+                setGlosasData={setGlosasData} // Función para actualizar los datos de glosa
+            />
         )}
         
         {/* Placeholder para Modal de Eliminar */}
-        {isModalOpen && modalType === 'eliminar' && (
-            <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center z-50">
-                <div className="bg-white p-6 rounded-lg shadow-xl max-w-xs w-full">
-                    <h3 className="text-xl font-bold mb-4">¿Seguro que quieres eliminar el trámite {selectedTramiteId}?</h3>
-                    <div className='flex justify-end space-x-2'>
-                        <button onClick={closeModal} className="bg-gray-400 text-white py-2 px-4 rounded">Cancelar</button>
-                        <button onClick={() => { /* Lógica de eliminación */ closeModal(); }} className="bg-red-600 text-white py-2 px-4 rounded">Eliminar</button>
-                    </div>
-                </div>
-            </div>
+        {isModalOpen && modalType === 'eliminar' && selectedTramite && (
+            <DeleteConfirmModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                onConfirm={handleConfirmDeleteTramite}
+                itemType="tramite"
+                // 🚨 Pasar los datos del trámite
+                itemData={selectedTramite}
+                // 🚨 Pasar el estado de protección. El modal se encarga de cambiar el contenido.
+                isProtected={isTramiteProtected} 
+            />
         )}        
       </div>
   </div>

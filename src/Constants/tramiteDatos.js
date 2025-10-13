@@ -62,3 +62,28 @@ export const BUSCAR_EN_OPTIONS = [
     { value: 'su-ant', label: 'SU-ANTECEDENTE' },
     
   ];
+  // ... (TRAMITE_COLORS y BUSCAR_EN_OPTIONS se mantienen)
+
+export const GLOSAS_MOCK_DATA = [
+    { 
+      id: 101, 
+      tramiteId: 1, // Pertenece a Legalizacion
+      titulo: 'Glosa Estandar Título', 
+      cuerpo: 'El título del trámite debe ser revisado por la unidad legal antes de su procesamiento final.',
+      interno: true // Simulación de glosa interna
+    },
+    { 
+      id: 102, 
+      tramiteId: 1, 
+      titulo: 'Revisión de Antecedentes', 
+      cuerpo: 'Verificar la presentación de antecedentes penales y policiales actualizados.',
+      interno: false 
+    },
+    { 
+      id: 201, 
+      tramiteId: 2, // Pertenece a Certificacion
+      titulo: 'Notas Finales Aprobadas', 
+      cuerpo: 'Certificado solo emitible si el estudiante tiene todas las materias aprobadas.',
+      interno: false 
+    },
+];
