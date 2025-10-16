@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import ConfirmModal from '../../modals/ConfirmModal';
 import { TRAMITE_COLORS } from '../../Constants/tramiteDatos'; 
 import { BookText, CircleArrowRight } from 'lucide-react';
+import EditLegalizacionModal from '../../modals/EditLegalizacionModal';
 
 // Función auxiliar para formatear la fecha a 'YYYY-MM-DD'
 const formatDate = (date) => date.toISOString().split('T')[0];
@@ -20,7 +21,9 @@ export default function Tramites() {
     // Estado para el modal de confirmación rápida
     const [isQuickModalOpen, setIsQuickModalOpen] = useState(false);
     const [quickModalData, setQuickModalData] = useState({});
-
+    //  estado para el Modal de Edición
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [tramiteToEdit, setTramiteToEdit] = useState(null);
     // 3. Condición para habilitar botones
     const isToday = selectedDate === today;
 
@@ -65,6 +68,17 @@ export default function Tramites() {
         });
         setIsQuickModalOpen(true);
     };
+    // Handler para abrir el modal de edición
+    const handleEditTramite = (tramite) => {
+        setTramiteToEdit(tramite);
+        setIsEditModalOpen(true);
+    };
+
+    // Handler para cerrar el modal de edición
+    const closeEditModal = () => {
+        setTramiteToEdit(null);
+        setIsEditModalOpen(false);
+    };
 
     // Lógica de filtrado de la tabla (solo para la fecha seleccionada)
     const filteredTramites = useMemo(() => {
@@ -91,7 +105,7 @@ export default function Tramites() {
                   </h1>
 
                 {/* Controles Principales (Búsqueda de Fecha, Botones de Acción, Búsquedas Secundarias) */}
-                <div className="flex flex-row justify-between items-start gap-y-4 mb-8">
+                <div className="flex flex-row justify-between items-start gap-y-4 mb-4 border-b pb-6">
                     
                     {/* PARTE IZQUIERDA: Búsqueda de Fecha y Botones de Acción */}
                     <div className="flex  md:flex-row md:items-start gap-4">
@@ -155,7 +169,7 @@ export default function Tramites() {
 
                 {/* 5. Título de la Tabla y Fecha Seleccionada */}
                 <div className="mb-4">
-                    <div className="text-gray-800 text-center py-3 rounded-t-lg  mb-2">
+                    <div className="text-gray-800 text-center py-3  rounded-t-lg  mb-2">
                         <h2 className="text-2xl font-semibold">Trámites de Legalización</h2>
                     </div>
                     {/* Fecha seleccionada debajo del título y a la izquierda */}
@@ -235,7 +249,13 @@ export default function Tramites() {
                                         
                                         {/* Columna Opciones */}
                                         <td className="px-3 py-2 whitespace-nowrap text-xs font-medium space-x-2">
-                                            <button className="text-blue-600 hover:text-blue-900" title="Insertar Datos">📝</button>
+                                            <button 
+                                                onClick={() => handleEditTramite(tramite)}
+                                                className="text-blue-600 hover:text-blue-900" 
+                                                title="Insertar Datos al Trámite"
+                                            >
+                                                📝
+                                            </button>
                                             <button className="text-purple-600 hover:text-purple-900" title="Cambiar Tipo">🔁</button>
                                             <button className="text-red-600 hover:text-red-800" title="Eliminar Trámite">🗑️</button>
                                         </td>
@@ -272,7 +292,13 @@ export default function Tramites() {
                         <button className="px-3 py-1 text-sm bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50" disabled>Next</button>
                     </div>
                 </div>
-
+                
+                {/* 🚨 Modal de Edición de Legalización */}
+                <EditLegalizacionModal 
+                    isOpen={isEditModalOpen}
+                    onClose={closeEditModal}
+                    tramiteData={tramiteToEdit} // Pasar los datos del trámite
+                />
                 {/* Modal de Confirmación Rápida */}
                 <ConfirmModal 
                     isOpen={isQuickModalOpen}
