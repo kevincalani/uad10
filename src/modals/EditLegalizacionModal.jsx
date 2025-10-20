@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import {X, CircleCheck, CircleMinus, Trash2, Eye, FilePenLine, FileCode,BookText } from 'lucide-react';
+import React, { useState } from 'react';
+import {X,BookText } from 'lucide-react';
 import { TIPOS_LEGALIZACION } from '../Constants/tramiteDatos';
 import DatosPersonalesForm from '../components/forms/DatosPersonalesForm';
 import DatosApoderadoForm from '../components/forms/DatosApoderadoForm';
@@ -10,10 +10,13 @@ import DocumentoTable from '../components/DocumentoTable';
 const BASE_TRAMITES_COUNT = 250; 
 
 // Componente principal del Modal
-export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) {
+export default function EditLegalizacionModal({ isOpen, onClose, tramiteData, onUpdateTramite }) {
     if (!isOpen || !tramiteData) return null;
 
     // --- ESTADOS ---
+    const initialSavedStatus = tramiteData.ci && tramiteData.nombre;
+    const [isDatosPersonalesSaved, setIsDatosPersonalesSaved] = useState(initialSavedStatus);
+
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
     const [documentos, setDocumentos] = useState([]); // Tabla de documentos
@@ -33,12 +36,19 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
         nroControlReimpresion: '',
     });
 
+    // --- Lógica de inicialización de Apellidos y Nombres (simplificada) ---
+    const initialName = tramiteData.nombre || '';
+    const initialNameParts = initialName.trim().split(/\s+/);
+    // Asume que la última palabra es el nombre, el resto son apellidos
+    const initialNombres = initialNameParts.length > 0 ? initialNameParts.slice(-1).join(' ') : '';
+    const initialApellidos = initialNameParts.length > 1 ? initialNameParts.slice(0, -1).join(' ') : initialName;
+
     // Formulario de Datos Personales (Simulación de autocompletado)
     const [datosPersonales, setDatosPersonales] = useState({
-        ci: '',
-        pasaporte: '',
-        apellidos: '',
-        nombres: '',
+        ci: tramiteData.ci || '', 
+        pasaporte: tramiteData.pasaporte || '',
+        apellidos: initialApellidos,
+        nombres: initialNombres,
     });
     
     // Formulario de Apoderado
@@ -51,6 +61,25 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
     
     // --- HANDLERS ---
     
+    const handleDatosPersonalesSubmit = () => {
+
+        const { ci, apellidos, nombres } = datosPersonales;
+
+        // Concatenar Apellidos y Nombres
+        const newNombre = `${apellidos.trim()} ${nombres.trim()}`.replace(/\s+/g, ' ');
+
+        // Simular la actualización de los datos del trámite en la tabla padre
+        if (onUpdateTramite) {
+            onUpdateTramite(tramiteData.id, {
+                ci: ci.trim(),
+                nombre: newNombre, // El campo nombre actualizado
+            });
+        }
+        
+        // Bloquear el formulario
+        setIsDatosPersonalesSaved(true);
+        // Opcional: alert(`Datos personales guardados: ${newNombre} (${ci.trim()}).`);
+    };
     // Simulación de Autocompletado de CI (Datos Personales)
     const handleCiChange = (e) => {
         const ci = e.target.value;
@@ -99,10 +128,19 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
         onClose();
         }
     };
-    // Agregar nuevo documento a la tabla
-    const handleAddDocumento = (e) => {
-        e.preventDefault();
-
+    // Generic Change Handler para Documento/Trámite
+    const handleNewDocFormChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        setNewDocForm(prev => ({ 
+            ...prev, 
+            [name]: type === 'checkbox' ? checked : value 
+        }));
+    };
+    
+    /** * MANEJADOR DE AGREGAR DOCUMENTO (Solo guarda y bloquea)
+     * Lo llamará el componente hijo *después* de que la validación sea exitosa.
+     */
+    const handleAddDocumento = () => {
         // Obtener el label de Tipo de Legalización
         const nombreTipo = TIPOS_LEGALIZACION.find(t => t.value === newDocForm.tipoLegalizacion)?.label || 'Desconocido';
         
@@ -111,12 +149,12 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
 
         const newDocumento = {
             id: Date.now(),
-            sitraVerificado: false, // Por defecto no verificado
+            sitraVerificado: false, 
             nombre: nombreTipo,
             tipoTramite: newDocForm.tipoTramite,
             numeroBd: newNumeroBd, 
             nroTitulo: `${newDocForm.nroTitulo1}/${newDocForm.nroTitulo2}`,
-            // ... otros datos del formulario si fueran necesarios
+            // ... otros datos relevantes del formulario newDocForm
         };
 
         setDocumentos(prev => [...prev, newDocumento]);
@@ -171,7 +209,7 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
                     <div className="flex flex-col lg:flex-row gap-6">
                         
                         {/* PARTE IZQUIERDA: Datos Personales y Apoderado */}
-                        <div className="w-full lg:w-5/12 space-y-6">
+                        <div className="w-full lg:w-4/12 space-y-6">
                             
                             {/* Datos Personales Componente */}
                             <DatosPersonalesForm
@@ -179,6 +217,8 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
                                 datosPersonales={datosPersonales}
                                 handleCiChange={handleCiChange}
                                 handleDatosPersonalesChange={handleDatosPersonalesChange}
+                                handleDatosPersonalesSubmit={handleDatosPersonalesSubmit} // <-- Nuevo Handler
+                                isDatosPersonalesSaved={isDatosPersonalesSaved} // <-- Nuevo Estado
                             />
                             
                             {/* Datos del Apoderado Componente */}
@@ -192,7 +232,7 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
                         </div>
 
                         {/* PARTE DERECHA: Documentos del Trámite (Sección Combinada) */}
-                        <DocumentosSection
+                        <DocumentoTable
                             documentos={documentos}
                             isAddDocumentoFormVisible={isAddDocumentoFormVisible}
                             setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
@@ -201,7 +241,9 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData }) 
                             handleToggleDestino={handleToggleDestino}
                             handleDeleteDocumento={handleDeleteDocumento}
                             handleAddDocumento={handleAddDocumento}
-                            tiposLegalizacion={TIPOS_LEGALIZACION} // Pasamos la constante
+                            tiposLegalizacion={TIPOS_LEGALIZACION} 
+                            isDatosPersonalesSaved={isDatosPersonalesSaved}// Pasamos la constante
+                            handleNewDocFormChange={handleNewDocFormChange}
                         />
 
                     </div>

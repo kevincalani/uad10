@@ -79,6 +79,13 @@ export default function Tramites() {
         setTramiteToEdit(null);
         setIsEditModalOpen(false);
     };
+    const handleUpdateTramite = (id, updatedFields) => {
+        setTramites(prevTramites => 
+            prevTramites.map(tramite => 
+                tramite.id === id ? { ...tramite, ...updatedFields } : tramite
+            )
+        );
+    };
 
     // Lógica de filtrado de la tabla (solo para la fecha seleccionada)
     const filteredTramites = useMemo(() => {
@@ -297,7 +304,8 @@ export default function Tramites() {
                 <EditLegalizacionModal 
                     isOpen={isEditModalOpen}
                     onClose={closeEditModal}
-                    tramiteData={tramiteToEdit} // Pasar los datos del trámite
+                    tramiteData={tramiteToEdit}
+                    onUpdateTramite={handleUpdateTramite} // Pasar los datos del trámite
                 />
                 {/* Modal de Confirmación Rápida */}
                 <ConfirmModal 

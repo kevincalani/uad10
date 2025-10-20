@@ -14,7 +14,7 @@ export default function ConfirmModal({
         if (isOpen) {
             const timer = setTimeout(() => {
                 onClose();
-            }, 1500); // 2 segundos
+            }, 1000); // 2 segundos
 
             return () => clearTimeout(timer); // Limpiar timer al desmontar o cerrar
         }

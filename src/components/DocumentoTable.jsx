@@ -2,8 +2,7 @@ import React from 'react';
 import { 
     X, CircleCheck, CircleMinus, Trash2, Eye, FilePenLine, FileCode 
 } from 'lucide-react';
-import AddDocumentoForm from '../Forms/AddDocumentoForm';
-import { TIPOS_LEGALIZACION } from '../Constants/tramiteDatos';
+import AddDocumentoForm from '../components/Forms/AddDocumentoForm';
 
 // ************************************************************
 // ***** DocumentoRow (Componente de Fila) *****
@@ -15,14 +14,14 @@ import { TIPOS_LEGALIZACION } from '../Constants/tramiteDatos';
 const DocumentoRow = ({ doc, index, onToggleDestino, onDelete }) => {
     
     const displayNombre = doc.tipoTramite === 'INTERNO' 
-        ? <span className="text-red-600 font-semibold">{doc.nombre} (Int.)</span>
+        ? <>{doc.nombre} <span className="text-red-600 font-semibold">(Int.)</span></>
         : doc.nombre;
     
     const currentYear = new Date().getFullYear();
     const numeroTramiteDisplay = `${doc.numeroBd}/${currentYear}`;
 
     return (
-        <tr className="hover:bg-gray-50">
+        <tr className="hover:bg-gray-200">
             <td className="px-2 py-1 whitespace-nowrap text-xs text-gray-900">{index + 1}</td>
             <td className="px-2 py-1 whitespace-nowrap text-xs">
                 {doc.sitraVerificado ? (
@@ -80,19 +79,20 @@ export default function DocumentoTable({
     handleToggleDestino, 
     handleDeleteDocumento,
     handleAddDocumento,
+    isDatosPersonalesSaved
 }) {
 
     return (
-        <div className="w-full lg:w-7/12">
-            <div className="border border-gray-200 p-4 rounded-lg shadow-sm h-full flex flex-col">
+        <div className="w-full lg:w-8/12">
+            <div className="border border-gray-200 p-4 rounded-lg shadow-sm  flex flex-col">
                 <h3 className="text-lg font-semibold text-gray-700 mb-4 border-b pb-2">Documentos del Trámite</h3>
                 
                 <div className="overflow-auto mb-4" style={{ flexGrow: 1, minHeight: '100px', maxHeight: '100%' }}>
-                    <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50 sticky top-0">
+                    <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm ">
+                        <thead className="bg-gray-300 sticky top-0">
                             <tr>
                                 {['N°', 'Sitra', 'Nombre', 'Nro. Trámite', 'N° Título', 'Opciones'].map(header => (
-                                    <th key={header} className="px-2 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                    <th key={header} className="px-2 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
                                         {header}
                                     </th>
                                 ))}
@@ -118,26 +118,38 @@ export default function DocumentoTable({
                     </table>
                 </div>
                 
-                {/* Botón Añadir Trámite */}
-                {!isAddDocumentoFormVisible && (
-                    <div className="flex justify-end mt-2 flex-shrink-0">
-                        <button 
-                            onClick={() => setIsAddDocumentoFormVisible(true)}
-                            className="bg-blue-600 text-white py-1 px-4 text-sm rounded font-medium hover:bg-blue-700 transition"
-                        >
-                            + Trámite
-                        </button>
+                {/* 2. Mensaje si Datos Personales NO están guardados */}
+                {!isDatosPersonalesSaved && (
+                    <div className="p-2 bg-yellow-100 border border-yellow-300 text-yellow-800 text-sm rounded text-center">
+                        Debe guardar los **Datos Personales** antes de añadir trámites.
                     </div>
                 )}
+                
+                {/* 2. Contenido de Añadir Trámite VISIBLE si Datos Personales están guardados */}
+                {isDatosPersonalesSaved && (
+                    <>
+                        {/* Botón Añadir Trámite */}
+                        {!isAddDocumentoFormVisible && (
+                            <div className="flex justify-end mt-2 flex-shrink-0">
+                                <button 
+                                    onClick={() => setIsAddDocumentoFormVisible(true)}
+                                    className="bg-blue-600 text-white py-1 px-4 text-sm rounded font-medium hover:bg-blue-700 transition"
+                                >
+                                    + Trámite
+                                </button>
+                            </div>
+                        )}
 
-                {/* Formulario para Añadir Trámite (Oculto/Visible) */}
-                {isAddDocumentoFormVisible && (
-                    <AddDocumentoForm
-                        setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
-                        newDocForm={newDocForm}
-                        setNewDocForm={setNewDocForm}
-                        handleAddDocumento={handleAddDocumento}
-                    />
+                        {/* Formulario para Añadir Trámite (Oculto/Visible) */}
+                        {isAddDocumentoFormVisible && (
+                            <AddDocumentoForm
+                                setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
+                                newDocForm={newDocForm}
+                                setNewDocForm={setNewDocForm}
+                                handleAddDocumento={handleAddDocumento}
+                            />
+                        )}
+                    </>
                 )}
             </div>
         </div>
