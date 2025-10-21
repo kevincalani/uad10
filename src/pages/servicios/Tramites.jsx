@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import ConfirmModal from '../../modals/ConfirmModal';
 import { TRAMITE_COLORS } from '../../Constants/tramiteDatos'; 
-import { BookText, CircleArrowRight } from 'lucide-react';
+import { BookText, CircleArrowRight,Info } from 'lucide-react';
 import EditLegalizacionModal from '../../modals/EditLegalizacionModal';
 
 // Función auxiliar para formatear la fecha a 'YYYY-MM-DD'
@@ -24,6 +24,10 @@ export default function Tramites() {
     //  estado para el Modal de Edición
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [tramiteToEdit, setTramiteToEdit] = useState(null);
+    // Estado del modal de Observación 
+    const [isObserveModalOpen, setIsObserveModalOpen] = useState(false);
+    const [tramiteToObserve, setTramiteToObserve] = useState(null); // Trámite completo
+    const [docToObserve, setDocToObserve] = useState(null); // Documento específico
     // 3. Condición para habilitar botones
     const isToday = selectedDate === today;
 
@@ -56,6 +60,10 @@ export default function Tramites() {
             fechaSolicitud: selectedDate,
             fechaFirma: '',
             fechaRecojo: '',
+            isObserved: false, 
+            isBlocked: false, 
+            observacion: '',
+            documentos: []
         };
 
         setTramites(prev => [...prev, newTramite]);
@@ -84,7 +92,21 @@ export default function Tramites() {
             prevTramites.map(tramite => 
                 tramite.id === id ? { ...tramite, ...updatedFields } : tramite
             )
-        );
+        );if (tramiteToEdit && tramiteToEdit.id === id) {
+            setTramiteToEdit(prev => ({ ...prev, ...updatedFields }));
+        }
+    };
+    const openObserveModal = (tramite, documento) => {
+        setTramiteToObserve(tramite);
+        setDocToObserve(documento); // 🆕 Guardar el documento específico
+        setIsObserveModalOpen(true);
+    };
+
+    // Handler para cerrar el modal de observación
+    const closeObserveModal = () => {
+        setIsObserveModalOpen(false);
+        setTramiteToObserve(null);
+        setDocToObserve(null);
     };
 
     // Lógica de filtrado de la tabla (solo para la fecha seleccionada)
@@ -234,7 +256,9 @@ export default function Tramites() {
                         <tbody className="bg-white divide-y divide-gray-200">
                             {currentTramites.length > 0 ? (
                                 currentTramites.map((tramite, index) => (
-                                    <tr key={tramite.id} className="hover:bg-gray-100">
+                                    <tr key={tramite.id} 
+                                    className={`hover:bg-gray-100 ${tramite.isBlocked ? 'bg-red-200 hover:bg-red-300' : ''}`}
+                                    >
                                         
                                         <td className="px-3 py-2 whitespace-nowrap text-xs font-medium text-gray-900">{(index + 1)}</td>
                                         
@@ -244,6 +268,13 @@ export default function Tramites() {
                                                 className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${TRAMITE_COLORS[tramite.tipo]?.base || 'bg-gray-500'} text-white`}
                                             >
                                                 {tramite.tipo}
+                                                {tramite.isObserved && ( 
+                                                    <Info 
+                                                        size={16} 
+                                                        className="ml-1 text-red-600 cursor-pointer" 
+                                                        title={`Observación: ${tramite.observacion}`}
+                                                    />
+                                                )}
                                             </span>
                                         </td>
                                         
@@ -305,7 +336,12 @@ export default function Tramites() {
                     isOpen={isEditModalOpen}
                     onClose={closeEditModal}
                     tramiteData={tramiteToEdit}
-                    onUpdateTramite={handleUpdateTramite} // Pasar los datos del trámite
+                    onUpdateTramite={handleUpdateTramite}
+                    isObserveModalOpen={isObserveModalOpen}
+                    openObserveModal={openObserveModal} // Permite al modal hijo abrir el modal de observación
+                    closeObserveModal={closeObserveModal}
+                    tramiteToObserve={tramiteToObserve} // Trámite principal (para contexto)
+                    docToObserve={docToObserve} // Pasar los datos del trámite
                 />
                 {/* Modal de Confirmación Rápida */}
                 <ConfirmModal 

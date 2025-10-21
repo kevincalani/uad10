@@ -15,27 +15,65 @@ export default function AddDocumentoForm({
     
     // Generic Change Handler for new document form (local logic)
     const handleNewDocChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setNewDocForm(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value 
-        }));
+         const { name, value, type, checked } = e.target;
+         setNewDocForm(prev => ({ 
+             ...prev, 
+             [name]: type === 'checkbox' ? checked : value    }));
+     };
+
+    // 🆕 Nuevo Handler para el Submit:
+    const handleSubmit = (e) => {
+        e.preventDefault(); // 🛑 CLAVE: Previene el envío del formulario nativo y la recarga de página
+        
+        // 1. Validar y preparar los datos (combinar nroTitulo1 y nroTitulo2)
+        const finalDocData = {
+            ...newDocForm,
+            // Asumiendo que el campo 'nombre' se mapea desde el 'tipoLegalizacion' o debe definirse.
+            // Aquí lo dejamos como 'nombre' (es la convención de tus datos de documento)
+            nombre: newDocForm.tipoLegalizacion, // Usamos tipoLegalizacion como nombre
+            nroTitulo: `${newDocForm.nroTitulo1 || ''}/${newDocForm.nroTitulo2 || ''}`,
+            // También asumimos valores iniciales por defecto para campos no cubiertos en el form
+            isObserved: false, 
+            isBlocked: false,
+            observacion: '',
+            // Simulamos el campo de verificación SITRA
+            sitraVerificado: true, // O false, dependiendo de tu lógica de negocio
+        };
+        
+        // 2. Llamar al handler del componente padre
+        handleAddDocumento(finalDocData); 
+        
+        // Opcional: Limpiar el formulario después de añadir
+        setNewDocForm({
+            tipoLegalizacion: TIPOS_LEGALIZACION[0].value, // Valor por defecto
+            tipoTramite: 'EXTERNO',
+            isPtag: false,
+            isCuadis: false,
+            nroTitulo1: '',
+            nroTitulo2: '',
+            isTituloSupletorio: false,
+            nroControl: '',
+            reintegro: '',
+            nroControlBusqueda: '',
+            nroControlReimpresion: '',
+        });
     };
     
-    return (
-        <div className="mt-4 p-4 border border-blue-300 rounded-lg bg-blue-50 flex-shrink-0">
-            <div className="flex justify-between items-center mb-3">
-                <div className="flex-grow text-center">
-                    <h4 className="font-semibold text-gray-700">Añadir Trámite</h4>
-                </div>
-                <button onClick={() => setIsAddDocumentoFormVisible(false)} className="text-red-500 hover:text-red-700 ml-auto">
-                    <X size={18} />
-                </button>
-            </div>
-            
-            <form onSubmit={handleAddDocumento} className="space-y-2 text-sm">
-                
-                {/* Fila 1: Tipo de Legalización */}
+     return (
+         <div className="mt-4 p-4 border border-blue-300 rounded-lg bg-blue-50 flex-shrink-0">
+             <div className="flex justify-between items-center mb-3">
+                 <div className="flex-grow text-center">
+                     <h4 className="font-semibold text-gray-700">Añadir Trámite</h4>
+                 </div>
+                 <button onClick={() => setIsAddDocumentoFormVisible(false)} className="text-red-500 hover:text-red-700 ml-auto">
+                     <X size={18} />
+                 </button>
+             </div>
+
+             {/* 🛑 Actualizar onSubmit para usar el nuevo handler local */}
+             <form onSubmit={handleSubmit} className="space-y-2 text-sm">
+
+                 {/* Fila 1: Tipo de Legalización */}
                 <div className="flex items-center">
                     <label className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-40">Tipo de Legalización:</label>
                     <select
@@ -172,14 +210,12 @@ export default function AddDocumentoForm({
                          onChange={handleNewDocChange} 
                     />
                 </div>
-
-                {/* Botón Crear */}
-                <div className="flex justify-end pt-2">
-                    <button type="submit" className="bg-green-500 text-white py-1 px-4 text-sm rounded font-medium hover:bg-green-600 transition">
-                        + Crear
-                    </button>
-                </div>
-            </form>
-        </div>
+                 <div className="flex justify-end pt-2">
+                     <button type="submit" className="bg-green-500 text-white py-1 px-4 text-sm rounded font-medium hover:bg-green-600 transition">
+                         + Crear
+                     </button>
+                 </div>
+             </form>
+         </div>
     );
 }

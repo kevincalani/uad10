@@ -4,14 +4,13 @@ import {
 } from 'lucide-react';
 import AddDocumentoForm from '../components/Forms/AddDocumentoForm';
 
-// ************************************************************
-// ***** DocumentoRow (Componente de Fila) *****
-// ************************************************************
-
 /**
  * Componente individual para la fila de Documentos del Trámite.
  */
-const DocumentoRow = ({ doc, index, onToggleDestino, onDelete }) => {
+const DocumentoRow = ({ doc, index, onToggleDestino, onDelete,onObserve }) => {
+    
+    const isObserved = doc.isObserved;
+    const isBlocked = doc.isBlocked;
     
     const displayNombre = doc.tipoTramite === 'INTERNO' 
         ? <>{doc.nombre} <span className="text-red-600 font-semibold">(Int.)</span></>
@@ -20,8 +19,66 @@ const DocumentoRow = ({ doc, index, onToggleDestino, onDelete }) => {
     const currentYear = new Date().getFullYear();
     const numeroTramiteDisplay = `${doc.numeroBd}/${currentYear}`;
 
+    // Estilo de la fila condicional (Fondo rojo si está bloqueado)
+    const rowClassName = `
+        hover:bg-gray-200 
+        ${isBlocked ? 'bg-red-200 hover:bg-red-300' : 'bg-white'}
+    `;
+    const buttons = [
+        // 1. Botón Cambiar Destino (SIEMPRE VISIBLE, sin importar el bloqueo)
+        <button 
+             key="destino"
+             onClick={() => onToggleDestino(doc.id)}
+             title="Cambiar Destino del Trámite"
+             className={`font-bold px-1 rounded text-xs transition duration-150 
+                ${doc.tipoTramite === 'EXTERNO' 
+                 ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+                 : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
+        >
+             {doc.tipoTramite === 'EXTERNO' ? 'EXT' : 'INT'}
+        </button>,
+
+        // 2. Botón Observar (SIEMPRE VISIBLE)
+        <button 
+            key="observar"
+            onClick={() => onObserve(doc)} 
+            title={isBlocked ? "Bloqueado" : isObserved ? "Observado" : "Observar"} 
+            className={`hover:text-red-800 ${isObserved ? 'text-red-600' : 'text-gray-500'}`}
+        >
+             <Eye size={16} />
+        </button>,
+
+        // 3. Botón Generar Glosa (Oculto si está bloqueado)
+        !isBlocked && <button 
+            key="glosa"
+            title="Generar Glosa (Modal)" 
+            className="text-gray-500 hover:text-gray-700"
+        >
+            <FilePenLine size={16} />
+        </button>,
+        
+        // 4. Botón Ver Documento PDF (Oculto si está bloqueado)
+        !isBlocked && <button 
+            key="pdf"
+            title="Ver Documento PDF (Modal)"
+            className="text-blue-600 hover:text-blue-800"
+        >
+            <FileCode size={16} />
+        </button>,
+        
+        // 5. Botón Eliminar Trámite (Oculto si está bloqueado)
+        !isBlocked && <button 
+            key="eliminar"
+            onClick={() => onDelete(doc.id)} 
+            title="Eliminar Trámite" 
+            className="text-red-600 hover:text-red-800"
+        >
+            <Trash2 size={16} />
+        </button>
+    ].filter(Boolean); // Filtrar elementos nulos (los que se ocultan por isBlocked)
+
     return (
-        <tr className="hover:bg-gray-200">
+        <tr className={rowClassName}>
             <td className="px-2 py-1 whitespace-nowrap text-xs text-gray-900">{index + 1}</td>
             <td className="px-2 py-1 whitespace-nowrap text-xs">
                 {doc.sitraVerificado ? (
@@ -35,37 +92,11 @@ const DocumentoRow = ({ doc, index, onToggleDestino, onDelete }) => {
             <td className="px-2 py-1 whitespace-nowrap text-xs text-gray-500">{doc.nroTitulo}</td>
             
             <td className="px-2 py-1 whitespace-nowrap text-xs space-x-1">
-                <button 
-                    onClick={() => onToggleDestino(doc.id)}
-                    title="Cambiar Destino del Trámite"
-                    className={`font-bold px-1 rounded text-xs transition duration-150 
-                        ${doc.tipoTramite === 'EXTERNO' 
-                            ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
-                            : 'bg-red-100 text-red-700 hover:bg-red-200'}`}
-                >
-                    {doc.tipoTramite === 'EXTERNO' ? 'EXT' : 'INT'}
-                </button>
-                <button title="Observado (Modal)" className="text-blue-600 hover:text-blue-800">
-                    <Eye size={16} />
-                </button>
-                <button title="Generar Glosa (Modal)" className="text-gray-500 hover:text-gray-700">
-                    <FilePenLine size={16} />
-                </button>
-                <button title="Ver Documento PDF (Modal)" className="text-blue-600 hover:text-blue-800">
-                    <FileCode size={16} />
-                </button>
-                <button onClick={() => onDelete(doc.id)} title="Eliminar Trámite" className="text-red-600 hover:text-red-800">
-                    <Trash2 size={16} />
-                </button>
+                {buttons}
             </td>
         </tr>
     );
 };
-
-
-// ************************************************************
-// ***** DocumentosSection (Componente Principal de la Sección) *****
-// ************************************************************
 
 /**
  * Muestra la tabla de documentos y el formulario para añadir nuevos.
@@ -79,7 +110,8 @@ export default function DocumentoTable({
     handleToggleDestino, 
     handleDeleteDocumento,
     handleAddDocumento,
-    isDatosPersonalesSaved
+    isDatosPersonalesSaved,
+    onObserve
 }) {
 
     return (
@@ -111,6 +143,7 @@ export default function DocumentoTable({
                                         index={index}
                                         onToggleDestino={handleToggleDestino}
                                         onDelete={handleDeleteDocumento}
+                                        onObserve={onObserve}
                                     />
                                 ))
                             )}

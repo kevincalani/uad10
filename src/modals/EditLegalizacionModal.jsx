@@ -1,25 +1,35 @@
-import React, { useState } from 'react';
-import {X,BookText } from 'lucide-react';
+import React, { useState,useEffect,useMemo } from 'react';
+import {X,BookText, Eye,Info } from 'lucide-react';
 import { TIPOS_LEGALIZACION } from '../Constants/tramiteDatos';
 import DatosPersonalesForm from '../components/forms/DatosPersonalesForm';
 import DatosApoderadoForm from '../components/forms/DatosApoderadoForm';
 import DocumentoTable from '../components/DocumentoTable';
+import ObservarTramiteModal from './ObservarTramiteModal';
+
 
 
 // Simulación: Número de trámites en la BD para generar el Nro. Trámite consecutivo
 const BASE_TRAMITES_COUNT = 250; 
 
 // Componente principal del Modal
-export default function EditLegalizacionModal({ isOpen, onClose, tramiteData, onUpdateTramite }) {
+export default function EditLegalizacionModal({ 
+    isOpen, 
+    onClose, 
+    tramiteData, 
+    onUpdateTramite,
+    isObserveModalOpen,
+    openObserveModal,
+    closeObserveModal,
+    tramiteToObserve, // Trámite completo (solo usado para el Modal de Observación)
+    docToObserve,
+ }) {
     if (!isOpen || !tramiteData) return null;
 
     // --- ESTADOS ---
-    const initialSavedStatus = tramiteData.ci && tramiteData.nombre;
-    const [isDatosPersonalesSaved, setIsDatosPersonalesSaved] = useState(initialSavedStatus);
-
+    const [isDatosPersonalesSaved, setIsDatosPersonalesSaved] = useState(!!tramiteData.nombre);
+    const [documentos, setDocumentos] = useState(tramiteData.documentos || []);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
-    const [documentos, setDocumentos] = useState([]); // Tabla de documentos
 
     // Formulario de Documento
     const [newDocForm, setNewDocForm] = useState({
@@ -58,6 +68,42 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData, on
         nombres: '',
         tipoApoderado: '',
     });
+
+    // 2. LÓGICA DE CÁLCULO DE ESTADO CONSOLIDADO DEL TRÁMITE
+    const isTramiteBlocked = useMemo(() => 
+        documentos.some(doc => doc.isBlocked)
+    , [documentos]);
+    
+    const isTramiteObserved = useMemo(() => 
+        documentos.some(doc => doc.isObserved)
+    , [documentos]);
+    
+    const observacionConsolidada = useMemo(() => 
+        documentos.filter(doc => doc.isObserved)
+                  .map(doc => doc.observacion)
+                  .join(' | ')
+    , [documentos]);
+    const updateParentTramite = (updatedFields = {}) => {
+         onUpdateTramite(tramiteData.id, { 
+            // Campos principales del trámite
+            ...tramiteData, 
+            // Documentos actualizados
+            documentos: documentos,
+            // Estado consolidado (Calculado)
+            isObserved: isTramiteObserved,
+            isBlocked: isTramiteBlocked,
+            observacion: observacionConsolidada,
+            // Otros campos que vengan de los formularios (ej. Datos Personales)
+            ...updatedFields
+        });
+    };
+    // Sincronizar documentos al abrir el modal
+    useEffect(() => {
+        if (isOpen && tramiteData) {
+            setDocumentos(tramiteData.documentos || []);
+            setIsDatosPersonalesSaved(!!tramiteData.nombre);
+        }
+    }, [isOpen, tramiteData]);
     
     // --- HANDLERS ---
     
@@ -140,51 +186,129 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData, on
     /** * MANEJADOR DE AGREGAR DOCUMENTO (Solo guarda y bloquea)
      * Lo llamará el componente hijo *después* de que la validación sea exitosa.
      */
-    const handleAddDocumento = () => {
-        // Obtener el label de Tipo de Legalización
-        const nombreTipo = TIPOS_LEGALIZACION.find(t => t.value === newDocForm.tipoLegalizacion)?.label || 'Desconocido';
-        
-        // Simulación del número consecutivo de la BD
-        const newNumeroBd = BASE_TRAMITES_COUNT + documentos.length + 1;
-
-        const newDocumento = {
-            id: Date.now(),
-            sitraVerificado: false, 
-            nombre: nombreTipo,
-            tipoTramite: newDocForm.tipoTramite,
-            numeroBd: newNumeroBd, 
-            nroTitulo: `${newDocForm.nroTitulo1}/${newDocForm.nroTitulo2}`,
-            // ... otros datos relevantes del formulario newDocForm
+    const handleAddDocumento = (newDocData) => {
+        // ... (Tu lógica existente para añadir documento) ...
+        const newId = Date.now();
+        const newDoc = {
+            id: newId, 
+            nombre: newDocData.nombre, 
+            numeroBd: BASE_TRAMITES_COUNT + documentos.length + 1, 
+            nroTitulo: newDocData.nroTitulo,
+            sitraVerificado: newDocData.sitraVerificado, 
+            tipoTramite: 'EXTERNO', // Valor inicial
+            isObserved: false, // Valor inicial
+            isBlocked: false, // Valor inicial
+            observacion: '',
         };
 
-        setDocumentos(prev => [...prev, newDocumento]);
-        setIsAddDocumentoFormVisible(false); // Ocultar formulario de adición
-        
-        // Opcional: Resetear formulario (mantendremos el estado para simplificar)
-        // setNewDocForm({...});
+        const updatedDocs = [...documentos, newDoc];
+        setDocumentos(updatedDocs);
+        setIsAddDocumentoFormVisible(false);
+
+        // 🆕 Actualizar el estado consolidado del trámite principal
+        // Usamos la nueva lista de documentos para forzar el recálculo y guardado
+        onUpdateTramite(tramiteData.id, { 
+            documentos: updatedDocs,
+            isObserved: updatedDocs.some(doc => doc.isObserved),
+            isBlocked: updatedDocs.some(doc => doc.isBlocked),
+            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
+        });
     };
     
     // Toggle para EXTERNO/INTERNO
     const handleToggleDestino = (id) => {
-        setDocumentos(prev => prev.map(doc => {
+        // No hay bloqueo aquí, se ejecuta normalmente
+        const updatedDocs = documentos.map(doc => {
             if (doc.id === id) {
-                return {
-                    ...doc,
-                    tipoTramite: doc.tipoTramite === 'EXTERNO' ? 'INTERNO' : 'EXTERNO'
-                };
+                 return {
+                     ...doc,
+                     tipoTramite: doc.tipoTramite === 'EXTERNO' ? 'INTERNO' : 'EXTERNO'
+                    };
             }
             return doc;
-        }));
+        });
+        setDocumentos(updatedDocs);
+
+        // 🆕 Actualizar el estado consolidado del trámite principal (aunque no cambie)
+        onUpdateTramite(tramiteData.id, { 
+            documentos: updatedDocs,
+            isObserved: updatedDocs.some(doc => doc.isObserved),
+            isBlocked: updatedDocs.some(doc => doc.isBlocked),
+            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
+        });
     };
     
     // Eliminar fila de la tabla
     const handleDeleteDocumento = (id) => {
-        if (window.confirm('¿Está seguro de eliminar este documento del trámite?')) {
-            setDocumentos(prev => prev.filter(doc => doc.id !== id));
-        }
+        const updatedDocs = documentos.filter(doc => doc.id !== id);
+        setDocumentos(updatedDocs);
+
+        // 🆕 Actualizar el estado consolidado del trámite principal
+        onUpdateTramite(tramiteData.id, { 
+            documentos: updatedDocs,
+            isObserved: updatedDocs.some(doc => doc.isObserved),
+            isBlocked: updatedDocs.some(doc => doc.isBlocked),
+            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
+        });
+    };
+    const handleObserveDocumento = (documento) => {
+        // Abrir el modal de observación global, pero pasándole el documento específico
+        openObserveModal(tramiteData, documento);
+    };
+    // HANDLER PARA GUARDAR OBSERVACIÓN DEL DOCUMENTO
+    const handleSaveObservation = (data) => {
+        // data contiene { observacion: string, bloquear: boolean }
+        if (!docToObserve) return;
+        
+        const isObserved = !!data.observacion;
+        
+        // 1. Actualizar el documento en el estado local 'documentos'
+        const updatedDocs = documentos.map(doc => 
+            doc.id === docToObserve.id 
+                ? { 
+                    ...doc, 
+                    isObserved: isObserved,
+                    isBlocked: data.bloquear,
+                    observacion: data.observacion,
+                  } 
+                : doc
+        );
+        setDocumentos(updatedDocs);
+
+        // 2. 🆕 Actualizar el estado consolidado del trámite principal
+        onUpdateTramite(tramiteData.id, { 
+            documentos: updatedDocs,
+            isObserved: updatedDocs.some(doc => doc.isObserved),
+            isBlocked: updatedDocs.some(doc => doc.isBlocked),
+            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
+        });
+        
+        // 3. Cerrar el modal de observación
+        closeObserveModal();
+    };
+
+    const handleSaveDatosPersonales = (datos) => {
+        setIsDatosPersonalesSaved(true);
+        // Cuando se guardan datos, también actualizamos el estado del trámite principal
+        onUpdateTramite(tramiteData.id, { 
+            nombre: datos.nombre, 
+            ci: datos.ci,
+        });
+    };
+    
+    const handleSaveDocumentos = () => {
+        // Si el usuario guarda el modal de edición, enviamos el estado de documentos y el estado consolidado
+        onUpdateTramite(tramiteData.id, {
+            documentos: documentos,
+            isObserved: isTramiteObserved,
+            isBlocked: isTramiteBlocked,
+            observacion: observacionConsolidada,
+        });
+        onClose();
     };
 
     return (
+    <>
         <div className="fixed inset-0 bg-gray-500/60 bg-opacity-50 flex justify-center items-center z-50 p-4"
             onClick={handleBackdropClick}>
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[95vh] overflow-y-auto">
@@ -241,14 +365,22 @@ export default function EditLegalizacionModal({ isOpen, onClose, tramiteData, on
                             handleToggleDestino={handleToggleDestino}
                             handleDeleteDocumento={handleDeleteDocumento}
                             handleAddDocumento={handleAddDocumento}
-                            tiposLegalizacion={TIPOS_LEGALIZACION} 
-                            isDatosPersonalesSaved={isDatosPersonalesSaved}// Pasamos la constante
-                            handleNewDocFormChange={handleNewDocFormChange}
+                            isDatosPersonalesSaved={isDatosPersonalesSaved}
+                            onObserve={handleObserveDocumento}
+                             isTramiteBlocked={isTramiteBlocked}
                         />
 
                     </div>
                     </div>
                 </div>
             </div>
+            <ObservarTramiteModal
+                isOpen={isObserveModalOpen}
+                onClose={closeObserveModal}
+                // Se pasa el documento específico que se va a observar
+                tramiteData={docToObserve} 
+                onSave={handleSaveObservation}
+            />
+        </>
     );
 }
