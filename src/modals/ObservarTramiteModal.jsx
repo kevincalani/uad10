@@ -70,38 +70,57 @@ export default function ObservarTramiteModal({
                 </div>
                 
                 {/* 2. Título del Formulario */}
-                <div className="p-4 border-b">
+                <div className="p-4 border-b border-gray-400">
                     <div className="bg-red-100 text-gray-700 p-2 rounded text-center font-medium">
                         Formulario de registro de observaciones
                     </div>
                 </div>
 
                 {/* 3. Datos del Formulario */}
-                <div className="p-6 space-y-4">
+                <div className="p-6 space-y-4 text-sm">
                     
-                    <p className="text-sm font-semibold text-red-700">
-                        Trámite: <span className="font-normal text-gray-800">{tramiteDisplay}</span>
-                    </p>
+                    {/* Estructura del campo Trámite */}
+                    {/* Usamos flex para alinear el label y el valor */}
+                    <div className="flex items-center">
+                        {/* Label: Alineado a la derecha, ancho fijo para alineación vertical */}
+                        <label className="block text-red-700 font-semibold whitespace-nowrap text-right mr-3 w-32">
+                            Trámite :
+                        </label>
+                        {/* Contenido: Toma el espacio restante */}
+                        <span className="font-normal text-gray-700 flex-grow">
+                            {tramiteDisplay}
+                        </span>
+                    </div>
 
-                    <label className="flex items-center text-sm font-semibold text-red-700">
-                        <span className='text-sm text-red-700'>Observacion: </span>
-                    <textarea
-                        value={observacion}
-                        onChange={(e) => setObservacion(e.target.value)}
-                        rows="3"
-                        className="w-2xl p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm"
-                    ></textarea>
-                    </label>
-                    <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
-                        <span className='text-red-700'>Bloquear: </span>
+                    {/* Estructura del campo Observación */}
+                    <div className="flex items-start">
+                        {/* Label: Alineado a la derecha, ancho fijo para alineación vertical */}
+                        <label className="block text-red-700 font-semibold whitespace-nowrap text-right mr-3 pt-1 w-32">
+                            Observación :
+                        </label>
+                        {/* Textarea: Toma el espacio restante */}
+                        <textarea
+                            value={observacion}
+                            onChange={(e) => setObservacion(e.target.value)}
+                            rows="4"
+                            className="w-32 p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500 text-sm flex-grow"
+                        ></textarea>
+                    </div>
+                    
+                    {/* Estructura del campo Bloquear */}
+                    <div className="flex items-center pt-2">
+                         {/* Label: Alineado a la derecha, ancho fijo para alineación vertical */}
+                        <label className="block text-red-700 font-semibold whitespace-nowrap text-right mr-3 w-32">
+                            Bloquear :
+                        </label>
+                        {/* Checkbox */}
                         <input
                             type="checkbox"
                             checked={bloquear}
                             onChange={(e) => setBloquear(e.target.checked)}
                             className="w-4 h-4 text-red-600 border-gray-300 rounded"
                         />
-                        
-                    </label>
+                    </div>
 
                     {/* Mensaje de Advertencia (Rodeado de margen rojo bordeado) */}
                     <div className="border border-red-400 bg-red-50 p-3 text-xs text-red-800 rounded">
@@ -112,7 +131,7 @@ export default function ObservarTramiteModal({
                 </div>
 
                 {/* 4. Botones de Acción */}
-                <div className="p-4 border-t flex justify-end space-x-3 bg-gray-50 rounded-b-lg">
+                <div className="p-4 border-t border-gray-400 flex justify-end space-x-3 bg-gray-50 rounded-b-lg">
                     <button 
                         onClick={onClose}
                         className="bg-gray-500 text-white py-2 px-4 rounded font-medium hover:bg-gray-600 transition"
