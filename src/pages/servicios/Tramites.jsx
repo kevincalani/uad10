@@ -3,6 +3,8 @@ import ConfirmModal from '../../modals/ConfirmModal';
 import { TRAMITE_COLORS } from '../../Constants/tramiteDatos'; 
 import { BookText, CircleArrowRight,Info } from 'lucide-react';
 import EditLegalizacionModal from '../../modals/EditLegalizacionModal';
+import TramiteActionButton from '../../components/TramiteActionButton';
+
 
 // Función auxiliar para formatear la fecha a 'YYYY-MM-DD'
 const formatDate = (date) => date.toISOString().split('T')[0];
@@ -152,27 +154,18 @@ export default function Tramites() {
 
                         {/* 3. Botones de Acción (agrupados y con flex-wrap para acomodar muchos) */}
                         <div className="flex flex-wrap gap-1 md:gap-2">
-                            {[
-                                { label: '+ Legalización', type: 'Legalizacion' },
-                                { label: '+ Certificación', type: 'Certificacion' },
-                                { label: '+ Confrontación', type: 'Confrontacion' },
-                                { label: '+ Búsqueda', type: 'Busqueda' },
-                                { label: '+ Consejo', type: 'Consejo' },
-                                { label: '+ Importar Legalización', type: 'Importar Legalización' }
-                            ].map(({ label, type, }) => (
-                                <button
+                            
+                            {['Legalizacion', 'Certificacion', 'Confrontacion', 'Busqueda', 'Consejo', 'Importar Legalizaciones'].map( type => (
+                                <TramiteActionButton
                                     key={type}
+                                    type={type}
                                     onClick={() => handleAddTramite(type)}
                                     // Los botones especiales (Confrontación, Importar) no se deshabilitan por fecha
                                     disabled={!isToday && ADD_TRAMITE_TYPES.includes(type)} 
-                                    className={`font-medium py-2 px-4 rounded transition duration-150 border 
-                                        ${!isToday && ADD_TRAMITE_TYPES.includes(type)
-                                            ? 'bg-gray-100 text-gray-500 cursor-not-allowed border-gray-300' // Deshabilitado
-                                            : 'bg-white text-gray-700 border-blue-500 hover:bg-blue-400 hover:border-blue-700' // Habilitado
-                                        }`}
+                                    
                                 >
-                                    {label}
-                                </button>
+                                    +
+                                </TramiteActionButton>
                             ))}
                         </div>
                     </div>

@@ -1,32 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import TramiteActionButton from '../../components/TramiteActionButton'
-import {TRAMITE_COLORS, GLOSAS_MOCK_DATA} from '../../Constants/tramiteDatos'
+import {TRAMITE_COLORS, GLOSAS_MOCK_DATA, TIPO_TRAMITE} from '../../Constants/tramiteDatos'
 import AddEditTramiteModal from '../../modals/AddEditTramiteModal';
 import GlosaModal from '../../modals/GlosaModal';
 import DeleteConfirmModal from '../../modals/DeleteConfirmModal';
-
-
-// Datos de ejemplo para la tabla (Estado 'habilitado' controla el color de la fila)
-const initialTramites = [
-  { id: 1, tipo: 'Legalizacion', nombre: 'Legalización de Título', cuenta: '001', asociado: 'Dra. María', duracion: '24h', costo: '150 Bs.', habilitado: true },
-  { id: 2, tipo: 'Certificacion', nombre: 'Certificado de Notas', cuenta: '002', asociado: 'Ing. Juan', duracion: '48h', costo: '50 Bs.', habilitado: true },
-  { id: 3, tipo: 'Confrontacion', nombre: 'Confrontación de Documento', cuenta: '003', asociado: 'Lic. Ana', duracion: '12h', costo: '20 Bs.', habilitado: false },
-  { id: 4, tipo: 'Busqueda', nombre: 'Búsqueda de Archivo', cuenta: '004', asociado: 'Dr. Lopez', duracion: '72h', costo: '10 Bs.', habilitado: true },
-  { id: 5, tipo: 'No atentado', nombre: 'Trámite No Atentado', cuenta: '005', asociado: 'Sra. Rosa', duracion: '24h', costo: '0 Bs.', habilitado: false },
-  { id: 6, tipo: 'Certificacion', nombre: 'Certificado de Notas', cuenta: '002', asociado: 'Ing. Juan', duracion: '48h', costo: '50 Bs.', habilitado: true },
-  { id: 7, tipo: 'Confrontacion', nombre: 'Confrontación de Documento', cuenta: '003', asociado: 'Lic. Ana', duracion: '12h', costo: '20 Bs.', habilitado: false },
-  { id: 8, tipo: 'Busqueda', nombre: 'Búsqueda de Archivo', cuenta: '004', asociado: 'Dr. Lopez', duracion: '72h', costo: '10 Bs.', habilitado: true },
-  { id: 9, tipo: 'No atentado', nombre: 'Trámite No Atentado', cuenta: '005', asociado: 'Sra. Rosa', duracion: '24h', costo: '0 Bs.', habilitado: false },
-  { id: 10, tipo: 'Busqueda', nombre: 'Búsqueda de Archivo', cuenta: '004', asociado: 'Dr. Lopez', duracion: '72h', costo: '10 Bs.', habilitado: true },
-  { id: 11, tipo: 'No atentado', nombre: 'Trámite No Atentado', cuenta: '005', asociado: 'Sra. Rosa', duracion: '24h', costo: '0 Bs.', habilitado: false },
-  { id: 12, tipo: 'Certificacion', nombre: 'Certificado de Notas', cuenta: '002', asociado: 'Ing. Juan', duracion: '48h', costo: '50 Bs.', habilitado: true },
-  { id: 13, tipo: 'Confrontacion', nombre: 'Confrontación de Documento', cuenta: '003', asociado: 'Lic. Ana', duracion: '12h', costo: '20 Bs.', habilitado: false },
-  { id: 14, tipo: 'Busqueda', nombre: 'Búsqueda de Archivo', cuenta: '004', asociado: 'Dr. Lopez', duracion: '72h', costo: '10 Bs.', habilitado: true },
-  { id: 15, tipo: 'No atentado', nombre: 'Trámite No Atentado', cuenta: '005', asociado: 'Sra. Rosa', duracion: '24h', costo: '0 Bs.', habilitado: false },
-];
+import api from '../../api/axios';
 
 export default function ConfigurarTramites() {
-  const [tramites, setTramites] = useState(initialTramites);
+  const [tramites, setTramites] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [selectedTramiteId, setSelectedTramiteId] = useState(null);
@@ -36,8 +17,50 @@ export default function ConfigurarTramites() {
   const [searchTerm, setSearchTerm] = useState('');
   const [glosasData, setGlosasData] = useState(GLOSAS_MOCK_DATA);
 
-  const selectedTramite = tramites.find(t => t.id === selectedTramiteId);
-  
+useEffect(() => {
+    fetchTramites();
+  }, []);
+
+  const fetchTramites = async () => {
+  try {
+    const response = await api.get('/api/tramites'); 
+    console.log('response.data:', response.data);
+
+    const dataObj = response.data.data;
+
+    // Convertimos el objeto en un array
+    const tramitesArray = Object.values(dataObj);
+
+    if (tramitesArray.length > 0) {
+      const mappedTramites = tramitesArray.map(t => ({
+        id: t.cod_tre,
+        nombre: t.tre_nombre,
+        tipo: TIPO_TRAMITE[t.tre_tipo] || "",
+        cuenta: t.tre_numero_cuenta || '',
+        duracion: t.tre_duracion || '',
+        costo: t.tre_costo || 0,
+        habilitado: t.tre_hab === 't',
+        asociado: t.tre_glosa || '',
+      }));
+
+      setTramites(mappedTramites);
+      console.log(mappedTramites, "tramites mapeados");
+    } else {
+      setTramites([]);
+      console.log("No se encontraron trámites");
+    }
+
+  } catch (error) {
+    console.error('Error al cargar trámites:', error);
+    setTramites([]);
+  }
+};
+
+
+  const selectedTramite = Array.isArray(tramites)
+  ? tramites.find(t => t.id === selectedTramiteId)
+  : null;
+
    // 🚨 SIMULACIÓN DE LÓGICA DE PROTECCIÓN (Se verifica al renderizar el modal)
   // Usaremos un ID fijo para la prueba, pero esto vendría de una verificación de datos real.
   const isTramiteProtected = selectedTramiteId === 1; 
@@ -55,40 +78,49 @@ export default function ConfigurarTramites() {
     setSelectedTramiteId(null);
   };
 
-  const handleToggleHabilitar = (id) => {
-    setTramites(tramites.map(tramite => 
-      tramite.id === id ? { ...tramite, habilitado: !tramite.habilitado } : tramite
-    ));
+   const handleToggleHabilitar = async (id) => {
+    const tramite = tramites.find(t => t.id === id);
+    if (!tramite) return;
+
+    try {
+      // Llamada PATCH a la API para habilitar/deshabilitar
+      await api.patch(`/api/tramite/toggle/${id}`);
+      
+      // Actualizamos localmente
+      setTramites(prev => prev.map(t => 
+        t.id === id ? { ...t, habilitado: !t.habilitado } : t
+      ));
+    } catch (error) {
+      console.error('Error al actualizar el estado del trámite:', error);
+    }
   };
   
-  const handleFormSubmit = (formData) => {
-      console.log('Datos enviados:', formData, 'Tipo de modal:', modalType, 'ID seleccionado:', selectedTramiteId);
-      // Aquí iría la lógica para guardar/actualizar el trámite
-      // Si modalType es 'add-Legalizacion', añades un nuevo trámite
-      // Si modalType es 'editar-Legalizacion', actualizas el trámite con selectedTramiteId
-      
+  const handleFormSubmit = async (formData) => {
+    try {
       if (modalType.startsWith('add-')) {
-          const newId = Math.max(...tramites.map(t => t.id)) + 1; // Genera un nuevo ID
-          const newTramite = { id: newId, tipo: modalType.substring(4), ...formData, habilitado: true };
-          setTramites(prev => [...prev, newTramite]);
+        const tipo = modalType.substring(4);
+        const response = await api.post('/api/tramite', { tipo, ...formData });
+        setTramites(prev => [...prev, response.data]); // Suponemos que la API devuelve el trámite creado
       } else if (modalType.startsWith('editar-')) {
-          setTramites(prev => prev.map(t => t.id === selectedTramiteId ? { ...t, ...formData } : t));
+        const tipo = modalType.substring(7);
+        const response = await api.post('/api/tramite', { id: selectedTramiteId, tipo, ...formData });
+        setTramites(prev => prev.map(t => t.id === selectedTramiteId ? response.data : t));
       }
       closeModal();
+    } catch (error) {
+      console.error('Error al guardar trámite:', error);
+    }
   };
 
-  // 🚨 FUNCIÓN FALTANTE: Confirma la eliminación de un Trámite
-    const handleConfirmDeleteTramite = () => {
-        if (!selectedTramiteId) return;
-
-        // 1. Lógica de Eliminación (simulación de actualización de estado)
+    const handleConfirmDeleteTramite = async () => {
+      if (!selectedTramiteId) return;
+      try {
+        await api.delete(`/api/tramite?id=${selectedTramiteId}`);
         setTramites(prev => prev.filter(t => t.id !== selectedTramiteId));
-
-        // 2. Cierra el modal
         closeModal();
-        
-        // Aquí iría tu llamada a la API o cualquier otra acción de limpieza
-        console.log(`Trámite ID: ${selectedTramiteId} eliminado del estado.`);
+      } catch (error) {
+        console.error('Error al eliminar trámite:', error);
+      }
     };
 
   // Lógica de filtrado y paginación
@@ -185,7 +217,7 @@ export default function ConfigurarTramites() {
                         {/* Columna Tipo con TAG de color */}
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span 
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${TRAMITE_COLORS[tramite.tipo].base} text-white`}
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${TRAMITE_COLORS[tramite.tipo]?.base} text-white`}
                           >
                             {tramite.tipo}
                           </span>
