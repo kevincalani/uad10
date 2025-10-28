@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import TramiteActionButton from '../../components/TramiteActionButton'
 import {TRAMITE_COLORS, GLOSAS_MOCK_DATA, TIPO_TRAMITE} from '../../Constants/tramiteDatos'
+import { SquarePen, TextAlignJustify, SquareCheck, Trash2, SquareX, BookText  } from 'lucide-react';
 import AddEditTramiteModal from '../../modals/AddEditTramiteModal';
 import GlosaModal from '../../modals/GlosaModal';
 import DeleteConfirmModal from '../../modals/DeleteConfirmModal';
-import api from '../../api/axios';
+import api from '../../api/axios'; // ajusta la ruta según tu estructura
 
 export default function ConfigurarTramites() {
+
   const [tramites, setTramites] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(null);
   const [selectedTramiteId, setSelectedTramiteId] = useState(null);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(500);
   const [searchTerm, setSearchTerm] = useState('');
   const [glosasData, setGlosasData] = useState(GLOSAS_MOCK_DATA);
 
@@ -33,14 +35,19 @@ useEffect(() => {
 
     if (tramitesArray.length > 0) {
       const mappedTramites = tramitesArray.map(t => ({
-        id: t.cod_tre,
-        nombre: t.tre_nombre,
-        tipo: TIPO_TRAMITE[t.tre_tipo] || "",
-        cuenta: t.tre_numero_cuenta || '',
-        duracion: t.tre_duracion || '',
-        costo: t.tre_costo || 0,
-        habilitado: t.tre_hab === 't',
-        asociado: t.tre_glosa || '',
+        cod_tre: t.cod_tre, // Se mantiene como identificador único
+        tre_nombre: t.tre_nombre,
+        tre_tipo: TIPO_TRAMITE[t.tre_tipo] || "",
+        tre_numero_cuenta: t.tre_numero_cuenta || '',
+        tre_duracion: t.tre_duracion || '',
+        tre_costo: t.tre_costo || "", 
+        tre_hab: t.tre_hab === 't',
+        tre_buscar_en: t.tre_buscar_en || '',
+        tre_titulo: t.tre_titulo || '',
+        tre_titulo_interno: t.tre_titulo_interno || '',
+        tre_glosa: t.tre_glosa || '',
+        tre_desc: t.tre_desc || null,
+        tre_solo_sello: t.tre_solo_sello || '',
       }));
 
       setTramites(mappedTramites);
@@ -58,7 +65,7 @@ useEffect(() => {
 
 
   const selectedTramite = Array.isArray(tramites)
-  ? tramites.find(t => t.id === selectedTramiteId)
+  ? tramites.find(t => t.cod_tre === selectedTramiteId)
   : null;
 
    // 🚨 SIMULACIÓN DE LÓGICA DE PROTECCIÓN (Se verifica al renderizar el modal)
@@ -79,7 +86,7 @@ useEffect(() => {
   };
 
    const handleToggleHabilitar = async (id) => {
-    const tramite = tramites.find(t => t.id === id);
+    const tramite = tramites.find(t => t.cod_tre === id);
     if (!tramite) return;
 
     try {
@@ -88,7 +95,7 @@ useEffect(() => {
       
       // Actualizamos localmente
       setTramites(prev => prev.map(t => 
-        t.id === id ? { ...t, habilitado: !t.habilitado } : t
+        t.cod_tre === id ? { ...t, tre_hab: !t.tre_hab } : t
       ));
     } catch (error) {
       console.error('Error al actualizar el estado del trámite:', error);
@@ -97,35 +104,56 @@ useEffect(() => {
   
   const handleFormSubmit = async (formData) => {
     try {
-      if (modalType.startsWith('add-')) {
-        const tipo = modalType.substring(4);
-        const response = await api.post('/api/tramite', { tipo, ...formData });
-        setTramites(prev => [...prev, response.data]); // Suponemos que la API devuelve el trámite creado
-      } else if (modalType.startsWith('editar-')) {
-        const tipo = modalType.substring(7);
-        const response = await api.post('/api/tramite', { id: selectedTramiteId, tipo, ...formData });
-        setTramites(prev => prev.map(t => t.id === selectedTramiteId ? response.data : t));
+
+      const tipo =
+        modalType.startsWith('add-')
+          ? modalType.substring(4)
+          : modalType.substring(7);
+
+      const payload = {
+        ct: selectedTramiteId || null,
+        nombre: formData.tre_nombre,
+        cuenta: formData.tre_numero_cuenta,
+        costo: formData.tre_costo,
+        duracion: formData.tre_duracion,
+        buscar_en: formData.tre_buscar_en,
+        desc: formData.tre_desc,
+        titulo: formData.tre_titulo,
+        titulo_interno: formData.tre_titulo_interno,
+        sello: formData.tre_solo_sello ? 'on' : '',
+        tipo: tipo,
+      };
+
+      const response = await api.post('/api/tramite', payload);
+      if (response.data.success) {
+        alert(response.data.message);
+        await fetchTramites();
+        closeModal();
+      } else {
+        console.error('⚠️ Error en la respuesta:', response.data);
+        alert(response.data.message || 'Error al guardar el trámite.');
       }
-      closeModal();
     } catch (error) {
-      console.error('Error al guardar trámite:', error);
+      console.error('🚨 Error al guardar trámite:', error);
+      alert('Error al guardar el trámite.');
     }
   };
 
+
     const handleConfirmDeleteTramite = async () => {
-      if (!selectedTramiteId) return;
-      try {
-        await api.delete(`/api/tramite?id=${selectedTramiteId}`);
-        setTramites(prev => prev.filter(t => t.id !== selectedTramiteId));
-        closeModal();
-      } catch (error) {
-        console.error('Error al eliminar trámite:', error);
-      }
-    };
+    if (!selectedTramiteId) return;
+    try {
+      await api.delete('/api/tramite', { data: { ct: selectedTramiteId } });
+      setTramites((prev) => prev.filter((t) => t.cod_tre !== selectedTramiteId));
+      closeModal();
+    } catch (error) {
+      console.error('❌ Error al eliminar trámite:', error);
+    }
+  };
 
   // Lógica de filtrado y paginación
   const filteredTramites = tramites.filter(tramite => 
-    tramite.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+    tramite.tre_nombre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const totalPages = Math.ceil(filteredTramites.length / rowsPerPage);
@@ -142,7 +170,8 @@ useEffect(() => {
       <div className="p-8 bg-white rounded-lg shadow-md">
         
         {/* 1. Título de la Página */}
-        <h1 className="text-3xl font-bold mb-6 text-gray-800">Configuración de Trámites</h1>
+        <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center">
+          <BookText className="mr-3 text-gray-800" size={32} />Configuración de Trámites</h1>
         
         {/* 2. Botones de Acción (Añadir Trámites) */}
         <div className="flex flex-wrap gap-4 mb-8 justify-start">
@@ -195,78 +224,79 @@ useEffect(() => {
         {/* Tabla de Datos */}
         <div className="overflow-x-auto border border-gray-200 rounded-lg">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-gray-500">
               <tr>
                 {['N°', 'Tipo', 'Nombre', 'N° Cuenta', 'Asociado', 'Duración', 'Costo', 'Opciones'].map(header => (
-                  <th key={header} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th key={header} className="px-4 py-2 text-left text-xs font-medium text-white uppercase tracking-wider">
                     {header}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y-2 divide-gray-200">
               {currentTramites.length > 0 ? (
-                  currentTramites.map((tramite) => (
+                  currentTramites.map((tramite,index) => (
                       <tr 
-                        key={tramite.id} 
+                        key={tramite.cod_tre} 
                         // Aplica la clase de fondo rojo si no está habilitado
-                        className={tramite.habilitado ? 'hover:bg-gray-100' : 'bg-red-100 hover:bg-red-200 transition duration-150'} 
+                        className={tramite.tre_hab ? 'hover:bg-gray-100' : 'bg-red-100 hover:bg-red-200 transition duration-150'} 
                       >
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{tramite.id}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-xs font-medium text-gray-900">{startIndex + index + 1}</td>
                         
                         {/* Columna Tipo con TAG de color */}
-                        <td className="px-6 py-4 whitespace-nowrap">
+                        <td className="px-4 py-2 whitespace-nowrap">
                           <span 
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${TRAMITE_COLORS[tramite.tipo]?.base} text-white`}
+                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${TRAMITE_COLORS[tramite.tre_tipo]?.base} text-white`}
                           >
-                            {tramite.tipo}
+                            {(tramite.tre_tipo).toUpperCase()}
                           </span>
                         </td>
                         
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tramite.nombre}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tramite.cuenta}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tramite.asociado}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{tramite.duracion}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">{tramite.costo}</td>
+                        <td className="px-4 py-2 max-w-64 whitespace text-xs text-gray-500">{tramite.tre_nombre}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-xs text-gray-500">{tramite.tre_numero_cuenta}</td>
+                        <td className="px-4 py-2 text-center whitespace-nowrap text-xs text-gray-500">{(tramite.tre_buscar_en).toUpperCase()}</td>
+                        <td className="px-4 py-2 max-w-16 whitespace text-xs text-gray-500">{tramite.tre_duracion}</td>
+                        <td className="px-4 py-2 whitespace-nowrap text-xs font-medium">{tramite.tre_costo} Bs.</td>
                         
                         {/* Columna Opciones */}
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-2">
+                        <td className="px-4 py-3 whitespace-nowrap text-sm font-medium flex space-x-2">
                           
                           {/* 1. Editar Trámite */}
                           <button 
-                              onClick={() => openModal('editar-' + tramite.tipo, tramite.id)}
+                              onClick={() => openModal('editar-' + tramite.tre_tipo, tramite.cod_tre)}
                               className="text-blue-600 hover:text-blue-900" 
                               title="Editar Trámite"
                           >
-                              ✏️
+                              <SquarePen className='bg-gray-50 p-1 my-0.5 rounded-lg shadow-md w-6 h-6 hover:bg-gray-100'/>
                           </button>
                           
                           {/* 2. Glosa */}
                           <button 
-                              onClick={() => openModal('glosa', tramite.id)}
+                              onClick={() => openModal('glosa', tramite.cod_tre)}
                               className="text-purple-600 hover:text-purple-900"
                               title="Glosa"
                           >
-                              📜
+                              <TextAlignJustify className='text-black bg-gray-50 p-1 my-0.5 rounded-lg shadow-md w-6 h-6 hover:bg-gray-100'/>
                           </button>
                           
                           {/* 3. Habilitar/Deshabilitar Tramite */}
                           <button 
-                              onClick={() => handleToggleHabilitar(tramite.id)}
-                              className={tramite.habilitado ? 'text-green-600 hover:text-green-800' : 'text-red-600 hover:text-red-800'}
-                              title={tramite.habilitado ? 'Deshabilitar' : 'Habilitar'}
+                              onClick={() => handleToggleHabilitar(tramite.cod_tre)}
+                              className={tramite.tre_hab ? 'text-green-600 hover:text-green-800' : 'text-red-600 hover:text-red-800'}
+                              title={tramite.tre_hab ? 'Deshabilitar' : 'Habilitar'}
                           >
                               {/* Íconos según el estado */}
-                              {tramite.habilitado ? '✅' : '❌'} 
+                              {tramite.tre_hab ? < SquareCheck className='bg-gray-50 p-1 my-0.5 rounded-lg shadow-md w-6 h-6 hover:bg-gray-100'/> 
+                              : <SquareX className='bg-gray-50 p-1 my-0.5 rounded-lg shadow-md w-6 h-6 hover:bg-gray-100'/>} 
                           </button>
                           
                           {/* 4. Eliminar Trámite */}
                           <button 
-                              onClick={() => openModal('eliminar', tramite.id)}
+                              onClick={() => openModal('eliminar', tramite.cod_tre)}
                               className="text-red-600 hover:text-red-800"
                               title="Eliminar Trámite"
                           >
-                              🗑️
+                              <Trash2 className='bg-gray-50 p-1 my-0.5 rounded-lg shadow-md w-6 h-6 hover:bg-gray-100'/>
                           </button>
                         </td>
                       </tr>
@@ -325,15 +355,8 @@ useEffect(() => {
               // Determina el título
               title={modalType.startsWith('add-') ? `Añadir Trámite: ${modalType.substring(4)}` : `Editar Trámite: ${modalType.substring(7)}`}
               // Si es edición, se le pasan los datos del trámite seleccionado
-              initialData={selectedTramiteId ? tramites.find(t => t.id === selectedTramiteId) : {}}
+              initialData={selectedTramiteId ? tramites.find(t => t.cod_tre === selectedTramiteId) : {}}
               onSubmit={handleFormSubmit}
-            />
-        )}
-        
-        {/* Renderizado del AddEditTramiteModal (Añadir/Editar Trámite) */}
-        {isModalOpen && (modalType.startsWith('add-') || modalType.startsWith('editar-')) && (
-            <AddEditTramiteModal
-              // ... (Props de Añadir/Editar Trámite) ...
             />
         )}
         

@@ -3,11 +3,11 @@
  */
 export const TIPO_TRAMITE ={
   L: "Legalizacion",
-  C: "Certifiacion",
+  C: "Certificacion",
   F: "Confrontacion",
   B: "Busqueda",
-  A: "No Atentado",
-  E: "Consejeros"
+  A: "No atentado",
+  E: "Consejero "
 }
 
 export const TRAMITE_COLORS = {

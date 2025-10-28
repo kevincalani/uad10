@@ -309,7 +309,7 @@ export default function EditLegalizacionModal({
 
     return (
     <>
-        <div className="fixed inset-0 bg-gray-500/60 bg-opacity-50 flex justify-center items-center z-50 p-4"
+        <div className="fixed inset-0 bg-gray-500/50 bg-opacity-50 flex justify-center items-center z-50 p-4"
             onClick={handleBackdropClick}>
             <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[95vh] overflow-y-auto">
         
