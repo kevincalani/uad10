@@ -127,7 +127,7 @@ export default function Tramites() {
     const rowsPerPageNum = Number(rowsPerPage);
     const startIndex = 0;
     return (
-        <div className='p-6 bg-gray-100'>
+        <div className=' bg-gray-100'>
             <div className="p-8 bg-white rounded-lg shadow-md">
                 
                 {/* 1. Título de la Página */}

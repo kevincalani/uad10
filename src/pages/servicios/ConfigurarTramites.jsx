@@ -166,7 +166,7 @@ useEffect(() => {
   // RENDERIZADO PRINCIPAL
   // ----------------------------------------------------------------------
   return (
-    <div className='p-6 bg-gray-100'>  
+    <div className=' bg-gray-100'>  
       <div className="p-8 bg-white rounded-lg shadow-md">
         
         {/* 1. Título de la Página */}
