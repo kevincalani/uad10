@@ -69,7 +69,7 @@ export default function DeleteConfirmModal({
                     )}
 
                     {/* 3. Contenido de la Información */}
-                    <div className="border border-gray-200 p-4 rounded-md bg-gray-50 mb-4 space-y-1">
+                    <div className="border border-gray-200 p-4 rounded-md bg-red-100 mb-4 space-y-1">
                         {itemDetails}
                     </div>
 

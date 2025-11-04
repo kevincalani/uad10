@@ -7,8 +7,12 @@ export const TIPO_TRAMITE ={
   F: "Confrontacion",
   B: "Busqueda",
   A: "No atentado",
-  E: "Consejero "
+  E: "Consejo"
 }
+// 🔁 Conversión inversa
+export const TIPO_TRAMITE_INVERTIDO = Object.fromEntries(
+  Object.entries(TIPO_TRAMITE).map(([k, v]) => [v, k])
+);
 
 export const TRAMITE_COLORS = {
   // Tipo: { color base, color hover (para botones), color de texto (si se necesita) }
@@ -47,7 +51,7 @@ export const TRAMITE_COLORS = {
     text: 'text-indigo-500' 
   }, // btn-primary
   
-  Consejero: { 
+  Consejo: { 
     base: 'bg-gray-500', 
     border: 'border-gray-500', 
     hover: 'hover:bg-gray-600', 
