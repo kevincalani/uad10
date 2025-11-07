@@ -81,7 +81,7 @@ export default function TramitesTable({
                   <th
                     key={header.id}
                     onClick={header.column.getToggleSortingHandler()}
-                    className="px-3 py-2 text-left cursor-pointer"
+                    className="px-3 py-2 text-left border-x cursor-pointer"
                   >
                     {flexRender(
                       header.column.columnDef.header,
@@ -100,12 +100,12 @@ export default function TramitesTable({
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
-                className={`border-b hover:bg-gray-100 ${
+                className={`border-b border-gray-400 hover:bg-gray-100 ${
                   row.original.tre_hab ? "" : "bg-red-100"
                 }`}
               >
                 {row.getVisibleCells().map((cell) => (
-                  <td key={cell.id} className="px-3 py-3 text-xs text-gray-600">
+                  <td key={cell.id} className="px-4 py-4 text-xs text-gray-600">
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
                 ))}

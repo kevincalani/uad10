@@ -63,6 +63,10 @@ export const getTramiteColumns = ({
     {
       accessorKey: "tre_costo",
       header: "Costo (Bs.)",
+       cell: ({ getValue }) => {
+        const costo = getValue();
+        return `${costo} Bs.`; // Agrega "Bs." al lado del costo
+      },
     },
     {
       id: "acciones",
@@ -70,10 +74,10 @@ export const getTramiteColumns = ({
       cell: ({ row }) => {
         const tramite = row.original;
         return (
-          <div className="flex gap-2 justify-center items-center">
+          <div className="flex justify-center items-center ">
             <button
               title="Editar"
-              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300"
+              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
               onClick={() =>
                 openModal(AddEditTramiteModal, {
                   title: `Editar Trámite: ${tramite.tre_tipo}`,
@@ -85,12 +89,12 @@ export const getTramiteColumns = ({
                 })
               }
             >
-              <SquarePen className="w-4 h-4 text-blue-600 hover:text-blue-800" />
+              <SquarePen className="w-4 h-4 text-blue-600 hover:text-blue-800 cursor-pointer" />
             </button>
 
             <button
               title="Glosa"
-              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300"
+              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
               onClick={() =>
                 openModal(GlosaModal, {
                   tramite,
@@ -104,7 +108,7 @@ export const getTramiteColumns = ({
 
             <button
               title={tramite.tre_hab ? "Deshabilitar" : "Habilitar"}
-              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300"
+              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
               onClick={() => onToggle(tramite.cod_tre)}
             >
               {tramite.tre_hab ? (
@@ -116,7 +120,7 @@ export const getTramiteColumns = ({
 
             <button
               title="Eliminar"
-              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300"
+              className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
               onClick={() =>
                 openModal(DeleteConfirmModal, {
                   itemData: tramite,
