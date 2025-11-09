@@ -4,49 +4,9 @@ import {
   Network, FolderUp, ChartNoAxesCombined, IdCard, UserCircle2
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-
-// --- Componente para la foto ---
-const FotoUsuario = ({ foto }) => {
-  const defaultIconSize = 100; // Tamaño del icono por defecto
-
-  if (foto) {
-    const src = `http://localhost:8000/img/foto/${foto}`;
-    return (
-      <img
-        src={src}
-        alt="Foto de perfil"
-        className="w-32 h-32 rounded-full object-cover mx-auto shadow-lg mb-4"
-      />
-    );
-  }
-
-  // Icono por defecto: user-circle2
-  return (
-    <div className="w-32 h-32 flex items-center justify-center mx-auto mb-4 bg-gray-100 rounded-full text-gray-400 border border-gray-300">
-      <UserCircle2 size={defaultIconSize} />
-    </div>
-  );
-};
-
-const formatSexo = (code) => {
-  if (!code) return '-';
-  const upperCode = code.toUpperCase();
-  if (upperCode === 'F' || upperCode === 'FEMENINO') return 'FEMENINO';
-  if (upperCode === 'M' || upperCode === 'MASCULINO') return 'MASCULINO';
-  return code;
-};
-//Recorta el formato de fecha ISO 8601 a 'YYYY-MM-DD HH:MM:SS'
-const formatDateTime = (isoDateString) => {
-    if (!isoDateString || typeof isoDateString !== 'string') return '-';
-    // Busca la 'T' y la corta. Si no hay 'T', simplemente la devuelve.
-    const parts = isoDateString.split('T');
-    if (parts.length < 2) return isoDateString; // Si no tiene 'T', no se formatea.
-
-    const datePart = parts[0]; // YYYY-MM-DD
-    const timePart = parts[1].split('.')[0]; // HH:MM:SS (corta los milisegundos y la 'Z')
-
-    return `${datePart} ${timePart}`;
-};
+import DatosPersonales from '../../components/administrador/DatosPersonales';
+import EditarDatosPersonales from '../../components/administrador/EditarDatosPersonales';
+import Responsable from '../../components/administrador/Responsable';
 
 // --- Estructura de la página de Detalle de Usuario ---
 export default function MostrarUsuario() {
@@ -55,6 +15,26 @@ export default function MostrarUsuario() {
   const navigate = useNavigate();
   
   const [usuario, setUsuario] = useState(location.state?.usuario);
+
+  // Función para actualizar el estado del usuario central (DatosPersonales)
+   // Se usa cuando la edición es exitosa.
+   const handleUpdateUsuario = (updatedData) => {
+    // La API puede devolver 'nombre' o 'name'. Nos aseguramos de unificar la propiedad 'name'.
+     const name = updatedData.nombre || updatedData.name;
+  
+     setUsuario(prev => ({
+       ...prev,
+       ...updatedData,
+       name: name, // Asegura que se use 'name'
+       // Si se actualiza la foto, Laravel a veces solo devuelve el nombre del archivo.
+       // Si la respuesta incluye un nuevo 'foto', lo usamos.
+       foto: updatedData.foto || prev.foto || null, 
+     }));
+
+    // Opcionalmente, vuelve a la pestaña 'Inicio' después de editar
+    setSelectedTab('Inicio'); 
+  };
+  
   // Estado para manejar qué botón está seleccionado
   const [selectedTab, setSelectedTab] = useState('Inicio');
 
@@ -62,8 +42,8 @@ export default function MostrarUsuario() {
   const tabs = [
     { title: 'Atrás', icon: CircleArrowLeft, action: () => navigate('/administracion/usuarios') }, // Vuelve a la lista de usuarios
     { title: 'Inicio', icon: User, component: <PanelInicio usuario={usuario} /> },
-    { title: 'Editar', icon: UserPen, component: <PanelEdicion /> },
-    { title: 'Responsable', icon: Users, component: <PanelResponsable /> },
+    { title: 'Editar', icon: UserPen, component: <EditarDatosPersonales usuario={usuario} onUpdateUsuario={handleUpdateUsuario} /> },
+    { title: 'Responsable', icon: Users, component: <Responsable /> },
     { title: 'Actividad', icon: BookText, component: <PanelActividad /> },
     { title: 'Tareas', icon: ListTodo, component: <PanelTareas /> },
     { title: 'Bitacora', icon: Network, component: <PanelBitacora /> },
@@ -73,18 +53,6 @@ export default function MostrarUsuario() {
   ];
 
   const currentTab = tabs.find(t => t.title === selectedTab);
-
-  // Lista de campos para el componente de Datos Personales
-  const personalDataFields = [
-    { label: 'Nombre', value: usuario.name, style: 'font-bold text-blue-800 uppercase' },
-    { label: 'CI', value: usuario.ci },
-    { label: 'Contacto', value: usuario.contacto },
-    { label: 'Sexo', value: formatSexo(usuario.sexo) }, 
-    { label: 'Fecha Ingreso', value: formatDateTime(usuario.created_at) },
-    { label: 'Rol', value: usuario.rol, style: 'uppercase' },
-    { label: 'Cargo', value: usuario.cargo },
-    { label: 'Dirección', value: usuario.direccion }, 
-  ];
 
   return (
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
@@ -130,38 +98,10 @@ export default function MostrarUsuario() {
       <div className="flex flex-col lg:flex-row gap-4 pt-4">
         
         {/* 2. DATOS PERSONALES (Columna Izquierda) */}
-        <div className="w-full lg:w-1/3 p-4 bg-white border border-gray-300 rounded-lg shadow-md h-fit">
-          <div className="flex justify-between items-center bg-blue-600 p-2 rounded-t-md -mt-4 -mx-4 mb-4 shadow">
-            <h2 className="text-base font-semibold text-white my-1 ml-1">Datos Personales</h2>
-          </div>
-          
-          <FotoUsuario foto={usuario.foto} />
-
-          {/* Grid de Datos Personales con Separadores */}
-          <div className="grid grid-cols-2 text-sm border-b border-gray-300 mb-4" >
-            {personalDataFields.map((field, index) => (
-              <React.Fragment key={field.label}>
-                {/* Etiqueta del campo */}
-                <div 
-                  className={`font-semibold text-gray-700 py-1 ${field.fullWidth ? 'col-span-2' : ''} ${index < personalDataFields.length - 1 && 'border-b border-gray-200'}`}
-                >
-                  {field.label}:
-                </div>
-                
-                {/* Valor del campo */}
-                <div 
-                  className={`text-gray-900 py-1 ${field.style || ''} ${field.fullWidth ? 'hidden' : ''} ${index < personalDataFields.length - 1 && 'border-b border-gray-300'}`}
-                >
-                  {field.value || '-'}
-                </div>
-                
-              </React.Fragment>
-            ))}
-          </div>
-        </div>
+        <DatosPersonales usuario={usuario} />
 
         {/* 3. PANEL DE EDICIÓN/CONTENIDO (Columna Derecha) */}
-        <div className="w-full lg:w-2/3 p-4 bg-white border border-gray-300 rounded-lg shadow-md">
+        <div className="w-full lg:w-7/10 p-4 bg-white border border-gray-300 rounded-lg shadow-md">
           <div className="bg-blue-600 p-2 rounded-t-md -mt-4 -mx-4 mb-4 shadow">
             <h2 className="text-base font-semibold text-white my-1 ml-1">Panel de Edición</h2>
           </div>
