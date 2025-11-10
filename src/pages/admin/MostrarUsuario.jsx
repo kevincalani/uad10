@@ -6,7 +6,8 @@ import {
 import { useNavigate, useLocation } from 'react-router-dom';
 import DatosPersonales from '../../components/administrador/DatosPersonales';
 import EditarDatosPersonales from '../../components/administrador/EditarDatosPersonales';
-import Responsable from '../../components/administrador/Responsable';
+import Permisos from '../../components/administrador/Permisos';
+
 
 // --- Estructura de la página de Detalle de Usuario ---
 export default function MostrarUsuario() {
@@ -43,13 +44,13 @@ export default function MostrarUsuario() {
     { title: 'Atrás', icon: CircleArrowLeft, action: () => navigate('/administracion/usuarios') }, // Vuelve a la lista de usuarios
     { title: 'Inicio', icon: User, component: <PanelInicio usuario={usuario} /> },
     { title: 'Editar', icon: UserPen, component: <EditarDatosPersonales usuario={usuario} onUpdateUsuario={handleUpdateUsuario} /> },
-    { title: 'Responsable', icon: Users, component: <Responsable /> },
+    { title: 'Responsable', icon: Users, component: <PanelResponsable /> },
     { title: 'Actividad', icon: BookText, component: <PanelActividad /> },
     { title: 'Tareas', icon: ListTodo, component: <PanelTareas /> },
     { title: 'Bitacora', icon: Network, component: <PanelBitacora /> },
     { title: 'Importaciones', icon: FolderUp, component: <PanelImportaciones /> },
     { title: 'Rendimiento', icon: ChartNoAxesCombined, component: <PanelRendimiento /> },
-    { title: 'Permisos', icon: IdCard, component: <PanelPermisos /> },
+    { title: 'Permisos', icon: IdCard, component: <Permisos usuario={usuario}/> },
   ];
 
   const currentTab = tabs.find(t => t.title === selectedTab);
@@ -58,7 +59,7 @@ export default function MostrarUsuario() {
     <div className="p-4 sm:p-6 bg-gray-50 min-h-screen">
       
       {/* 1. BARRA DE BOTONES DE NAVEGACIÓN SUPERIOR */}
-      <div className="flex flex-wrap gap-1 bg-white p-2 border border-gray-200 shadow-sm rounded-t-lg">
+      <div className="flex flex-wrap gap-2 bg-white p-2 border border-gray-200 shadow-sm rounded-t-lg">
         {tabs.map((tab) => {
           const isSelected = tab.title === selectedTab;
           const Icon = tab.icon;
