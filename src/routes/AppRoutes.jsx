@@ -65,6 +65,7 @@ import CorregirDatos from '../pages/admin/CorregirDatos';
 // USUARIOS
 import ListaUsuarios from '../pages/admin/ListaUsuarios';
 import ReporteUsuarios from '../pages/admin/ReportesUsuarios'
+import MostrarUsuario from '../pages/admin/MostrarUsuario';
 // PROGRMACIÓN
 import Actividades from '../pages/admin/Actividades';
 import Dependientes from '../pages/admin/Dependientes';
@@ -138,6 +139,7 @@ export default function AppRoutes() {
             {/* USUARIOS */}
             <Route path="/administracion/usuarios" element={<ListaUsuarios />} />
             <Route path="/administracion/usuarios/reportes" element={<ReporteUsuarios />} />
+            <Route path="/usuarios/:userId/mostrar-usuario" element={<MostrarUsuario />} />
             {/* PROGRAMACIÓN */}
             <Route path="/administracion/programacion/actividades" element={<Actividades />} />
             <Route path="/administracion/programacion/dependientes" element={<Dependientes />} />
