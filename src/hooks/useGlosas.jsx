@@ -1,12 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import api from "../api/axios";
 
-/**
- * Hook para manejar glosas asociadas a un trámite
- * @param {number} cod_tre - Código del trámite
- * @param {Object} options - Configuración opcional
- * @param {boolean} options.autoFetch - Si debe cargar automáticamente las glosas al montar
- */
 export function useGlosas(cod_tre, { autoFetch = true } = {}) {
   const [glosas, setGlosas] = useState([]);
   const [loading, setLoading] = useState(false);

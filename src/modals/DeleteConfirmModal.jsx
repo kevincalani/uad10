@@ -1,4 +1,5 @@
 import React from 'react';
+import {X} from 'lucide-react'
 
 export default function DeleteConfirmModal({
   onClose,
@@ -30,17 +31,18 @@ export default function DeleteConfirmModal({
     </>
   );
 
-  const protectionMessage = "Este trámite no se puede eliminar porque está asociado a trámites, reportes, o documentos. Si desea inhabilitarlo, presione el botón (✅/❌) en la columna de Opciones.";
-  const actionDisabled = isProtected;
+  const protectionMessage =
+  itemType === "tramite"
+    ? "No se puede eliminar el trámite porque tiene glosas registradas. Si desea inhabilitarlo, presione el botón (✅/❌) en la columna de Opciones."
+    : "Esta glosa no se puede eliminar por restricciones del sistema.";
+const actionDisabled = isProtected;
 
   return (
     <div className="bg-white rounded-lg shadow-xl w-full max-w-lg p-0 max-h-[90vh] overflow-y-auto">
       {/* Header */}
       <div className="bg-red-600 text-white p-4 flex justify-between items-center">
         <h3 className="text-xl font-semibold">{title}</h3>
-        <button onClick={onClose} className="text-white hover:text-gray-200">
-          ✖
-        </button>
+        <X onClick={onClose} className="text-white hover:text-gray-200 cursor-pointer"/>
       </div>
 
       {/* Body */}
@@ -51,7 +53,7 @@ export default function DeleteConfirmModal({
           <h4 className="text-lg font-semibold mb-4 text-gray-700">{question}</h4>
         )}
 
-        <div className="border border-gray-200 p-4 rounded-md bg-red-100 mb-4 space-y-1">
+        <div className="border border-gray-200 p-6 rounded-md bg-red-100 mb-4 space-y-1">
           {itemDetails}
         </div>
 
@@ -61,7 +63,7 @@ export default function DeleteConfirmModal({
               <p className="text-sm font-medium">{protectionMessage}</p>
             </div>
           ) : (
-            <p className="text-sm font-medium text-red-600">
+            <p className="text-sm font-medium text-red-600 border border-red-600 rounded-lg p-1">
               * Esta acción se quedará registrada en el sistema.
             </p>
           )}

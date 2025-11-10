@@ -110,7 +110,7 @@ export default function AddEditTramiteModal({
               value={formData.tre_nombre}
               onChange={handleChange}
               required
-              className="w-full border-b border-gray-300 focus:outline-none focus:border-blue-500 py-1"
+              className="w-full border-b border-gray-300 pl-2 focus:outline-none focus:border-blue-500 py-1 "
             />
           </div>
 

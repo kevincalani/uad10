@@ -9,8 +9,8 @@ import {
 import { useModal } from "../../hooks/useModal";
 import AddEditTramiteModal from "../../modals/AddEditTramiteModal";
 import GlosaModal from "../../modals/GlosaModal";
-import DeleteConfirmModal from "../../modals/DeleteConfirmModal";
 import { TRAMITE_COLORS } from "../../Constants/tramiteDatos";
+import DeleteTramiteModal from "../../modals/DeleteTramiteModal";
 
 export const getTramiteColumns = ({
   refresh,
@@ -122,9 +122,8 @@ export const getTramiteColumns = ({
               title="Eliminar"
               className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
               onClick={() =>
-                openModal(DeleteConfirmModal, {
+                openModal(DeleteTramiteModal, {
                   itemData: tramite,
-                  itemType: "tramite",
                   onConfirm: () => onDelete(tramite.cod_tre),
                 })
               }

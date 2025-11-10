@@ -3,6 +3,7 @@ import GlosaForm from "../components/Forms/GlosaForm";
 import DeleteConfirmModal from "./DeleteConfirmModal";
 import { useGlosas } from "../hooks/useGlosas";
 import { useModal } from "../hooks/useModal";
+import {X} from 'lucide-react'
 
 export default function GlosaModal({ onClose, tramite }) {
   const { glosas, loading, addGlosa, updateGlosa, deleteGlosa } = useGlosas(tramite?.cod_tre);
@@ -49,7 +50,7 @@ export default function GlosaModal({ onClose, tramite }) {
       {/* Header */}
       <div className="bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
         <h2 className="text-xl font-semibold">Glosas de Trámite</h2>
-        <button onClick={onClose} className="text-white hover:text-gray-200">✖</button>
+        <X  className=" text-white hover:text-gray-200 cursor-pointer" onClick={onClose}/>
       </div>
 
       {/* Info del trámite */}
@@ -57,7 +58,7 @@ export default function GlosaModal({ onClose, tramite }) {
         <div className="bg-blue-500 text-white py-2 px-4 rounded-md shadow-md text-lg inline-block">
           Formulario para Editar Glosas
         </div>
-        <div className="text-start text-md text-gray-600 p-1 mt-1">
+        <div className="text-start text-md text-gray-600 p-1 mt-2">
           {`Trámite: ${tramite.tre_nombre} (${tramite.tre_tipo})`}
         </div>
       </div>

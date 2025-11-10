@@ -83,20 +83,6 @@ export default function EditLegalizacionModal({
                   .map(doc => doc.observacion)
                   .join(' | ')
     , [documentos]);
-    const updateParentTramite = (updatedFields = {}) => {
-         onUpdateTramite(tramiteData.id, { 
-            // Campos principales del trámite
-            ...tramiteData, 
-            // Documentos actualizados
-            documentos: documentos,
-            // Estado consolidado (Calculado)
-            isObserved: isTramiteObserved,
-            isBlocked: isTramiteBlocked,
-            observacion: observacionConsolidada,
-            // Otros campos que vengan de los formularios (ej. Datos Personales)
-            ...updatedFields
-        });
-    };
     // Sincronizar documentos al abrir el modal
     useEffect(() => {
         if (isOpen && tramiteData) {
@@ -173,14 +159,6 @@ export default function EditLegalizacionModal({
         if (e.target === e.currentTarget) {
         onClose();
         }
-    };
-    // Generic Change Handler para Documento/Trámite
-    const handleNewDocFormChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setNewDocForm(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value 
-        }));
     };
     
     /** * MANEJADOR DE AGREGAR DOCUMENTO (Solo guarda y bloquea)
