@@ -49,6 +49,38 @@ export function useTramitesLegalizacion(selectedDate) {
 
 
     // -------------------------
+    //  🔹 Buscar por número de trámite
+    // -------------------------
+    const buscarPorNumero = async (numero) => {
+        try {
+            const res = await api.get(`/api/buscar-tramite-legalizacion/${numero}`);
+
+            const lista = res.data?.data?.tramitas || [];
+
+            // 🔹 Actualizar la tabla con el resultado
+            setTramites(lista);
+
+            // 🔹 Retornar resultado para que la vista muestre toast
+            return {
+                ok: true,
+                tramites: lista,
+                fecha: res.data?.data?.fecha || null
+            };
+
+        } catch (err) {
+            console.error("Error buscando trámite:", err);
+
+            // Retornar el estado del error a la vista (sin toast aquí)
+            if (err.response?.status === 422) {
+                return { ok: false, error: "Número de trámite inválido" };
+            }
+
+            return { ok: false, error: "Error buscando trámite" };
+        }
+    };
+
+
+    // -------------------------
     //  🔹 GENERAR NUEVO TRÁMITE
     // -------------------------
     const generarTramite = async (tipoTexto) => {
@@ -66,7 +98,7 @@ export function useTramitesLegalizacion(selectedDate) {
             // Agregar al estado sin refetch
             setTramites((prev) => [...prev, nuevo]);
 
-            return nuevo; // útil para abrir modal
+            return nuevo;
 
         } catch (error) {
             console.error("Error generando trámite:", error);
@@ -81,7 +113,8 @@ export function useTramitesLegalizacion(selectedDate) {
         error,
         reload: () => fetchTramites(selectedDate),
 
-        // 🆕 Función para generar trámites
+        // 🆕 Nuevas funciones
+        buscarPorNumero,
         generarTramite,
     };
 }

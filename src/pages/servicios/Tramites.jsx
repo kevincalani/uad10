@@ -8,6 +8,7 @@ import ConfirmModal from "../../modals/ConfirmModal";
 import LegalizacionesTable from "../../components/Tramites/LegalizacionesTable";
 import { toastTramite } from "../../utils/toastTramite";
 import BuscarValoradoModal from "../../modals/BuscarValoradoModal";
+import { toast } from "../../utils/toast";
 
 const formatDate = (d) => {
     const year = d.getFullYear();
@@ -21,8 +22,9 @@ export default function Tramites() {
     const today = useMemo(() => formatDate(new Date()), []);
     const [selectedDate, setSelectedDate] = useState(today);
     const [valoradoInput, setValoradoInput] = useState("");
+    const [tramiteInput, setTramiteInput] = useState("");
 
-    const { tramites, setTramites, loading, error, generarTramite } =
+    const { tramites, setTramites, loading, error, generarTramite, buscarPorNumero } =
         useTramitesLegalizacion(selectedDate);
 
     const { openModal } = useModal();
@@ -46,6 +48,26 @@ export default function Tramites() {
         } catch {
             toast.error("Error al generar trámite");
         }
+    };
+    const handleBuscarTramite = async () => {
+        if (!tramiteInput.trim()) {
+            toast.error("Ingrese un Número de Trámite");
+            return;
+        }
+
+        const res = await buscarPorNumero(tramiteInput.trim());
+
+        if (!res.ok) {
+            toast.error(res.error);
+            return;
+        }
+
+        if (res.tramites.length === 0) {
+            toast.error("No existe registros con este Número de trámite");
+            return;
+        }
+        setTramiteInput("")
+        toast.success("Trámite encontrado");
     };
 
     return (
@@ -103,6 +125,7 @@ export default function Tramites() {
                                 return;
                                 }
                                 openModal(BuscarValoradoModal, { valorado: valoradoInput });
+                                setValoradoInput("")
                             }}
                             >
                                 🔍
@@ -113,9 +136,14 @@ export default function Tramites() {
                             <input
                                 type="text"
                                 placeholder="Nro Trámite"
+                                value={tramiteInput}
+                                onChange={(e) => setTramiteInput(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleBuscarTramite()}
                                 className="border border-gray-300 rounded-l py-2 px-3 w-30 focus:outline-none focus:ring-1 focus:ring-blue-500"
                             />
-                            <button className="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700">
+                            <button className="bg-blue-600 text-white p-2 rounded-r hover:bg-blue-700"
+                                    onClick={handleBuscarTramite}
+                            >
                                 🔍
                             </button>
                         </div>

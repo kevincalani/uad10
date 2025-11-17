@@ -46,7 +46,7 @@ export default function LegalizacionesColumns() {
                 const nombre = row.per_nombre ?? "";
                 const apellido = row.per_apellido ?? "";
 
-                const fullName = `${nombre} ${apellido}`.trim();
+                const fullName = `${apellido} ${nombre}`.trim();
 
                 return fullName || ""; // si queda vacío, no muestra nada
             },
