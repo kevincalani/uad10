@@ -155,6 +155,7 @@ export default function Tramites() {
                 {/* Tabla completa (delegada) */}
                 <LegalizacionesTable
                     tramites={tramites}
+                    setTramites={setTramites}
                     loading={loading}
                     error={error}
                     selectedDate={selectedDate}

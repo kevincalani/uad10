@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { X, BookText } from "lucide-react";
-import DatosPersonalesForm from "../components/forms/DatosPersonalesForm";
+import DatosPersonalesForm from "../components/Forms/DatosPersonalesForm";
 import DatosApoderadoForm from "../components/forms/DatosApoderadoForm";
 import DocumentoTable from "../components/DocumentoTable";
 import { useModal } from "../hooks/useModal";
+import { usePersona } from "../hooks/usePersona";
+import { useTramitesLegalizacion } from "../hooks/useTramitesLegalizacion";
 import api from "../api/axios";
+import { toast } from "../utils/toast";
 
 export default function EditLegalizacionModal({
     tramiteData,
-    tramites,
-    setTramites,
-    showToast
+    setTramites
 }) {
     const { closeModal } = useModal();
     if (!tramiteData) return null;
+
+    const { cargarPersona, cargarApoderado } = usePersona();
+    const { guardarDatosTramite} = useTramitesLegalizacion();
 
     // ---------------------------------------
     //  ESTADOS
@@ -23,18 +27,6 @@ export default function EditLegalizacionModal({
     );
     const [documentos, setDocumentos] = useState([]);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
-    const [datosPersonales, setDatosPersonales] = useState({
-        ci: tramiteData.per_ci || "",
-        pasaporte: "",
-        apellidos: tramiteData.per_apellido || "",
-        nombres: tramiteData.per_nombre || ""
-    });
-    const [datosApoderado, setDatosApoderado] = useState({
-        ci: "",
-        apellidos: "",
-        nombres: "",
-        tipoApoderado: ""
-    });
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
     const [newDocForm, setNewDocForm] = useState({
         tipoLegalizacion: "",
@@ -50,18 +42,29 @@ export default function EditLegalizacionModal({
         isTituloSupletorio: false,
         archivo: null
     });
+    const [datosPersonales, setDatosPersonales] = useState({
+        ci: tramiteData.per_ci || "",
+        pasaporte: tramiteData.per_pasaporte || "",
+        apellidos: tramiteData.per_apellido || "",
+        nombres: tramiteData.per_nombre || ""
+    });
 
-    // ---------------------------------------
-    //  CARGA INICIAL DE DATOS
-    // ---------------------------------------
+    const [datosApoderado, setDatosApoderado] = useState({
+        ci: "",
+        apellidos: "",
+        nombres: "",
+        tipoApoderado: ""
+    });
+
     useEffect(() => {
         const fetchInitialData = async () => {
             try {
                 const res = await api.get(`/api/datos-tramite-legalizacion/${tramiteData.cod_tra}`);
+
                 if (res.data.status === "success") {
                     const data = res.data.data;
-                  console.log(data)
-                    // Datos personales
+
+                    // DATOS PERSONALES
                     if (data.tramite) {
                         setDatosPersonales({
                             ci: data.tramite.per_ci || "",
@@ -72,10 +75,10 @@ export default function EditLegalizacionModal({
                         setIsDatosPersonalesSaved(!!data.tramite.per_nombre);
                     }
 
-                    // Documentos
+                    // DOCUMENTOS
                     setDocumentos(data.documentos || []);
 
-                    // Apoderado
+                    // APODERADO
                     if (data.apoderado) {
                         setDatosApoderado({
                             ci: data.apoderado.ap_ci || "",
@@ -88,7 +91,7 @@ export default function EditLegalizacionModal({
                 }
             } catch (err) {
                 console.error(err);
-                showToast("error", "Error al cargar los datos del trámite");
+                toast.error("Error al cargar los datos del trámite");
             }
         };
 
@@ -96,10 +99,31 @@ export default function EditLegalizacionModal({
     }, [tramiteData]);
 
     // ---------------------------------------
-    //  DATOS PERSONALES
+    //  AUTOCOMPLETADO DE PERSONA
     // ---------------------------------------
-    const handleCiChange = (e) => {
-        setDatosPersonales(prev => ({ ...prev, ci: e.target.value }));
+    const handleCiChange = async (e) => {
+        const ci = e.target.value;
+
+        setDatosPersonales(p => ({ ...p, ci }));
+
+        if (ci.length < 3) return;
+
+        const persona = await cargarPersona(ci);
+
+        if (persona) {
+            setDatosPersonales(p => ({
+                ...p,
+                apellidos: persona.per_apellido,
+                nombres: persona.per_nombre,
+                pasaporte: persona.per_pasaporte || p.pasaporte
+            }));
+        } else {
+            setDatosPersonales(p => ({
+                ...p,
+                apellidos: "",
+                nombres: ""
+            }));
+        }
     };
 
     const handleDatosPersonalesChange = (e) => {
@@ -107,66 +131,57 @@ export default function EditLegalizacionModal({
         setDatosPersonales(prev => ({ ...prev, [name]: value }));
     };
 
+    // ---------------------------------------
+    //  GUARDAR DATOS PERSONALES (HOOK)
+    // ---------------------------------------
     const handleDatosPersonalesSubmit = async () => {
         try {
-            const res = await api.post("/api/g-traleg", {
-                ci: datosPersonales.ci,
-                nombre: datosPersonales.nombres,
-                apellido: datosPersonales.apellidos,
-                pasaporte: datosPersonales.pasaporte,
-                ctra: tramiteData.id_tra,
-            });
+            const form = new FormData();
+            form.append("ctra", tramiteData.cod_tra);
+            form.append("ci", datosPersonales.ci);
+            form.append("nombre", datosPersonales.nombres);
+            form.append("apellido", datosPersonales.apellidos);
+            form.append("pasaporte", datosPersonales.pasaporte);
 
-            const persona = res.data.data.persona;
+            const res = await guardarDatosTramite(form);
 
-            const merged = {
-                ...tramiteData,
-                per_ci: persona.per_ci,
-                per_nombre: persona.per_nombre,
-                per_apellido: persona.per_apellido,
-            };
+            if (res.ok) {
+                setIsDatosPersonalesSaved(true);
 
-            setTramites(prev =>
-                prev.map(t => t.id_tra === merged.id_tra ? merged : t)
-            );
+                // Actualiza la tabla principal usando setTramites del padre
+                setTramites(prev =>
+                    prev.map(t => (t.cod_tra === tramiteData.cod_tra ? res.tramite : t))
+                );
 
-            setIsDatosPersonalesSaved(true);
-            showToast("success", res.data.message);
-
+                toast.success(res.message);
+            } else {
+                toast.error(res.error);
+            }
         } catch (err) {
             console.error(err);
-            showToast("error", "Error al guardar los datos personales");
+            toast.error("Error inesperado al guardar los datos del trámite");
         }
-    };
+};
 
     // ---------------------------------------
-    //  APODERADO
+    //  AUTOCOMPLETADO DE APODERADO
     // ---------------------------------------
-    const handleApoderadoCiChange = (e) => {
-        setDatosApoderado(prev => ({ ...prev, ci: e.target.value }));
-    };
+    const handleApoderadoCiChange = async (e) => {
+        const ci = e.target.value;
 
-    const handleDatosApoderadoChange = (e) => {
-        const { name, value } = e.target;
-        setDatosApoderado(prev => ({ ...prev, [name]: value }));
-    };
+        setDatosApoderado(p => ({ ...p, ci }));
 
-    const handleGuardarApoderado = async () => {
-        try {
-            const res = await api.post("/api/guardar-apoderado", {
-                ctra: tramiteData.id_tra,
-                ci: datosApoderado.ci,
-                apellido: datosApoderado.apellidos,
-                nombre: datosApoderado.nombres,
-                tipo: datosApoderado.tipoApoderado,
-            });
+        if (ci.length < 3) return;
 
-            showToast("success", res.data.mensaje);
-            setIsApoderadoFormVisible(false);
+        const ap = await cargarApoderado(ci);
 
-        } catch (err) {
-            console.error(err);
-            showToast("error", "Error al guardar apoderado");
+        if (ap) {
+            setDatosApoderado(p => ({
+                ...p,
+                apellidos: ap.ap_apellido,
+                nombres: ap.ap_nombre,
+                tipoApoderado: ap.ap_tipo || ""
+            }));
         }
     };
 
@@ -197,15 +212,14 @@ export default function EditLegalizacionModal({
             const nuevo = res.data.data;
             setDocumentos(prev => [...prev, nuevo]);
 
-            showToast("success", "Documento agregado correctamente");
+            toast.success("Documento agregado correctamente");
             setIsAddDocumentoFormVisible(false);
 
         } catch (err) {
             console.error(err);
-            showToast("error", "Error al agregar documento");
+            toast.error("Error al agregar documento");
         }
     };
-
     // ---------------------------------------
     //  RENDER
     // ---------------------------------------
@@ -236,7 +250,7 @@ export default function EditLegalizacionModal({
                             datosPersonales={datosPersonales}
                             handleCiChange={handleCiChange}
                             handleDatosPersonalesChange={handleDatosPersonalesChange}
-                            handleDatosPersonalesSubmit={handleDatosPersonalesSubmit}
+                            onSave={handleDatosPersonalesSubmit}
                             isDatosPersonalesSaved={isDatosPersonalesSaved}
                         />
 
@@ -245,8 +259,11 @@ export default function EditLegalizacionModal({
                             setIsApoderadoFormVisible={setIsApoderadoFormVisible}
                             datosApoderado={datosApoderado}
                             handleApoderadoCiChange={handleApoderadoCiChange}
-                            handleDatosApoderadoChange={handleDatosApoderadoChange}
-                            onSave={handleGuardarApoderado}
+                            handleDatosApoderadoChange={(e) => {
+                                const { name, value } = e.target;
+                                setDatosApoderado(prev => ({ ...prev, [name]: value }));
+                            }}
+                            onSave={() => {}}
                         />
 
                     </div>

@@ -105,6 +105,41 @@ export function useTramitesLegalizacion(selectedDate) {
             throw error;
         }
     };
+        // -------------------------
+    // 🔹 GUARDAR DATOS PERSONALES DEL TRÁMITE
+    // -------------------------
+    const guardarDatosTramite = async (formData) => {
+        try {
+            const res = await api.post("/api/g-traleg", formData);
+
+            if (res.data.status === "success") {
+
+                // 🔹 Actualizar la lista sin recargar todo
+                const t = res.data.data.tramite;
+                setTramites(prev =>
+                    prev.map(x => x.cod_tra === t.cod_tra ? t : x)
+                );
+
+                return {
+                    ok: true,
+                    message: res.data.message,
+                    persona: res.data.data.persona,
+                    tramite: res.data.data.tramite
+                };
+            }
+
+            return { ok: false, error: "No se pudo guardar" };
+
+        } catch (err) {
+            console.error("Error guardando datos del trámite:", err);
+
+            return {
+                ok: false,
+                error: err.response?.data?.message || "Error al guardar"
+            };
+        }
+    };
+
 
     return {
         tramites,
@@ -116,5 +151,6 @@ export function useTramitesLegalizacion(selectedDate) {
         // 🆕 Nuevas funciones
         buscarPorNumero,
         generarTramite,
+        guardarDatosTramite,
     };
 }

@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from "react";
 import LegalizacionesColumns from "./LegalizacionesColums";
 
-export default function LegalizacionesTable({ tramites, loading, error, selectedDate }) {
+export default function LegalizacionesTable({ tramites, loading, error, selectedDate, setTramites }) {
     const [searchTerm, setSearchTerm] = useState("");
     const [rowsPerPage, setRowsPerPage] = useState(500);
 
@@ -15,7 +15,7 @@ export default function LegalizacionesTable({ tramites, loading, error, selected
 
     const currentRows = filtered.slice(0, rowsPerPage);
 
-    const columns = LegalizacionesColumns();
+    const columns = LegalizacionesColumns({setTramites});
 
     return (
         <div>

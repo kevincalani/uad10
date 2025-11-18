@@ -3,7 +3,7 @@ import { TRAMITE_COLORS, TIPO_TRAMITE } from "../../Constants/tramiteDatos";
 import EditLegalizacionModal from "../../modals/EditLegalizacionModal";
 import { useModal } from "../../hooks/useModal";
 
-export default function LegalizacionesColumns() {
+export default function LegalizacionesColumns({setTramites}) {
     const { openModal } = useModal();
 
     return [
@@ -74,7 +74,10 @@ export default function LegalizacionesColumns() {
                     <button
                         className="text-blue-600"
                         onClick={() =>
-                            openModal(EditLegalizacionModal, { tramiteData: row })
+                            openModal(EditLegalizacionModal, { 
+                                tramiteData: row, 
+                                setTramites
+                            })
                         }
                     >
                         📝
