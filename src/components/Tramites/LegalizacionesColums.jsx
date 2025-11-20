@@ -3,7 +3,7 @@ import { TRAMITE_COLORS, TIPO_TRAMITE } from "../../Constants/tramiteDatos";
 import EditLegalizacionModal from "../../modals/EditLegalizacionModal";
 import { useModal } from "../../hooks/useModal";
 
-export default function LegalizacionesColumns({setTramites}) {
+export default function LegalizacionesColumns({setTramites,guardarDatosTramite}) {
     const { openModal } = useModal();
 
     return [
@@ -45,11 +45,8 @@ export default function LegalizacionesColumns({setTramites}) {
             cell: ({ row }) => {
                 const nombre = row.per_nombre ?? "";
                 const apellido = row.per_apellido ?? "";
-
-                const fullName = `${apellido} ${nombre}`.trim();
-
-                return fullName || ""; // si queda vacío, no muestra nada
-            },
+                return `${apellido} ${nombre}`.trim();
+            }
         },
         {
             header: "Fecha Solicitud",
@@ -76,7 +73,8 @@ export default function LegalizacionesColumns({setTramites}) {
                         onClick={() =>
                             openModal(EditLegalizacionModal, { 
                                 tramiteData: row, 
-                                setTramites
+                                setTramites,
+                                guardarDatosTramite
                             })
                         }
                     >

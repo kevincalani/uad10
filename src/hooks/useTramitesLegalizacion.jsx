@@ -113,18 +113,22 @@ export function useTramitesLegalizacion(selectedDate) {
             const res = await api.post("/api/g-traleg", formData);
 
             if (res.data.status === "success") {
+                const { tramite: t, persona: p } = res.data.data;
 
-                // 🔹 Actualizar la lista sin recargar todo
-                const t = res.data.data.tramite;
+                // 🔹 Actualizar la lista fusionando datos de persona y tramite
                 setTramites(prev =>
-                    prev.map(x => x.cod_tra === t.cod_tra ? t : x)
+                    prev.map(x =>
+                        x.cod_tra === t.cod_tra
+                            ? { ...x, ...t, per_nombre: p.per_nombre, per_apellido: p.per_apellido, per_ci: p.per_ci }
+                            : x
+                    )
                 );
 
                 return {
                     ok: true,
                     message: res.data.message,
-                    persona: res.data.data.persona,
-                    tramite: res.data.data.tramite
+                    persona: p,
+                    tramite: t,
                 };
             }
 
@@ -139,6 +143,7 @@ export function useTramitesLegalizacion(selectedDate) {
             };
         }
     };
+
 
 
     return {

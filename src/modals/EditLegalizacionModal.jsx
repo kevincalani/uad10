@@ -5,19 +5,17 @@ import DatosApoderadoForm from "../components/forms/DatosApoderadoForm";
 import DocumentoTable from "../components/DocumentoTable";
 import { useModal } from "../hooks/useModal";
 import { usePersona } from "../hooks/usePersona";
-import { useTramitesLegalizacion } from "../hooks/useTramitesLegalizacion";
 import api from "../api/axios";
 import { toast } from "../utils/toast";
 
 export default function EditLegalizacionModal({
     tramiteData,
-    setTramites
+    guardarDatosTramite
 }) {
     const { closeModal } = useModal();
     if (!tramiteData) return null;
 
     const { cargarPersona, cargarApoderado } = usePersona();
-    const { guardarDatosTramite} = useTramitesLegalizacion();
 
     // ---------------------------------------
     //  ESTADOS
@@ -147,11 +145,6 @@ export default function EditLegalizacionModal({
 
             if (res.ok) {
                 setIsDatosPersonalesSaved(true);
-
-                // Actualiza la tabla principal usando setTramites del padre
-                setTramites(prev =>
-                    prev.map(t => (t.cod_tra === tramiteData.cod_tra ? res.tramite : t))
-                );
 
                 toast.success(res.message);
             } else {

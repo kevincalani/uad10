@@ -24,7 +24,7 @@ export default function Tramites() {
     const [valoradoInput, setValoradoInput] = useState("");
     const [tramiteInput, setTramiteInput] = useState("");
 
-    const { tramites, setTramites, loading, error, generarTramite, buscarPorNumero } =
+    const { tramites, setTramites, loading, error, generarTramite, buscarPorNumero,guardarDatosTramite } =
         useTramitesLegalizacion(selectedDate);
 
     const { openModal } = useModal();
@@ -156,6 +156,7 @@ export default function Tramites() {
                 <LegalizacionesTable
                     tramites={tramites}
                     setTramites={setTramites}
+                    guardarDatosTramite ={guardarDatosTramite}
                     loading={loading}
                     error={error}
                     selectedDate={selectedDate}
