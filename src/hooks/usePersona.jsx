@@ -35,7 +35,7 @@ export function usePersona() {
     // ----------------------------
     // 🔹 Obtener apoderado por CI
     // ----------------------------
-    const cargarApoderado = async (ci) => {
+    const cargarApoderadoPorCi = async (ci) => {
         if (!ci) return;
 
         setLoading(true);
@@ -57,12 +57,47 @@ export function usePersona() {
             setLoading(false);
         }
     };
+    const cargarApoderadoPorTramite = async (cod_tra) => {
+        if (!cod_tra) return null;
+        setLoading(true);
+        try {
+        const res = await api.get(`/api/datos-apoderado/${cod_tra}`);
+        if (res.data.success) {
+            setApoderado(res.data.data);
+            return res.data.data;
+        }
+        setApoderado(null);
+        return null;
+        } catch (err) {
+        console.error("Error cargando apoderado por trámite:", err);
+        setApoderado(null);
+        return null;
+        } finally {
+        setLoading(false);
+        }
+    };
+
+  const guardarApoderado = async (formData) => {
+        try {
+        const res = await api.post("/api/guardar-apoderado", formData);
+        if (res.data.status === "success") {
+            setApoderado(res.data.data);
+            return { ok: true, data: res.data.data, message: res.data.message };
+        }
+        return { ok: false, error: res.data.message || "No se pudo guardar" };
+        } catch (err) {
+        console.error("Error guardando apoderado:", err);
+        return { ok: false, error: err.response?.data?.message || "Error al guardar" };
+        }
+    };
 
     return {
         persona,
         apoderado,
         loading,
         cargarPersona,
-        cargarApoderado
+        cargarApoderadoPorCi,
+        cargarApoderadoPorTramite,
+        guardarApoderado
     };
 }
