@@ -45,9 +45,6 @@ export function usePersona() {
             if (res.data.success) {
                 setApoderado(res.data.data);
                 return res.data.data;
-            } else {
-                setApoderado(null);
-                return null;
             }
         } catch (err) {
             console.error("Error cargando apoderado:", err);
@@ -62,12 +59,11 @@ export function usePersona() {
         setLoading(true);
         try {
         const res = await api.get(`/api/datos-apoderado/${cod_tra}`);
-        if (res.data.success) {
-            setApoderado(res.data.data);
-            return res.data.data;
-        }
-        setApoderado(null);
-        return null;
+            
+            const apo = res.data.apoderado ?? null;
+            setApoderado(apo);
+            console.log(apo)
+            return apo;
         } catch (err) {
         console.error("Error cargando apoderado por trámite:", err);
         setApoderado(null);
@@ -79,15 +75,10 @@ export function usePersona() {
 
   const guardarApoderado = async (formData) => {
         try {
-        const res = await api.post("/api/guardar-apoderado", formData);
-        if (res.data.status === "success") {
-            setApoderado(res.data.data);
-            return { ok: true, data: res.data.data, message: res.data.message };
-        }
-        return { ok: false, error: res.data.message || "No se pudo guardar" };
+            const res = await api.post("/api/guardar-apoderado", formData);
+            return { ok: true, data: res.data };
         } catch (err) {
-        console.error("Error guardando apoderado:", err);
-        return { ok: false, error: err.response?.data?.message || "Error al guardar" };
+            return { ok: false, error: err.response?.data?.message || "Error al guardar" };
         }
     };
 

@@ -60,7 +60,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                 const res = await api.get(`/api/datos-tramite-legalizacion/${tramiteData.cod_tra}`);
                 if (res.data.status === "success") {
                     const data = res.data.data;
-
+                    console.log(res.data)
                     // DATOS PERSONALES
                     if (data.tramite) {
                         setDatosPersonales({
@@ -78,10 +78,10 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                     // APODERADO (si ya viene en la respuesta)
                     if (data.apoderado) {
                         setDatosApoderado({
-                            ci: data.apoderado.ap_ci || "",
-                            apellidos: data.apoderado.ap_apellido || "",
-                            nombres: data.apoderado.ap_nombre || "",
-                            tipoApoderado: data.apoderado.ap_tipo || "",
+                            ci: data.apoderado.apo_ci || "",
+                            apellidos: data.apoderado.apo_apellido || "",
+                            nombres: data.apoderado.apo_nombre || "",
+                            tipoApoderado: data.tramite.tra_tipo_apoderado || "",
                         });
                         setIsApoderadoFormVisible(true);
                     }
@@ -90,6 +90,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                 // 2️⃣ Si hay cod_apo pero no vino apoderado en la respuesta
                 if (tramiteData.cod_apo && (!res.data.data.apoderado || Object.keys(res.data.data.apoderado).length === 0)) {
                     const ap = await cargarApoderadoPorTramite(tramiteData.cod_tra);
+                    console.log(ap,"edit")
                     if (ap) {
                         setDatosApoderado({
                             ci: ap.ap_ci,
@@ -108,7 +109,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
         };
 
         fetchData();
-    }, [tramiteData, cargarApoderadoPorTramite]);
+    }, [tramiteData]);
 
     // ---------------------------------------
     //  AUTOCOMPLETADO DE PERSONA
@@ -165,26 +166,37 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     // ---------------------------------------
     //  AUTOCOMPLETADO DE APODERADO
     // ---------------------------------------
-    const handleApoderadoCiChange = async (e) => {
-        const ci = e.target.value;
-        setDatosApoderado(p => ({ ...p, ci }));
+    {/* --- SOLO LA PARTE CORREGIDA --- */}
 
-        if (ci.length < 3) return;
+    const handleApoderadoCiChange = async (ci) => {
+        setDatosApoderado(prev => ({ ...prev, ci }));
+
+        if (ci.length < 3) return null;
 
         const ap = await cargarApoderadoPorCi(ci);
+
         if (ap) {
-            setDatosApoderado({
-                ci: ap.ap_ci,
-                apellidos: ap.ap_apellido,
-                nombres: ap.ap_nombre,
-                tipoApoderado: ap.ap_tipo || ""
-            });
-            setIsApoderadoFormVisible(true);
+            const datos = {
+            ci: ci,
+            apellidos: ap.apo_apellido,
+            nombres: ap.apo_nombre,
+            tipoApoderado: "",
+            };
+            setDatosApoderado(datos);
+            console.log(ap)
+            return datos;
         } else {
-            setDatosApoderado(p => ({ ...p, apellidos: "", nombres: "", tipoApoderado: "" }));
+            const datos = {
+            ci,
+            apellidos: "",
+            nombres: "",
+            tipoApoderado: "",
+            };
+
+            setDatosApoderado(datos);
+            return null;
         }
     };
-
     // ---------------------------------------
     //  AGREGAR DOCUMENTO
     // ---------------------------------------
@@ -267,25 +279,28 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                                     form.append("ci", nuevoApoderado.ci);
                                     form.append("nombre", nuevoApoderado.nombres);
                                     form.append("apellido", nuevoApoderado.apellidos);
-                                    form.append("tipoApoderado", nuevoApoderado.tipoApoderado);
+                                    form.append("tipo", nuevoApoderado.tipoApoderado);  // 🔥 CORRECTO
 
                                     const res = await guardarApoderado(form);
+
                                     if (res.ok) {
-                                        setDatosApoderado({
-                                            ci: res.data.ap_ci,
-                                            apellidos: res.data.ap_apellido,
-                                            nombres: res.data.ap_nombre,
-                                            tipoApoderado: res.data.ap_tipo
-                                        });
-                                        toast.success("Apoderado guardado correctamente");
-                                        setIsApoderadoFormVisible(true);
+                                    const apo = res.data.apoderado;
+
+                                    setDatosApoderado({
+                                        ci: apo.apo_ci,
+                                        apellidos: apo.apo_apellido,
+                                        nombres: apo.apo_nombre,
+                                        tipoApoderado: apo.apo_tipo,
+                                    });
+
+                                    toast.success("Apoderado guardado correctamente");
                                     } else {
-                                        toast.error(res.error);
+                                    toast.error(res.error);
                                     }
                                 } catch (err) {
                                     toast.error("Error guardando apoderado");
                                 }
-                            }}
+                                }}
                         />
                     </div>
 
