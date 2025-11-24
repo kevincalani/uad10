@@ -8,13 +8,13 @@ export default function DocumentoTable({
     setIsAddDocumentoFormVisible,
     newDocForm,
     setNewDocForm,
+    tramiteData,
     handleToggleDestino,
     handleDeleteDocumento,
     handleAddDocumento,
     isDatosPersonalesSaved,
     onObserve
 }) {
-
     return (
         <div className="w-full lg:w-8/12">
             <div className="border border-gray-200 p-4 rounded-lg shadow-sm flex flex-col">
@@ -27,7 +27,10 @@ export default function DocumentoTable({
                         <thead className="bg-gray-300 sticky top-0">
                             <tr>
                                 {['N°', 'Sitra', 'Nombre', 'Nro. Trámite', 'N° Título', 'Opciones'].map(header => (
-                                    <th key={header} className="px-2 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">
+                                    <th
+                                        key={header}
+                                        className="px-2 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider"
+                                    >
                                         {header}
                                     </th>
                                 ))}
@@ -43,7 +46,7 @@ export default function DocumentoTable({
                             ) : (
                                 documentos.map((doc, index) => (
                                     <DocumentoRow
-                                        key={doc.cod_tra || index}  // usar cod_tra si existe, sino index
+                                        key={doc.cod_tra || index}
                                         doc={doc}
                                         index={index}
                                         onToggleDestino={handleToggleDestino}
@@ -74,9 +77,8 @@ export default function DocumentoTable({
                         ) : (
                             <AddDocumentoForm
                                 setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
-                                newDocForm={newDocForm}
-                                setNewDocForm={setNewDocForm}
-                                handleAddDocumento={handleAddDocumento}
+                                tramiteData={tramiteData}
+                                setDocumentos={handleAddDocumento}
                             />
                         )}
                     </>

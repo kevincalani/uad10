@@ -312,6 +312,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                         newDocForm={newDocForm}
                         setNewDocForm={setNewDocForm}
                         handleAddDocumento={handleAddDocumento}
+                        tramiteData={tramiteData}
                         isDatosPersonalesSaved={isDatosPersonalesSaved}
                         handleDeleteDocumento={() => {}}
                         handleToggleDestino={() => {}}
