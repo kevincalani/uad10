@@ -1,13 +1,12 @@
 import React from 'react';
 import DocumentoRow from './DocumentoRow';
 import AddDocumentoForm from '../components/Forms/AddDocumentoForm';
+import useDocleg from '../hooks/useDocLeg';
 
 export default function DocumentoTable({
     documentos,
     isAddDocumentoFormVisible,
     setIsAddDocumentoFormVisible,
-    newDocForm,
-    setNewDocForm,
     tramiteData,
     listaTramites,
     handleToggleDestino,
@@ -16,6 +15,9 @@ export default function DocumentoTable({
     isDatosPersonalesSaved,
     onObserve
 }) {
+
+    const {createDocumento} = useDocleg()
+
     return (
         <div className="w-full lg:w-8/12">
             <div className="border border-gray-200 p-4 rounded-lg shadow-sm flex flex-col">
@@ -81,6 +83,7 @@ export default function DocumentoTable({
                                 tramiteData={tramiteData}
                                 listaTramites={listaTramites}
                                 setDocumentos={handleAddDocumento}
+                                createDocumento={createDocumento}
                             />
                         )}
                     </>

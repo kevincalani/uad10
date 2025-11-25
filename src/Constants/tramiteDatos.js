@@ -81,6 +81,19 @@ export const BUSCAR_EN_OPTIONS = [
     { value: 'su-ant', label: 'SU-ANTECEDENTE' },
     
   ];
+  /**
+ * Opciones para el campo "Buscar en" en los modales de trámites.
+ */
+export const BUSCAR_EN_DOCUMENTOS = [
+    { value: 'db', label: 'DB' },
+    { value: 'ca', label: 'CA' },
+    { value: 'da', label: 'DA' },
+    { value: 'tp', label: 'TP' },
+    { value: 'di', label: 'DI' },
+    { value: 'tpos', label: 'TPOS' },
+    { value: 're', label: 'RE' },
+    { value: 'su', label: 'SU' },
+  ];
   // ... (TRAMITE_COLORS y BUSCAR_EN_OPTIONS se mantienen)
 
 export const GLOSAS_MOCK_DATA = [

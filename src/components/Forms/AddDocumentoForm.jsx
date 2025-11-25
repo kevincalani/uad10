@@ -1,19 +1,21 @@
 import React, { useState } from "react";
-import { Plus, XCircle } from "lucide-react";
+import { CloudCog, Plus, XCircle } from "lucide-react";
 import { toast } from "../../utils/toast";
-import api from "../../api/axios";
+import { BUSCAR_EN_DOCUMENTOS } from "../../Constants/tramiteDatos";
 
 export default function AddDocumentoForm({ 
   tramiteData,
   listaTramites, 
   setIsAddDocumentoFormVisible, 
-  setDocumentos 
+  setDocumentos,
+  createDocumento 
 }) {
   // Detectar si es trámite de Búsqueda (Tipo B)
   const esTipoB = tramiteData?.tra_tipo_tramite === 'B';
 
   const [formData, setFormData] = useState({
-    tipo: "",
+    ctra:tramiteData.cod_tra,
+    tipo: "2",
     tipo_tramite: "EXTERNO",
     ptaang: false,
     cuadis: false,
@@ -24,17 +26,11 @@ export default function AddDocumentoForm({
     reintegro: "",
     valorado_bus: "",
     reimpresion: "",
-    buscar_en: "DB",
+    buscar_en: "",
     documentos: ""
   });
 
   const [loading, setLoading] = useState(false);
-
-  const opcionesBuscarEn = [
-    { value: 'DB', label: 'DB' },
-    { value: 'CR', label: 'CR' },
-  ];
-
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -43,53 +39,44 @@ export default function AddDocumentoForm({
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  // Seleccionar el trámite y actualizar el campo "tipo"
+    const handleTramiteSelect = (e) => {
+      console.log(e.target.value)
+      const codTreSeleccionado = e.target.value;
+      setFormData(prev => ({
+        ...prev,
+        tipo: codTreSeleccionado
+      }));
+    };
+  // Enviar los datos del formulario
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
 
-    try {
-      const fd = new FormData();
-      fd.append("ctra", tramiteData.tramite.cod_tra);
-      fd.append("tipo", formData.tipo);
-      fd.append("numero", formData.numero || "-");
-      fd.append("gestion", formData.gestion || new Date().getFullYear().toString().slice(-2));
-      fd.append("control", formData.control);
-      fd.append("ptaang", formData.ptaang ? "on" : "");
-      fd.append("cuadis", formData.cuadis ? "on" : "");
-      fd.append("supletorio", formData.supletorio ? "on" : "");
-      fd.append("tipo_tramite", formData.tipo_tramite === 'INTERNO' ? 't' : 'f');
+      // Solo enviar los campos de búsqueda si es un formulario de tipo B
+      const formDataToSend = {
+        ...formData,
+        ...(esTipoB && { 
+          buscar_en: formData.buscar_en, 
+          documentos: formData.documentos 
+        })
+      };
 
-      if (!esTipoB) {
-        fd.append("reintegro", formData.reintegro);
-        fd.append("valorado_bus", formData.valorado_bus);
-        fd.append("reimpresion", formData.reimpresion);
-      } else {
-        fd.append("reimpresion", formData.reimpresion);
-        fd.append("buscar_en", formData.buscar_en);
-        fd.append("documentos", formData.documentos);
-      }
+      const response = await createDocumento(formDataToSend);
 
-      const res = await api.post('/api/g-docleg', fd);
-
-      if (res.data.status === 'success') {
+      if (response?.status === 'success') {
         toast.success("Documento añadido correctamente");
-        setDocumentos(prev => [...prev, res.data.data]);
+        setDocumentos(prev => [...prev, response.data]);
         setIsAddDocumentoFormVisible(false);
       } else {
-        toast.error(res.data.message || "Error al registrar");
+        toast.error("Error al registrar documento");
       }
 
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.message || "Error al conectar con el servidor");
-    } finally {
       setLoading(false);
-    }
-  };
+    };
+
 
   // --- ESTILOS AJUSTADOS ---
-  // w-28 (112px) fuerza a que los textos largos hagan salto de línea.
-  // leading-tight junta las líneas verticalmente.
   const labelClass = "text-right font-bold text-gray-600 italic text-sm leading-tight pr-2 w-28 flex-shrink-0 self-center";
   const inputClass = "border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-400 w-full";
 
@@ -121,7 +108,7 @@ export default function AddDocumentoForm({
           <select
             name="tipo"
             value={formData.tipo}
-            onChange={handleChange}
+            onChange={handleTramiteSelect}
             className={`${inputClass} bg-white`}
             required
           >
@@ -183,7 +170,7 @@ export default function AddDocumentoForm({
               <label className={labelClass}>Buscar en :</label>
               <div className="flex items-center w-full pb-2 border-b border-gray-300">
               <select name="buscar_en" value={formData.buscar_en} onChange={handleChange} className={inputClass}>
-                {opcionesBuscarEn.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+                {BUSCAR_EN_DOCUMENTOS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
               </select>
               </div>
             </div>
@@ -307,7 +294,7 @@ export default function AddDocumentoForm({
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-6 rounded shadow flex items-center gap-2 transition-colors text-sm disabled:opacity-50"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow flex items-center gap-2 transition-colors text-sm disabled:opacity-50"
           >
             {loading ? "Guardando..." : <><Plus size={16} /> Crear</>}
           </button>
