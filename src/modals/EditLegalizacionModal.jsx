@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, BookText } from "lucide-react";
 import DatosPersonalesForm from "../components/Forms/DatosPersonalesForm";
-import DatosApoderadoForm from "../components/forms/DatosApoderadoForm";
+import DatosApoderadoForm from "../components/Forms/DatosApoderadoForm";
 import DocumentoTable from "../components/DocumentoTable";
 import { useModal } from "../hooks/useModal";
 import { usePersona } from "../hooks/usePersona";
@@ -18,6 +18,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     //  ESTADOS
     // ---------------------------------------
     const [isDatosPersonalesSaved, setIsDatosPersonalesSaved] = useState(!!tramiteData.per_nombre);
+    const [listaTramites, setListaTramites] = useState([])
     const [documentos, setDocumentos] = useState([]);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
@@ -74,7 +75,8 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
 
                     // DOCUMENTOS
                     setDocumentos(data.documentos || []);
-
+                    //LISTA TRAMITES
+                    setListaTramites(data.lista_tramites)
                     // APODERADO (si ya viene en la respuesta)
                     if (data.apoderado) {
                         setDatosApoderado({
@@ -313,6 +315,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                         setNewDocForm={setNewDocForm}
                         handleAddDocumento={handleAddDocumento}
                         tramiteData={tramiteData}
+                        listaTramites={listaTramites}
                         isDatosPersonalesSaved={isDatosPersonalesSaved}
                         handleDeleteDocumento={() => {}}
                         handleToggleDestino={() => {}}

@@ -9,6 +9,7 @@ export default function DocumentoTable({
     newDocForm,
     setNewDocForm,
     tramiteData,
+    listaTramites,
     handleToggleDestino,
     handleDeleteDocumento,
     handleAddDocumento,
@@ -78,6 +79,7 @@ export default function DocumentoTable({
                             <AddDocumentoForm
                                 setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
                                 tramiteData={tramiteData}
+                                listaTramites={listaTramites}
                                 setDocumentos={handleAddDocumento}
                             />
                         )}
