@@ -41,7 +41,6 @@ export default function useDocleg() {
         setLoading(true);
         setError(null);
         setSuccess(null);
-        console.log("intento")
         try {
             const payload = mapFormToBackend(formData);
             console.log('Payload enviado:', payload);
@@ -54,7 +53,7 @@ export default function useDocleg() {
         } catch (err) {
             console.error('Error al crear documento:', err);
             setError(err.response?.data?.message || err.message || 'Error desconocido');
-            return null;
+            return err;
         } finally {
             setLoading(false);
         }

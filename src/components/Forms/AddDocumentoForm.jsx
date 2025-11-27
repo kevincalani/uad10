@@ -6,16 +6,16 @@ import { BUSCAR_EN_DOCUMENTOS } from "../../Constants/tramiteDatos";
 export default function AddDocumentoForm({ 
   tramiteData,
   listaTramites, 
-  setIsAddDocumentoFormVisible, 
-  setDocumentos,
-  createDocumento 
+  setIsAddDocumentoFormVisible,
+  createDocumento, 
+  fetchData
 }) {
   // Detectar si es trámite de Búsqueda (Tipo B)
   const esTipoB = tramiteData?.tra_tipo_tramite === 'B';
 
   const [formData, setFormData] = useState({
     ctra:tramiteData.cod_tra,
-    tipo: "2",
+    tipo: "",
     tipo_tramite: "EXTERNO",
     ptaang: false,
     cuadis: false,
@@ -63,13 +63,12 @@ export default function AddDocumentoForm({
       };
 
       const response = await createDocumento(formDataToSend);
-
       if (response?.status === 'success') {
         toast.success("Documento añadido correctamente");
-        setDocumentos(prev => [...prev, response.data]);
+        await fetchData();
         setIsAddDocumentoFormVisible(false);
       } else {
-        toast.error("Error al registrar documento");
+        toast.error(response.response.data.message);
       }
 
       setLoading(false);

@@ -22,20 +22,6 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     const [documentos, setDocumentos] = useState([]);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
-    const [newDocForm, setNewDocForm] = useState({
-        tipoLegalizacion: "",
-        tipoTramite: "EXTERNO",
-        isPtag: false,
-        isCuadis: false,
-        nroTitulo1: "",
-        nroTitulo2: "",
-        nroControl: "",
-        reintegro: "",
-        nroControlBusqueda: "",
-        nroControlReimpresion: "",
-        isTituloSupletorio: false,
-        archivo: null
-    });
 
     const [datosPersonales, setDatosPersonales] = useState({
         ci: tramiteData.per_ci || "",
@@ -55,7 +41,10 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     //  CARGAR DATOS INICIALES
     // ---------------------------------------
     useEffect(() => {
-        const fetchData = async () => {
+        fetchData();
+    }, [tramiteData]);
+
+    const fetchData = async () => {
             try {
                 // 1️⃣ Datos del trámite y documentos
                 const res = await api.get(`/api/datos-tramite-legalizacion/${tramiteData.cod_tra}`);
@@ -109,10 +98,6 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                 toast.error("Error al cargar los datos del trámite");
             }
         };
-
-        fetchData();
-    }, [tramiteData]);
-
     // ---------------------------------------
     //  AUTOCOMPLETADO DE PERSONA
     // ---------------------------------------
@@ -200,40 +185,6 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
         }
     };
     // ---------------------------------------
-    //  AGREGAR DOCUMENTO
-    // ---------------------------------------
-    const handleAddDocumento = async (formValues) => {
-        try {
-            const fd = new FormData();
-            fd.append("ctra", tramiteData.id_tra);
-            fd.append("tipoLegalizacion", formValues.tipoLegalizacion);
-            fd.append("tipoTramite", formValues.tipoTramite);
-            fd.append("isPtag", formValues.isPtag);
-            fd.append("isCuadis", formValues.isCuadis);
-            fd.append("isTituloSupletorio", formValues.isTituloSupletorio);
-            fd.append("nroControl", formValues.nroControl);
-            fd.append("reintegro", formValues.reintegro);
-            fd.append("nroControlBusqueda", formValues.nroControlBusqueda);
-            fd.append("nroControlReimpresion", formValues.nroControlReimpresion);
-            fd.append("nroTitulo", formValues.nroTitulo);
-            fd.append("archivo", formValues.archivo || "");
-
-            const res = await api.post("/api/g-docleg", fd, {
-                headers: { "Content-Type": "multipart/form-data" }
-            });
-
-            const nuevo = res.data.data;
-            setDocumentos(prev => [...prev, nuevo]);
-            toast.success("Documento agregado correctamente");
-            setIsAddDocumentoFormVisible(false);
-
-        } catch (err) {
-            console.error(err);
-            toast.error("Error al agregar documento");
-        }
-    };
-
-    // ---------------------------------------
     //  RENDER
     // ---------------------------------------
     return (
@@ -300,6 +251,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                                     toast.error(res.error);
                                     }
                                 } catch (err) {
+                                    console.log(err)
                                     toast.error("Error guardando apoderado");
                                 }
                                 }}
@@ -311,9 +263,8 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                         documentos={documentos}
                         isAddDocumentoFormVisible={isAddDocumentoFormVisible}
                         setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
-                        newDocForm={newDocForm}
-                        setNewDocForm={setNewDocForm}
-                        handleAddDocumento={handleAddDocumento}
+                        fetchData={fetchData}
+                        setDocumentos={setDocumentos}
                         tramiteData={tramiteData}
                         listaTramites={listaTramites}
                         isDatosPersonalesSaved={isDatosPersonalesSaved}
