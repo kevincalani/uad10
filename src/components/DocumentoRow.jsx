@@ -2,7 +2,7 @@
 import React from 'react';
 import { X, CircleCheck, CircleMinus, Trash2, Eye, FilePenLine, FileCode } from 'lucide-react';
 
-export default function DocumentoRow({ doc, index, onToggleDestino, onDelete, onObserve }) {
+export default function DocumentoRow({ doc, index, onCambiarDestino, onDelete, onObserve }) {
 
     // Determinar estado del documento
     const isObserved = !!doc.dtra_obs;
@@ -29,7 +29,7 @@ export default function DocumentoRow({ doc, index, onToggleDestino, onDelete, on
     const botones = [
         {
             key: 'destino',
-            onClick: () => onToggleDestino(doc.cod_tra),
+            onClick: () => onCambiarDestino(doc.cod_dtra),
             title: 'Cambiar Destino del Trámite',
             label: doc.dtra_interno === 'f' ? 'EXT' : 'INT',
             className: doc.dtra_interno === 'f'
@@ -41,7 +41,7 @@ export default function DocumentoRow({ doc, index, onToggleDestino, onDelete, on
             onClick: () => onObserve(doc),
             icon: <Eye size={16} />,
             title: isBlocked ? 'Bloqueado' : isObserved ? 'Observado' : 'Observar',
-            className: isObserved ? 'text-red-600 hover:text-red-800' : 'text-gray-500 hover:text-gray-700',
+            className: isObserved ? 'text-red-600 hover:text-red-800' : 'text-blue-500 hover:text-blue-700',
         },
         !isBlocked && {
             key: 'glosa',
@@ -68,7 +68,7 @@ export default function DocumentoRow({ doc, index, onToggleDestino, onDelete, on
         <tr className={rowClassName}>
             <td className="px-2 py-1 whitespace-nowrap text-xs text-gray-900">{index + 1}</td>
             <td className="px-2 py-1 whitespace-nowrap text-xs">
-                {doc.dtra_verificacion_sitra
+                {doc.dtra_verificacion_sitra==0
                     ? <CircleCheck size={16} className="text-green-500" title="Verificado SITRA" />
                     : <CircleMinus size={16} className="text-red-500" title="No Verificado SITRA" />}
             </td>

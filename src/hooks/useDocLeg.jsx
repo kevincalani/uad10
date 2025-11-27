@@ -59,5 +59,23 @@ export default function useDocleg() {
         }
     };
 
-    return { createDocumento, loading, error, success };
+    // 🔥 NUEVO: Cambiar destino (EXT/INT)
+    const cambiarDestino = async (cod_dtra) => {
+        try {
+            const res = await api.get(`/api/cambiar-interno-docleg/${cod_dtra}`);
+            console.log(res,"res")
+            return res
+            
+        } catch (err) {
+            console.error("Error al cambiar destino:", err);
+            return err;
+        }
+    };
+    return { 
+        createDocumento,
+        loading, 
+        error, 
+        success,
+        cambiarDestino
+    };
 }

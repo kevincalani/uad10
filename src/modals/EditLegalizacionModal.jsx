@@ -144,6 +144,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
             if (res.ok) {
                 setIsDatosPersonalesSaved(true);
                 toast.success(res.message);
+                fetchData()
             } else {
                 toast.error(res.error);
             }
@@ -273,7 +274,6 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                         listaTramites={listaTramites}
                         isDatosPersonalesSaved={isDatosPersonalesSaved}
                         handleDeleteDocumento={() => {}}
-                        handleToggleDestino={() => {}}
                         onObserve={() => {}}
                     />
 

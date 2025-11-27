@@ -15,7 +15,7 @@ export default function AddDocumentoForm({
 
   const [formData, setFormData] = useState({
     ctra:tramiteData.cod_tra,
-    tipo: "",
+    tipo: listaTramites[0].cod_tre,
     tipo_tramite: "EXTERNO",
     ptaang: false,
     cuadis: false,

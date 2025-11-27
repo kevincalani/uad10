@@ -2,6 +2,7 @@ import React from 'react';
 import DocumentoRow from './DocumentoRow';
 import AddDocumentoForm from '../components/Forms/AddDocumentoForm';
 import useDocleg from '../hooks/useDocLeg';
+import { toast } from '../utils/toast';
 
 export default function DocumentoTable({
     documentos,
@@ -9,7 +10,6 @@ export default function DocumentoTable({
     setIsAddDocumentoFormVisible,
     tramiteData,
     listaTramites,
-    handleToggleDestino,
     handleDeleteDocumento,
     setDocumentos,
     isDatosPersonalesSaved,
@@ -17,7 +17,43 @@ export default function DocumentoTable({
     fetchData
 }) {
 
-    const {createDocumento} = useDocleg()
+    const {createDocumento,cambiarDestino} = useDocleg()
+
+    const handleToggleDestino = async (cod_dtra) => {
+        setDocumentos(prevDocs => prevDocs.map(doc =>
+            doc.cod_dtra === cod_dtra
+                ? { ...doc, dtra_interno: doc.dtra_interno === 'f' ? 't' : 'f' }
+                : doc
+        ));
+
+        try {
+            const res = await cambiarDestino(cod_dtra);
+
+            if (res?.data?.success) {
+                const nuevoValor = res.data.data.dtra_interno;
+
+                // Actualizamos el valor real que vino desde el backend
+                setDocumentos(prevDocs => prevDocs.map(doc =>
+                    doc.cod_dtra === cod_dtra
+                        ? { ...doc, dtra_interno: nuevoValor }
+                        : doc
+                ));
+
+                toast.success(res.data.data.message || "Destino cambiado correctamente");
+            } else {
+                throw new Error("Error al cambiar destino");
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("No se pudo cambiar el destino");
+
+            setDocumentos(prevDocs => prevDocs.map(doc =>
+                doc.cod_dtra === cod_dtra
+                    ? { ...doc, dtra_interno: doc.dtra_interno === 'f' ? 't' : 'f' }
+                    : doc
+            ));
+        }
+    };
 
     return (
         <div className="w-full lg:w-8/12">
@@ -53,7 +89,7 @@ export default function DocumentoTable({
                                         key={doc.cod_dtra || index}
                                         doc={doc}
                                         index={index}
-                                        onToggleDestino={handleToggleDestino}
+                                        onCambiarDestino={handleToggleDestino}
                                         onDelete={handleDeleteDocumento}
                                         onObserve={onObserve}
                                     />
