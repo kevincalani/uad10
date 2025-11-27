@@ -1,30 +1,15 @@
 import React from "react";
 import LabeledInput from "../LabeledInput"; // importa el componente
 
-/**
- * Formulario para editar/guardar los datos personales del titular del trámite.
- */
 export default function DatosPersonalesForm({
     tramiteData,
     datosPersonales,
-    handleDatosPersonalesChange, // <--- viene del padre
+    handleDatosPersonalesChange,
     handleCiChange,
     onSave,
     isDatosPersonalesSaved,
+    ptaang
 }) {
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        onSave();
-    };
-
-    const formatDate = (fecha) => {
-        try {
-            const [year, month, day] = fecha.split("-");
-            return `${day}/${month}/${year}`;
-        } catch {
-            return fecha;
-        }
-    };
 
     return (
         <div className="border border-gray-200 p-4 rounded-lg shadow-sm">
@@ -37,15 +22,15 @@ export default function DatosPersonalesForm({
 
             <div className="h-20 w-20 flex flex-col mb-3 text-center mx-auto border border-gray-200 rounded-lg shadow-sm">
                 <p className="text-4xl font-bold text-red-600 mb-1">{tramiteData.tra_numero}</p>
-                <p className="text-sm text-gray-600">{(tramiteData.tra_fecha_solicitud)}</p>
+                <p className="text-sm text-gray-600">{tramiteData.tra_fecha_solicitud}</p>
             </div>
 
-            <form className="space-y-3 pb-3" onSubmit={handleSubmit}>
+            <form className="space-y-3 pb-3" onSubmit={(e) => e.preventDefault()}>
                 <LabeledInput
                     label="CI:"
                     name="ci"
                     value={datosPersonales.ci}
-                    onChange={handleCiChange} // <-- handler del padre
+                    onChange={handleCiChange}
                     required
                     disabled={isDatosPersonalesSaved}
                 />
@@ -76,7 +61,8 @@ export default function DatosPersonalesForm({
                 {!isDatosPersonalesSaved && (
                     <div className="flex justify-end pt-2">
                         <button
-                            type="submit"
+                            type="button"
+                            onClick={onSave}
                             className="bg-green-500 text-white py-1 px-4 text-sm rounded font-medium hover:bg-green-600 transition"
                         >
                             Guardar
@@ -84,6 +70,17 @@ export default function DatosPersonalesForm({
                     </div>
                 )}
             </form>
+            {ptaang && ptaang.length > 0 && (
+                <div className="mt-2 bg-red-300 rounded-sm  px-2">
+                    <ul className="list-disc ml-5 text-sm text-gray-700">
+                        {ptaang.map((p, index) => (
+                            <li key={index}>
+                                Ya tiene DIPLOMA ACADEMICO Nº <b>{p.dtra_numero} / {p.dtra_gestion}</b> por PTAANG
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 }

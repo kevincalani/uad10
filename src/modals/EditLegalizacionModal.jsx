@@ -20,6 +20,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     const [isDatosPersonalesSaved, setIsDatosPersonalesSaved] = useState(!!tramiteData.per_nombre);
     const [listaTramites, setListaTramites] = useState([])
     const [documentos, setDocumentos] = useState([]);
+    const [ptaang,setPtaang] = useState([]);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
 
@@ -42,7 +43,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     // ---------------------------------------
     useEffect(() => {
         fetchData();
-    }, [tramiteData]);
+    }, [tramiteData.cod_tra]);
 
     const fetchData = async () => {
             try {
@@ -64,6 +65,8 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
 
                     // DOCUMENTOS
                     setDocumentos(data.documentos || []);
+                    // PTANG 
+                    setPtaang(data.ptaang)
                     //LISTA TRAMITES
                     setListaTramites(data.lista_tramites)
                     // APODERADO (si ya viene en la respuesta)
@@ -216,6 +219,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                             handleDatosPersonalesChange={handleDatosPersonalesChange}
                             onSave={handleDatosPersonalesSubmit}
                             isDatosPersonalesSaved={isDatosPersonalesSaved}
+                            ptaang={ptaang}
                         />
 
                         <DatosApoderadoForm
