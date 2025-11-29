@@ -21,6 +21,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     const [listaTramites, setListaTramites] = useState([])
     const [documentos, setDocumentos] = useState([]);
     const [ptaang,setPtaang] = useState([]);
+    const [confrontacion,setConfrontacion] = useState([]);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
 
@@ -62,7 +63,8 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                         });
                         setIsDatosPersonalesSaved(!!data.tramite.per_nombre);
                     }
-
+                    //CONFRONTACION
+                    setConfrontacion(data.confrontacion)
                     // DOCUMENTOS
                     setDocumentos(data.documentos || []);
                     // PTANG 
@@ -273,8 +275,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                         tramiteData={tramiteData}
                         listaTramites={listaTramites}
                         isDatosPersonalesSaved={isDatosPersonalesSaved}
-                        handleDeleteDocumento={() => {}}
-                        onObserve={() => {}}
+                        confrontacion={confrontacion}
                     />
 
                 </div>

@@ -71,11 +71,98 @@ export default function useDocleg() {
             return err;
         }
     };
+    // ======================================
+    // 📌 VERIFICACIÓN SITRA
+    // ======================================
+    const verificacionSitra = async (cod_dtra) => {
+        try {
+            const res = await api.get(`/api/verificacion-sitra/${cod_dtra}`);
+            return res.data.data;
+        } catch (err) {
+            console.error("Error SITRA:", err);
+            throw err;
+        }
+    };
+    // ======================================
+    // 📌 OBTENER OBSERVACIONES
+    // ======================================
+    const getObservaciones = async (cod_dtra) => {
+        try {
+            const res = await api.get(`/api/obs-docleg/${cod_dtra}`);
+            return res.data.data;
+        } catch (err) {
+            console.error("Error obtener observaciones:", err);
+            throw err;
+        }
+    };
+    // ======================================
+    // 📌 GUARDAR OBSERVACIÓN
+    // ======================================
+    const saveObservacion = async ({ cod_dtra, obs, falso }) => {
+        try {
+            const body = {
+                cdtra: cod_dtra,
+                obs,
+                falso: falso ? "on" : ""
+            };
+
+            const res = await api.post('/api/g-obs-docleg', body);
+            return res.data;
+        } catch (err) {
+            console.error("Error guardar observación:", err);
+            throw err;
+        }
+    };
+
+    // ======================================
+    // 📌 GENERAR GLOSA
+    // ======================================
+    const generarGlosa = async (cod_dtra) => {
+        try {
+            const res = await api.get(`/api/generar-glosa-leg/${cod_dtra}`);
+            return res.data.data;
+        } catch (err) {
+            console.error("Error generar glosa:", err);
+            throw err;
+        }
+    };
+
+    // ======================================
+    // 📌 VER PDF
+    // ======================================
+    const verDocumentoPDF = async (cod_dtra) => {
+        try {
+            const res = await api.get(`/api/ver-documento-pdf-legalizado/${cod_dtra}`);
+            return res.data;
+        } catch (err) {
+            console.error("Error PDF:", err);
+            throw err;
+        }
+    };
+
+    // ======================================
+    // 📌 ELIMINAR DOCUMENTO
+    // ======================================
+    const eliminarDocumento = async (cod_dtra) => {
+        try {
+            const res = await api.post(`/api/eli-docleg`, { cdtra: cod_dtra });
+            return res.data;
+        } catch (err) {
+            console.error("Error eliminar doc:", err);
+            throw err;
+        }
+    };
     return { 
         createDocumento,
         loading, 
         error, 
         success,
-        cambiarDestino
+        cambiarDestino,
+        verificacionSitra,
+        getObservaciones,
+        saveObservacion,
+        generarGlosa,
+        verDocumentoPDF,
+        eliminarDocumento,
     };
 }

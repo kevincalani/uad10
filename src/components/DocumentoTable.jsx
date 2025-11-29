@@ -10,11 +10,10 @@ export default function DocumentoTable({
     setIsAddDocumentoFormVisible,
     tramiteData,
     listaTramites,
-    handleDeleteDocumento,
     setDocumentos,
     isDatosPersonalesSaved,
-    onObserve,
-    fetchData
+    fetchData,
+    confrontacion
 }) {
 
     const {createDocumento,cambiarDestino} = useDocleg()
@@ -86,12 +85,11 @@ export default function DocumentoTable({
                             ) : (
                                 documentos.map((doc, index) => (
                                     <DocumentoRow
-                                        key={doc.cod_dtra || index}
                                         doc={doc}
                                         index={index}
                                         onCambiarDestino={handleToggleDestino}
-                                        onDelete={handleDeleteDocumento}
-                                        onObserve={onObserve}
+                                        confrontacion={confrontacion}
+                                        tramiteTipo={tramiteData.tra_tipo_tramite}
                                     />
                                 ))
                             )}
