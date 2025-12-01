@@ -16,8 +16,6 @@ export const getTramiteColumns = ({
   refresh,
   onToggle,
   onDelete,
-  glosasData,
-  setGlosasData,
   onSubmit
 }) => {
   const { openModal } = useModal();
@@ -97,9 +95,7 @@ export const getTramiteColumns = ({
               className="bg-100 p-1 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer"
               onClick={() =>
                 openModal(GlosaModal, {
-                  tramite,
-                  glosasData,
-                  setGlosasData,
+                  tramite
                 })
               }
             >

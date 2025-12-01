@@ -2,13 +2,15 @@ import React from 'react';
 import {
     X, CircleCheck, CircleMinus,
     Trash2, Eye, FilePenLine, FileCode,
-    ArrowLeftCircle
+    ArrowLeftCircle,
+    FileText
 } from 'lucide-react';
 import { useModal } from '../hooks/useModal';
 import SitraModal from '../modals/servicios/SitraModal';
 import ObservarTramiteModal from '../modals/Servicios/ObservarTramiteModal';
 import GlosaLegalizacionModal from '../modals/Servicios/GlosaLegalizacionModal';
 import VerDocumentoPDFModal from '../modals/Servicios/VerDocumentoPDFModal';
+import EliminarDoclegModal from '../modals/servicios/EliminarDocLegModal';
 
 export default function DocumentoRow({
     doc,
@@ -20,9 +22,9 @@ export default function DocumentoRow({
 }) {
     const { openModal } = useModal()
     // ---- ESTADO VISUAL EXACTO (Blade compatible) ----
-    let rowBg = "bg-white hover:bg-gray-300";
-    if (doc.dtra_falso === "t") rowBg = "bg-red-200 hover:bg-gray-300";
-    else if (doc.dtra_generado === "t") rowBg = "bg-green-200 hover:bg-gray-300";
+    let rowBg = "bg-white hover:bg-gray-400";
+    if (doc.dtra_falso === "t") rowBg = "bg-red-200 hover:bg-gray-400";
+    else if (doc.dtra_generado === "t") rowBg = "bg-green-300 hover:bg-gray-400";
 
     // ---- Nombre + indicador interno ----
     const displayNombre = (
@@ -102,7 +104,7 @@ export default function DocumentoRow({
             key: "corregir tramite",
             icon: <ArrowLeftCircle size={16} className='text-blue-600'/>,
             onClick: () => openModal("corregir tramite", doc),
-            hidden: doc.dtra_generado === ""
+            hidden: doc.dtra_generado === null
         },
         // ------------------ Observaciones ------------------
         {
@@ -132,7 +134,16 @@ export default function DocumentoRow({
                 }),
             hidden: doc.dtra_generado === "t"
         },
-
+        // ------------------ Ver Glosas ------------------
+        {
+            key: "Ver Glosas",
+            icon: <FileText size={16} className="text-gray-500" />,
+            title: "Ver Glosas",
+            onClick: () => openModal(EliminarDoclegModal, {
+                doc
+            }),
+            hidden: doc.dtra_generado === null
+        },
         // ------------------ Ver PDF ------------------
         {
             key: "pdf",
@@ -151,8 +162,12 @@ export default function DocumentoRow({
             key: "eliminar",
             icon: <Trash2 size={16} className="text-red-500" />,
             title: "Eliminar",
-            onClick: () => openModal("delete", doc)
-        }
+            onClick: () => openModal(EliminarDoclegModal, {
+                cod_dtra:doc.cod_dtra
+            }),
+            hidden: doc.dtra_generado === "t"
+        },
+        
     ].filter((b) => !b.hidden);
 
     return (
@@ -162,7 +177,7 @@ export default function DocumentoRow({
             <td className="px-2 py-1 text-xs">
                 <button
 
-                        className="px-1 bg-white rounded-full shadow-md hover:bg-gray-300 transition text-xs cursor-pointer"
+                        className="p-2 bg-white rounded-full shadow-md hover:bg-gray-300 transition text-xs cursor-pointer"
                         onClick={() =>
                             openModal(SitraModal,{
                                 cod_dtra:doc.cod_dtra

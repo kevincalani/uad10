@@ -15,8 +15,6 @@ export default function TramitesTable({
   refresh,
   onToggle,
   onDelete,
-  glosasData,
-  setGlosasData,
   onSubmit
 }) {
   const [globalFilter, setGlobalFilter] = useState("");
@@ -24,8 +22,6 @@ export default function TramitesTable({
     refresh,
     onToggle,
     onDelete,
-    glosasData,
-    setGlosasData,
     onSubmit,
   });
 

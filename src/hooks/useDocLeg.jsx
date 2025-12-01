@@ -133,7 +133,7 @@ export default function useDocleg() {
     const verDocumentoPDF = async (cod_dtra) => {
         try {
             const res = await api.get(`/api/ver-documento-pdf-legalizado/${cod_dtra}`);
-            console.log(res)
+            console.log(res,"pdf")
             return res;
         } catch (err) {
             console.error("Error PDF:", err);

@@ -10,12 +10,10 @@ import api from "../../api/axios";
 import {
   TIPO_TRAMITE,
   TIPO_TRAMITE_INVERTIDO,
-  GLOSAS_MOCK_DATA,
 } from "../../Constants/tramiteDatos";
 
 export default function ConfigurarTramites() {
   const [tramites, setTramites] = useState([]);
-  const [glosasData, setGlosasData] = useState(GLOSAS_MOCK_DATA);
   const { openModal } = useModal();
 
   const fetchTramites = async () => {
@@ -135,8 +133,6 @@ export default function ConfigurarTramites() {
           refresh={fetchTramites}
           onToggle={handleToggleHabilitar}
           onDelete={handleDelete}
-          glosasData={glosasData}
-          setGlosasData={setGlosasData}
           onSubmit={handleFormSubmit}
         />
       </div>
