@@ -133,7 +133,8 @@ export default function useDocleg() {
     const verDocumentoPDF = async (cod_dtra) => {
         try {
             const res = await api.get(`/api/ver-documento-pdf-legalizado/${cod_dtra}`);
-            return res.data;
+            console.log(res)
+            return res;
         } catch (err) {
             console.error("Error PDF:", err);
             throw err;
@@ -148,6 +149,7 @@ export default function useDocleg() {
             const res = await api.post(`/api/eli-docleg`, { cdtra: cod_dtra });
             return res.data;
         } catch (err) {
+            console.log(err)
             console.error("Error eliminar doc:", err);
             throw err;
         }

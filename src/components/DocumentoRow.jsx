@@ -1,24 +1,28 @@
 import React from 'react';
 import {
     X, CircleCheck, CircleMinus,
-    Trash2, Eye, FilePenLine, FileCode
+    Trash2, Eye, FilePenLine, FileCode,
+    ArrowLeftCircle
 } from 'lucide-react';
 import { useModal } from '../hooks/useModal';
 import SitraModal from '../modals/servicios/SitraModal';
-
+import ObservarTramiteModal from '../modals/Servicios/ObservarTramiteModal';
+import GlosaLegalizacionModal from '../modals/Servicios/GlosaLegalizacionModal';
+import VerDocumentoPDFModal from '../modals/Servicios/VerDocumentoPDFModal';
 
 export default function DocumentoRow({
     doc,
     index,
     onCambiarDestino,
     tramiteTipo,
-    confrontacion
+    confrontacion,
+    fetchData
 }) {
     const { openModal } = useModal()
     // ---- ESTADO VISUAL EXACTO (Blade compatible) ----
-    let rowBg = "bg-white";
-    if (doc.dtra_falso === "t") rowBg = "bg-red-200";
-    else if (doc.dtra_generado === "t") rowBg = "bg-green-200";
+    let rowBg = "bg-white hover:bg-gray-300";
+    if (doc.dtra_falso === "t") rowBg = "bg-red-200 hover:bg-gray-300";
+    else if (doc.dtra_generado === "t") rowBg = "bg-green-200 hover:bg-gray-300";
 
     // ---- Nombre + indicador interno ----
     const displayNombre = (
@@ -74,7 +78,7 @@ export default function DocumentoRow({
 
     if (!["B", "F"].includes(tramiteTipo)) {
         campoEspecifico = (
-            <td className="px-2 py-1 text-xs text-gray-500">
+            <td className="px-2 py-1 text-xs">
                 {numeroTituloDisplay}
             </td>
         );
@@ -90,7 +94,15 @@ export default function DocumentoRow({
                 doc.dtra_interno === "f"
                     ? "bg-blue-100 text-blue-700"
                     : "bg-red-100 text-red-700",
-            onClick: () => onCambiarDestino(doc.cod_dtra)
+            onClick: () => onCambiarDestino(doc.cod_dtra),
+            hidden: doc.dtra_generado === "t"
+        },
+        // ----------------- Corregir Tramite ----------------
+        {
+            key: "corregir tramite",
+            icon: <ArrowLeftCircle size={16} className='text-blue-600'/>,
+            onClick: () => openModal("corregir tramite", doc),
+            hidden: doc.dtra_generado === ""
         },
         // ------------------ Observaciones ------------------
         {
@@ -101,7 +113,12 @@ export default function DocumentoRow({
                     ? "text-red-600 hover:text-red-800"
                     : "text-blue-500 hover:text-blue-700",
             title: "Observaciones",
-            onClick: () => openModal("observaciones", doc)
+            onClick: () =>
+                openModal(ObservarTramiteModal, {
+                    cod_dtra: doc.cod_dtra,
+                    fetchData // 🔥 para refrescar la tabla después de guardar
+                }), 
+            hidden: doc.dtra_generado === "t"
         },
 
         // ------------------ Generar glosa ------------------
@@ -109,7 +126,10 @@ export default function DocumentoRow({
             key: "glosa",
             icon: <FilePenLine size={16} />,
             title: "Generar glosa",
-            onClick: () => openModal("glosa", doc),
+            onClick: () => 
+                openModal(GlosaLegalizacionModal, {
+                    doc
+                }),
             hidden: doc.dtra_generado === "t"
         },
 
@@ -117,8 +137,10 @@ export default function DocumentoRow({
         {
             key: "pdf",
             icon: <FileCode size={16} className="text-blue-600" />,
-            title: "Ver PDF",
-            onClick: () => openModal("pdf", doc),
+            title: "Ver Documento PDF",
+            onClick: () => openModal(VerDocumentoPDFModal, {
+                cod_dtra:doc.cod_dtra
+            }),
             hidden: false
         },
 
@@ -134,13 +156,13 @@ export default function DocumentoRow({
     ].filter((b) => !b.hidden);
 
     return (
-        <tr className={`${rowBg} border-b`}>
+        <tr className={`${rowBg} `}>
             <td className="px-2 py-1 text-xs">{index + 1}</td>
 
             <td className="px-2 py-1 text-xs">
                 <button
 
-                        className="px-1 rounded transition text-xs cursor-pointer"
+                        className="px-1 bg-white rounded-full shadow-md hover:bg-gray-300 transition text-xs cursor-pointer"
                         onClick={() =>
                             openModal(SitraModal,{
                                 cod_dtra:doc.cod_dtra
@@ -161,16 +183,19 @@ export default function DocumentoRow({
 
             {campoEspecifico}
 
-            <td className="px-2 py-1 text-xs space-x-1 flex flex-nowrap">
+            <td className="px-2 py-1 text-xs space-x-1 ">
+                <div className='flex justify-center items-end flex-wrap'>
                 {botones.map((b) => (
                     <button
                         key={b.key}
-                        className={`px-1 rounded transition text-xs ${b.className ?? ""}`}
+                        className={`p-2 mx-0.5 bg-white rounded-full shadow-md hover:bg-gray-300 transition cursor-pointer ${b.className ?? ""}`}
                         onClick={b.onClick}
+                        title={b.title}
                     >
                         {b.icon ?? b.label}
                     </button>
                 ))}
+                </div>
             </td>
         </tr>
     );

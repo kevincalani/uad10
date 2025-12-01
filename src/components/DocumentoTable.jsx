@@ -63,12 +63,12 @@ export default function DocumentoTable({
 
                 <div className="overflow-auto mb-4" style={{ flexGrow: 1, minHeight: '100px', maxHeight: '100%' }}>
                     <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm">
-                        <thead className="bg-gray-300 sticky top-0">
+                        <thead className="bg-gray-500 sticky top-0">
                             <tr>
                                 {['N°', 'Sitra', 'Nombre', 'Nro. Trámite', 'N° Título', 'Opciones'].map(header => (
                                     <th
                                         key={header}
-                                        className="px-2 py-2 text-left text-xs font-medium text-gray-700 uppercase tracking-wider"
+                                        className="px-2 py-2 text-left text-xs text-white font-semibold uppercase tracking-wider"
                                     >
                                         {header}
                                     </th>
@@ -90,6 +90,7 @@ export default function DocumentoTable({
                                         onCambiarDestino={handleToggleDestino}
                                         confrontacion={confrontacion}
                                         tramiteTipo={tramiteData.tra_tipo_tramite}
+                                        fetchData={fetchData}
                                     />
                                 ))
                             )}

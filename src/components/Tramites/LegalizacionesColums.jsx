@@ -67,22 +67,24 @@ export default function LegalizacionesColumns({setTramites,guardarDatosTramite})
             header: "Opciones",
             accessorKey: "acciones",
             cell: ({ row }) => (
-                <div className="space-x-2">
+                <div className="space-x-1 flex flex-nowrap">
                     <button
-                        className="text-blue-600"
+                        title="Insertar Datos Tramite"
+                        className=" p-2 bg-white rounded-full shadow-md text-blue-600 cursor-pointer"
                         onClick={() =>
                             openModal(EditLegalizacionModal, { 
                                 tramiteData: row, 
                                 setTramites,
                                 guardarDatosTramite
                             })
+                        
                         }
                     >
                         📝
                     </button>
 
-                    <button className="text-purple-600">🔁</button>
-                    <button className="text-red-600">🗑️</button>
+                    <button className="p-2 bg-white rounded-full shadow-md text-purple-600 cursor-pointer">🔁</button>
+                    <button className="p-2 bg-white rounded-full shadow-md text-red-600 cursor-pointer">🗑️</button>
                 </div>
             ),
         },
@@ -90,7 +92,7 @@ export default function LegalizacionesColumns({setTramites,guardarDatosTramite})
             header: "Entrega",
             accessorKey: "entrega",
             cell: () => (
-                <button className="text-green-600">
+                <button className="p-2 bg-white rounded-full shadow-md text-green-600 cursor-pointer">
                     <CircleArrowRight size={20} />
                 </button>
             ),
