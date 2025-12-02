@@ -114,15 +114,50 @@ export default function useDocleg() {
         }
     };
 
-    // ======================================
-    // 📌 GENERAR GLOSA
-    // ======================================
-    const generarGlosa = async (cod_dtra) => {
+    // Generar glosa (abrir modal)
+    const generarGlosaModal = async (cod_dtra) => {
         try {
             const res = await api.get(`/api/generar-glosa-leg/${cod_dtra}`);
             return res.data.data;
         } catch (err) {
             console.error("Error generar glosa:", err);
+            throw err;
+        }
+    };
+
+    //  Elegir modelo de glosa
+    const elegirModelo = async (cod_glo, cod_dtra) => {
+        try {
+            const res = await api.post('/api/elegir-modelo-glosa', {
+                cod_glo,
+                cod_dtra
+            });
+            return res.data;
+        } catch (err) {
+            console.error("Error elegir modelo:", err);
+            throw err;
+        }
+    };
+
+    //  Guardar glosa (legalizar título)
+    const guardarGlosa = async (formData) => {
+        try {
+            const res = await api.post('/api/legalizar-titulo', formData);
+            return res.data;
+        } catch (err) {
+            console.error("Error guardar glosa:", err);
+            throw err;
+        }
+    };
+
+    //  Generar PDF
+    const generarPDF = async (cod_dtra) => {
+        try {
+            // Para PDF, abrimos en nueva ventana
+            const url = `${api.defaults.baseURL}/api/generar-pdf-legalizacion/${cod_dtra}`;
+            window.open(url, '_blank');
+        } catch (err) {
+            console.error("Error generar PDF:", err);
             throw err;
         }
     };
@@ -133,7 +168,6 @@ export default function useDocleg() {
     const verDocumentoPDF = async (cod_dtra) => {
         try {
             const res = await api.get(`/api/ver-documento-pdf-legalizado/${cod_dtra}`);
-            console.log(res,"pdf")
             return res;
         } catch (err) {
             console.error("Error PDF:", err);
@@ -163,8 +197,11 @@ export default function useDocleg() {
         verificacionSitra,
         getObservaciones,
         saveObservacion,
-        generarGlosa,
         verDocumentoPDF,
         eliminarDocumento,
+        generarGlosaModal,
+        elegirModelo,
+        guardarGlosa,
+        generarPDF,
     };
 }

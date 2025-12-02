@@ -44,6 +44,7 @@ export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
             if (fetchData) fetchData(); // refrescar tabla documentos
             onClose();
         } catch (err) {
+            console.log(err)
             toast.error("No se pudo guardar la observación");
         }
     };

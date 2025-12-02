@@ -1,4 +1,4 @@
-import { CircleArrowRight } from "lucide-react";
+import { CircleArrowRight, Move, Pencil, Trash2 } from "lucide-react";
 import { TRAMITE_COLORS, TIPO_TRAMITE } from "../../Constants/tramiteDatos";
 import EditLegalizacionModal from "../../modals/EditLegalizacionModal";
 import { useModal } from "../../hooks/useModal";
@@ -70,7 +70,7 @@ export default function LegalizacionesColumns({setTramites,guardarDatosTramite})
                 <div className="space-x-1 flex flex-nowrap">
                     <button
                         title="Insertar Datos Tramite"
-                        className=" p-2 bg-white rounded-full shadow-md text-blue-600 cursor-pointer"
+                        className=" p-2 bg-white rounded-full shadow-md text-blue-600 hover:bg-gray-300 cursor-pointer"
                         onClick={() =>
                             openModal(EditLegalizacionModal, { 
                                 tramiteData: row, 
@@ -80,11 +80,15 @@ export default function LegalizacionesColumns({setTramites,guardarDatosTramite})
                         
                         }
                     >
-                        📝
+                        <Pencil size={16} />
                     </button>
 
-                    <button className="p-2 bg-white rounded-full shadow-md text-purple-600 cursor-pointer">🔁</button>
-                    <button className="p-2 bg-white rounded-full shadow-md text-red-600 cursor-pointer">🗑️</button>
+                    <button className="p-2 bg-white rounded-full shadow-md text-purple-600 hover:bg-gray-300 cursor-pointer">
+                        <Move size={16}/>
+                    </button>
+                    <button className="p-2 bg-white rounded-full shadow-md text-red-600 hover:bg-gray-300 cursor-pointer">
+                        <Trash2 size={16}/>
+                    </button>
                 </div>
             ),
         },
@@ -92,8 +96,8 @@ export default function LegalizacionesColumns({setTramites,guardarDatosTramite})
             header: "Entrega",
             accessorKey: "entrega",
             cell: () => (
-                <button className="p-2 bg-white rounded-full shadow-md text-green-600 cursor-pointer">
-                    <CircleArrowRight size={20} />
+                <button className="p-2 bg-white rounded-full shadow-md text-green-600 hover:bg-gray-300 cursor-pointer">
+                    <CircleArrowRight size={16} />
                 </button>
             ),
         },

@@ -8,8 +8,7 @@ import { usePersona } from "../hooks/usePersona";
 import api from "../api/axios";
 import { toast } from "../utils/toast";
 
-export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite }) {
-    const { closeModal } = useModal();
+export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite,onClose }) {
     if (!tramiteData) return null;
 
     const { cargarPersona, cargarApoderadoPorCi, cargarApoderadoPorTramite, guardarApoderado } = usePersona();
@@ -201,7 +200,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                 <h3 className="text-xl font-semibold flex items-center">
                     <BookText size={32} className="mr-3" /> LEGALIZACIÓN
                 </h3>
-                <X size={24} className="cursor-pointer" onClick={closeModal} />
+                <X size={24} className="cursor-pointer" onClick={onClose} />
             </div>
 
             {/* BODY */}

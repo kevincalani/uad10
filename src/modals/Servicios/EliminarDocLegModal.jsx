@@ -4,7 +4,7 @@ import { toast } from "../../utils/toast";
 import api from "../../api/axios";
 import useDocleg from "../../hooks/useDocLeg";
 
-export default function EliminarDoclegModal({ cod_dtra, onClose }) {
+export default function EliminarDoclegModal({ cod_dtra, onClose, fetchData }) {
     const { eliminarDocumento } = useDocleg();
 
     const [loading, setLoading] = useState(true);
@@ -34,6 +34,7 @@ export default function EliminarDoclegModal({ cod_dtra, onClose }) {
 
             if (res.status === "success") {
                 toast.success(res.message);
+                if(fetchData)fetchData()
                 onClose();
             } else {
                 toast.error(res.message || "No se pudo eliminar");

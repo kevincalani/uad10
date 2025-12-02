@@ -7,9 +7,9 @@ import {
 } from 'lucide-react';
 import { useModal } from '../hooks/useModal';
 import SitraModal from '../modals/servicios/SitraModal';
-import ObservarTramiteModal from '../modals/Servicios/ObservarTramiteModal';
-import GlosaLegalizacionModal from '../modals/Servicios/GlosaLegalizacionModal';
-import VerDocumentoPDFModal from '../modals/Servicios/VerDocumentoPDFModal';
+import ObservarTramiteModal from '../modals/servicios/ObservarTramiteModal';
+import GlosaLegalizacionModal from '../modals/servicios/GlosaLegalizacionModal';
+import VerDocumentoPDFModal from '../modals/servicios/VerDocumentoPDFModal';
 import EliminarDoclegModal from '../modals/servicios/EliminarDocLegModal';
 
 export default function DocumentoRow({
@@ -130,7 +130,8 @@ export default function DocumentoRow({
             title: "Generar glosa",
             onClick: () => 
                 openModal(GlosaLegalizacionModal, {
-                    doc
+                    cod_dtra:doc.cod_dtra,
+                    
                 }),
             hidden: doc.dtra_generado === "t"
         },
@@ -163,7 +164,8 @@ export default function DocumentoRow({
             icon: <Trash2 size={16} className="text-red-500" />,
             title: "Eliminar",
             onClick: () => openModal(EliminarDoclegModal, {
-                cod_dtra:doc.cod_dtra
+                cod_dtra:doc.cod_dtra,
+                fetchData
             }),
             hidden: doc.dtra_generado === "t"
         },
@@ -175,7 +177,8 @@ export default function DocumentoRow({
             <td className="px-2 py-1 text-xs">{index + 1}</td>
 
             <td className="px-2 py-1 text-xs">
-                <button
+                {doc.dtra_verificacion_sitra !==""
+                ?<button
 
                         className="p-2 bg-white rounded-full shadow-md hover:bg-gray-300 transition text-xs cursor-pointer"
                         onClick={() =>
@@ -186,10 +189,10 @@ export default function DocumentoRow({
                     >
                     {doc.dtra_verificacion_sitra==0
                     ? <CircleCheck size={16} className="text-green-500" title="Verificado SITRA" />
-                    : doc.dtra_verificacion_sitra==2
-                    ?<CircleMinus size={16} className="text-red-500" title="No Verificado SITRA" />
-                    :<></>}
+                    :<CircleMinus size={16} className="text-red-500" title="No Verificado SITRA" />
+                    }
                 </button>
+                :<></>}
             </td>
 
             <td className="px-2 py-1 text-xs">{displayNombre}</td>

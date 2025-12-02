@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { X, Eye } from "lucide-react";
-import { useModal } from "../../hooks/useModal";
 import useDocleg from "../../hooks/useDocLeg";
 import { toast } from "../../utils/toast";
 import { TIPO_DOCUMENTO } from "../../Constants/tramiteDatos";
@@ -12,8 +11,7 @@ const formatFecha = (f) => {
     return d.toLocaleDateString("es-BO");
 };
 
-export default function ModalVerDocumentoPDF({ cod_dtra }) {
-    const { closeModal } = useModal();
+export default function ModalVerDocumentoPDF({ cod_dtra, onClose }) {
     const { verDocumentoPDF } = useDocleg();
 
     const [loading, setLoading] = useState(true);
@@ -53,7 +51,7 @@ export default function ModalVerDocumentoPDF({ cod_dtra }) {
                 No existe el Título registrado en la base de datos
                 <div className="mt-6">
                     <button
-                        onClick={closeModal}
+                        onClick={onClose}
                         className="bg-gray-300 px-4 py-1 rounded hover:bg-gray-400"
                     >
                         Cerrar
@@ -73,7 +71,7 @@ export default function ModalVerDocumentoPDF({ cod_dtra }) {
                 <h3 className="text-xl font-semibold flex items-center">
                     <Eye size={26} className="mr-3" /> Título
                 </h3>
-                <X size={24} className="cursor-pointer" onClick={closeModal} />
+                <X size={24} className="cursor-pointer" onClick={onClose} />
             </div>
 
             {/* BODY */}
@@ -305,7 +303,7 @@ export default function ModalVerDocumentoPDF({ cod_dtra }) {
 
             {/* FOOTER */}
             <div className="p-4 border-t border-gray-300 flex justify-end">
-                <button className="bg-gray-500 px-4 py-1 rounded text-white hover:bg-gray-600 cursor-pointer" onClick={closeModal}>
+                <button className="bg-gray-500 px-4 py-1 rounded text-white hover:bg-gray-600 cursor-pointer" onClick={onClose}>
                     Cerrar
                 </button>
             </div>
