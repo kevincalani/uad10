@@ -15,10 +15,10 @@ export default function DocumentoTable({
     fetchData,
     confrontacion
 }) {
-
-    const {createDocumento,cambiarDestino} = useDocleg()
+    const { createDocumento, cambiarDestino } = useDocleg();
 
     const handleToggleDestino = async (cod_dtra) => {
+        // Optimistic update
         setDocumentos(prevDocs => prevDocs.map(doc =>
             doc.cod_dtra === cod_dtra
                 ? { ...doc, dtra_interno: doc.dtra_interno === 'f' ? 't' : 'f' }
@@ -31,14 +31,13 @@ export default function DocumentoTable({
             if (res?.data?.success) {
                 const nuevoValor = res.data.data.dtra_interno;
 
-                // Actualizamos el valor real que vino desde el backend
                 setDocumentos(prevDocs => prevDocs.map(doc =>
                     doc.cod_dtra === cod_dtra
                         ? { ...doc, dtra_interno: nuevoValor }
                         : doc
                 ));
 
-                toast.success(res.data.data.message || "Destino cambiado correctamente");
+                toast.success(res.data.message || "Destino cambiado correctamente");
             } else {
                 throw new Error("Error al cambiar destino");
             }
@@ -46,6 +45,7 @@ export default function DocumentoTable({
             console.error(err);
             toast.error("No se pudo cambiar el destino");
 
+            // Revert optimistic update
             setDocumentos(prevDocs => prevDocs.map(doc =>
                 doc.cod_dtra === cod_dtra
                     ? { ...doc, dtra_interno: doc.dtra_interno === 'f' ? 't' : 'f' }
@@ -53,6 +53,20 @@ export default function DocumentoTable({
             ));
         }
     };
+
+    // 🔥 Headers dinámicos según tipo de trámite
+    const esBusqueda = tramiteData.tra_tipo_tramite === 'B';
+    const esConfrontacion = tramiteData.tra_tipo_tramite === 'F';
+    
+    const headers = ['N°', 'Sitra', 'Nombre', 'Nro. Trámite'];
+    
+    // Añadir columna "Documentos" si es Búsqueda o Confrontación
+    if (esBusqueda || esConfrontacion) {
+        headers.push('Documentos');
+    }
+    
+    // Siempre incluir estas columnas al final
+    headers.push('N° Título', 'Opciones');
 
     return (
         <div className="w-full lg:w-8/12">
@@ -63,9 +77,9 @@ export default function DocumentoTable({
 
                 <div className="overflow-auto mb-4" style={{ flexGrow: 1, minHeight: '100px', maxHeight: '100%' }}>
                     <table className="min-w-full divide-y divide-gray-200 border border-gray-200 rounded-lg shadow-sm">
-                        <thead className="bg-gray-500 sticky top-0">
+                        <thead className="bg-gray-600 sticky top-0">
                             <tr>
-                                {['N°', 'Sitra', 'Nombre', 'Nro. Trámite', 'N° Título', 'Opciones'].map(header => (
+                                {headers.map(header => (
                                     <th
                                         key={header}
                                         className="px-2 py-2 text-left text-xs text-white font-semibold uppercase tracking-wider"
@@ -78,13 +92,14 @@ export default function DocumentoTable({
                         <tbody className="bg-white divide-y divide-gray-100">
                             {documentos.length === 0 ? (
                                 <tr>
-                                    <td colSpan="6" className="text-center py-4 text-gray-500 text-sm">
+                                    <td colSpan={headers.length} className="text-center py-4 text-gray-500 text-sm">
                                         No hay documentos añadidos.
                                     </td>
                                 </tr>
                             ) : (
                                 documentos.map((doc, index) => (
                                     <DocumentoRow
+                                        key={doc.cod_dtra}
                                         doc={doc}
                                         index={index}
                                         onCambiarDestino={handleToggleDestino}

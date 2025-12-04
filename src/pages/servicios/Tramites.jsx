@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { BookText } from "lucide-react";
 import { useModal } from "../../hooks/useModal";
 import { useTramitesLegalizacion } from "../../hooks/useTramitesLegalizacion";
@@ -24,7 +24,7 @@ export default function Tramites() {
     const [valoradoInput, setValoradoInput] = useState("");
     const [tramiteInput, setTramiteInput] = useState("");
 
-    const { tramites, setTramites, loading, error, generarTramite, buscarPorNumero,guardarDatosTramite } =
+    const { tramites, setTramites, loading, error, generarTramite, buscarPorNumero,guardarDatosTramite, fetchTramites } =
         useTramitesLegalizacion(selectedDate);
 
     const { openModal } = useModal();

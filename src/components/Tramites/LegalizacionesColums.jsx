@@ -2,6 +2,7 @@ import { CircleArrowRight, Move, Pencil, Trash2 } from "lucide-react";
 import { TRAMITE_COLORS, TIPO_TRAMITE } from "../../Constants/tramiteDatos";
 import EditLegalizacionModal from "../../modals/EditLegalizacionModal";
 import { useModal } from "../../hooks/useModal";
+import CambiarTipoTramiteModal from "../../modals/servicios/tramitesLegalizacion/CambiarTipoTramiteModal";
 
 export default function LegalizacionesColumns({setTramites,guardarDatosTramite}) {
     const { openModal } = useModal();
@@ -83,7 +84,15 @@ export default function LegalizacionesColumns({setTramites,guardarDatosTramite})
                         <Pencil size={16} />
                     </button>
 
-                    <button className="p-2 bg-white rounded-full shadow-md text-purple-600 hover:bg-gray-300 cursor-pointer">
+                    <button 
+                        className="p-2 bg-white rounded-full shadow-md text-purple-600 hover:bg-gray-300 cursor-pointer"
+                        title="Cambiar Tipo de Tramite"
+                        onClick={() =>
+                            openModal(CambiarTipoTramiteModal,{
+                                cod_tra:row.cod_tra
+                            })
+                        }
+                    >
                         <Move size={16}/>
                     </button>
                     <button className="p-2 bg-white rounded-full shadow-md text-red-600 hover:bg-gray-300 cursor-pointer">

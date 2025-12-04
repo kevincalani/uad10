@@ -13,7 +13,7 @@ export function useTramitesLegalizacion(selectedDate) {
     const [tramites, setTramites] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const [success, setSuccess] = useState(null);
     // -------------------------
     //  🔹 Obtener trámites
     // -------------------------
@@ -143,6 +143,36 @@ export function useTramitesLegalizacion(selectedDate) {
             };
         }
     };
+    // Cargar formulario cambiar tipo de trámite
+    const cargarFormularioCambioTramite = async (cod_tra) => {
+        try {
+            setLoading(true);
+            const res = await api.get(`/api/f-cambiar-tipo-tramite/${cod_tra}`);
+            return res.data.data;
+        } catch (err) {
+            console.error("Error al cargar formulario:", err);
+            setError(err.response?.data?.message || err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Cambiar tipo de trámite
+    const cambiarTipoTramite = async (formData) => {
+        try {
+            setLoading(true);
+            const res = await api.post('/api/e-tipo-tramite', formData);
+            setSuccess(res.data.message);
+            return res.data;
+        } catch (err) {
+            console.error("Error al cambiar tipo de trámite:", err);
+            setError(err.response?.data?.message || err.message);
+            throw err;
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
 
@@ -157,5 +187,7 @@ export function useTramitesLegalizacion(selectedDate) {
         buscarPorNumero,
         generarTramite,
         guardarDatosTramite,
+        cargarFormularioCambioTramite,
+        cambiarTipoTramite,
     };
 }

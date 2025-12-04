@@ -174,6 +174,55 @@ export default function useDocleg() {
             throw err;
         }
     };
+    // Configurar impresión PDF
+    const configurarImpresionPDF = async (cod_dtra) => {
+        try {
+            const res = await api.get(`/api/configurar-impresion-pdf-leg/${cod_dtra}`);
+            return res.data.data;
+        } catch (err) {
+            console.error("Error al cargar configuración:", err);
+            throw err;
+        }
+    };
+
+    // Cambiar posición de PDF
+    const cambiarPosicionPDF = async (cdtra, posicion) => {
+        try {
+            const res = await api.post('/api/cambiar-posicion-pdf', {
+                cdtra,
+                posicion
+            });
+            return res.data;
+        } catch (err) {
+            console.error("Error al cambiar posición:", err);
+            throw err;
+        }
+    };
+
+    // Cargar datos para corregir documento
+    const cargarDatosCorreccion = async (cod_dtra) => {
+        try {
+            const res = await api.get(`/api/fe-corregir-docleg/${cod_dtra}`);
+            return res.data.data;
+        } catch (err) {
+            console.error("Error al cargar datos para corrección:", err);
+            throw err;
+        }
+    };
+
+    // Corregir documento (deshacer generación)
+    const corregirDocumento = async (cdtra, ctra) => {
+        try {
+            const res = await api.post('/api/corregir-docleg', {
+                cdtra,
+                ctra
+            });
+            return res.data;
+        } catch (err) {
+            console.error("Error al corregir documento:", err);
+            throw err;
+        }
+    };
 
     // ======================================
     // 📌 ELIMINAR DOCUMENTO
@@ -188,6 +237,7 @@ export default function useDocleg() {
             throw err;
         }
     };
+
     return { 
         createDocumento,
         loading, 
@@ -203,5 +253,9 @@ export default function useDocleg() {
         elegirModelo,
         guardarGlosa,
         generarPDF,
+        configurarImpresionPDF,
+        cambiarPosicionPDF,
+        cargarDatosCorreccion,
+        corregirDocumento
     };
 }

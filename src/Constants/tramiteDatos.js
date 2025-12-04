@@ -119,7 +119,7 @@ export const TIPO_APODERADO = [
     { value: 'poder_notariado', label: 'Poder Notariado' },
 ];
 export const TIPO_DOCUMENTO ={
-    db: "Diploma Bachiller",
+    db: "Diploma de Bachiller",
     da: "Diploma Academico",
     tp: "Titulo Profesional",
     ca: "Certificado Academico",

@@ -135,7 +135,22 @@ export default function GlosaLegalizacionModal({ cod_dtra, onClose, onSuccess })
     }
 
     const { docleg, tramite, persona, apoderado, tramita, glosas, qr_generado } = data;
-
+    
+    // Formatear fecha (replica el formato PHP: d/m/Y)
+    const formatearFecha = (fecha) => {
+        if (!fecha || fecha === '') return '-';
+        
+        // Dividir la fecha en partes (asumiendo formato YYYY-MM-DD desde la BD)
+        const partes = fecha.split(/[-T\s]/); // Divide por guión, T o espacio
+        
+        if (partes.length < 3) return '-';
+        
+        const anio = partes[0];
+        const mes = partes[1];
+        const dia = partes[2];
+        
+        return `${dia}/${mes}/${anio}`;
+    };
     // Si el trámite está bloqueado
     if (docleg.dtra_falso === 't') {
         return (
@@ -171,7 +186,7 @@ export default function GlosaLegalizacionModal({ cod_dtra, onClose, onSuccess })
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="bg-white rounded-lg shadow-2xl w-full max-w-7xl max-h-[95vh]  flex flex-col">
             {/* Header */}
             <div className="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold flex items-center gap-2">
@@ -188,65 +203,76 @@ export default function GlosaLegalizacionModal({ cod_dtra, onClose, onSuccess })
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto p-6">
-                <div className="bg-blue-50 rounded-lg shadow-sm p-3 mb-4 inline-block">
+                <div className="bg-blue-100 rounded-lg shadow-sm p-3 mb-4 mx-auto max-w-sm">
                     <h6 className="text-gray-800 font-bold text-center">Glosa de Legalización</h6>
                 </div>
-
-                <div className="grid grid-cols-12 gap-6">
+                    <hr className="my-4 border-gray-300" /> 
+                <div className="grid grid-cols-12 gap-4">
                     {/* Columna izquierda - Datos */}
-                    <div className="col-span-4 space-y-4">
+                    <div className="col-span-12 md:col-span-4 space-y-4 text-sm">
                         {/* Datos Personales */}
-                        <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
-                            <h6 className="text-blue-600 font-bold text-sm mb-3 text-right italic">
-                                * Datos personales
-                            </h6>
-                            <div className="space-y-2 text-sm">
-                                <div className="flex justify-between border-b border-gray-400 pb-1">
-                                    <span className="font-semibold text-gray-700 italic">Nombre:</span>
-                                    <span className="text-gray-900">
-                                        {persona.per_apellido} {persona.per_nombre}
-                                    </span>
-                                </div>
-                                <div className="flex justify-between border-b border-gray-400 pb-1">
-                                    <span className="font-semibold text-gray-700 italic">CI:</span>
-                                    <span className="text-gray-900">{persona.per_ci}</span>
-                                </div>
-                                <div className="flex justify-between border-b border-gray-400 pb-1">
-                                    <span className="font-semibold text-gray-700 italic">Trámite:</span>
-                                    <span className="text-gray-900">{tramite.tre_nombre}</span>
-                                </div>
-                                <div className="flex justify-between border-b border-gray-400 pb-1">
-                                    <span className="font-semibold text-gray-700 italic">Fecha solicitud:</span>
-                                    <span className="text-gray-900">
-                                        {tramita.tra_fecha_solicitud
-                                            ? new Date(tramita.tra_fecha_solicitud).toLocaleDateString('es-BO')
-                                            : '-'}
-                                    </span>
-                                </div>
-                            </div>
+                         <div className='rounded-lg p-4 shadow-sm border border-gray-200'>
+                            <table className="w-full ">
+                                <tbody>
+                                    <tr>
+                                        <td colSpan="2" className="text-right text-blue-600 font-bold italic pb-2">
+                                            * Datos personales
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-right italic text-gray-800 pr-2 py-1">Nombre:</th>
+                                        <td className="border-b border-gray-800 text-gray-700">
+                                            {persona.per_apellido} {persona.per_nombre}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-right italic text-gray-800 pr-2 py-1">CI:</th>
+                                        <td className="border-b border-gray-800 text-gray-700">{persona.per_ci}</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-right italic text-gray-800 pr-2 py-1">Trámite:</th>
+                                        <td className="border-b border-gray-800 text-gray-700">{tramite.tre_nombre}</td>
+                                    </tr>
+                                    <tr>
+                                        <th className="text-right italic text-gray-800 pr-2 py-1">Fecha de solicitud:</th>
+                                        <td className="border-b border-gray-800 text-gray-700">
+                                            {formatearFecha(tramita.tra_fecha_solicitud)}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
 
                         {/* Datos del Apoderado */}
-                        {apoderado && tramita.cod_apo && (
-                            <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
-                                <h6 className="text-blue-600 font-bold text-sm mb-3 text-right italic">
-                                    * Datos del apoderado
-                                </h6>
-                                <div className="space-y-2 text-sm">
-                                    <div className="flex justify-between border-b border-gray-400 pb-1">
-                                        <span className="font-semibold text-gray-700 italic">Nombre apoderado:</span>
-                                        <span className="text-gray-900">
-                                            {apoderado.apo_apellido} {apoderado.per_nombre}
-                                        </span>
-                                    </div>
-                                    <div className="flex justify-between border-b border-gray-400 pb-1">
-                                        <span className="font-semibold text-gray-700 italic">CI:</span>
-                                        <span className="text-gray-900">{apoderado.apo_ci}</span>
-                                    </div>
+                        {tramita.cod_apo && tramita.cod_apo !== '' && apoderado && (
+                            <>
+                                <hr className="my-3 border-gray-300" />
+                                <div>
+                                    <table className="w-full">
+                                        <tbody>
+                                            <tr>
+                                                <td colSpan="2" className="text-right text-blue-600 font-bold italic pb-2">
+                                                    * Datos del apoderado
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th className="text-right italic text-gray-800 pr-2 py-1">
+                                                    Nombre apoderado:
+                                                </th>
+                                                <td className="border-b border-gray-800 text-gray-700">
+                                                    {apoderado.apo_apellido} {apoderado.per_nombre}
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th className="text-right italic text-gray-800 pr-2 py-1">CI:</th>
+                                                <td className="border-b border-gray-800 text-gray-700">{apoderado.apo_ci}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
+                            </>
                         )}
-
+                        
                         {/* Modelos de Glosa */}
                         {glosas && glosas.length > 0 && (
                             <div className="bg-gray-50 rounded-lg p-4 shadow-sm border border-gray-200">
@@ -260,13 +286,13 @@ export default function GlosaLegalizacionModal({ cod_dtra, onClose, onSuccess })
                                             <div
                                                 key={glosa.cod_glo}
                                                 className={`flex justify-between items-center p-2 rounded border-b border-gray-400 transition ${
-                                                    isSelected ? 'bg-red-100' : 'hover:bg-gray-300'
+                                                    isSelected ? 'bg-red-200' : 'hover:bg-gray-300'
                                                 }`}
                                             >
                                                 <span className="text-sm text-gray-800">{glosa.glo_titulo}</span>
                                                 <button
                                                     onClick={() => handleElegirModelo(glosa.cod_glo)}
-                                                    className="text-blue-600 hover:text-blue-800 transition"
+                                                    className="text-blue-600 transition p-1 bg-white hover:bg-gray-300 rounded-full cursor-pointer"
                                                     title="Seleccionar modelo"
                                                     disabled={isSelected}
                                                 >
@@ -338,74 +364,89 @@ export default function GlosaLegalizacionModal({ cod_dtra, onClose, onSuccess })
                         </div>
 
                         {/* Opciones de posición de impresión */}
-                        <div className="bg-white p-4 rounded-lg border border-gray-300">
-                            <h4 className="font-semibold text-gray-700 mb-3">Imprimir en:</h4>
-                            <div className="flex flex-nowrap gap-4">
-                                <label className="flex items-center gap-2 cursor-pointer ">
-                                    <img src="/src/assets/glosa_pdf_inicio.gif" width="35" height="35" alt="Inicio" />
-                                    <span className="text-sm">Inicio</span>
-                                    <input
-                                        type="radio"
-                                        name="posicion"
-                                        value="0"
-                                        checked={posicion === '0'}
-                                        onChange={(e) => setPosicion(e.target.value)}
-                                        className="w-4 h-4"
-                                    />
-                                </label>
-
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <img src="/src/assets/glosa_pdf_arriba.gif" width="35" height="35" alt="Superior" />
-                                    <span className="text-sm">Superior</span>
-                                    <input
-                                        type="radio"
-                                        name="posicion"
-                                        value="1"
-                                        checked={posicion === '1'}
-                                        onChange={(e) => setPosicion(e.target.value)}
-                                        className="w-4 h-4"
-                                    />
-                                </label>
-
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <img src="/src/assets/glosa_pdf_medio.gif" width="35" height="35" alt="Medio" />
-                                    <span className="text-sm">Medio</span>
-                                    <input
-                                        type="radio"
-                                        name="posicion"
-                                        value="2"
-                                        checked={posicion === '2'}
-                                        onChange={(e) => setPosicion(e.target.value)}
-                                        className="w-4 h-4"
-                                    />
-                                </label>
-
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <img src="/src/assets/glosa_pdf_abajo.gif" width="35" height="35" alt="Inferior" />
-                                    <span className="text-sm">Inferior</span>
-                                    <input
-                                        type="radio"
-                                        name="posicion"
-                                        value="3"
-                                        checked={posicion === '3'}
-                                        onChange={(e) => setPosicion(e.target.value)}
-                                        className="w-4 h-4"
-                                    />
-                                </label>
-
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <img src="/src/assets/glosa_pdf_final.gif" width="35" height="35" alt="Final" />
-                                    <span className="text-sm">Final</span>
-                                    <input
-                                        type="radio"
-                                        name="posicion"
-                                        value="4"
-                                        checked={posicion === '4'}
-                                        onChange={(e) => setPosicion(e.target.value)}
-                                        className="w-4 h-4"
-                                    />
-                                </label>
-                            </div>
+                        <div className="w-6/6">
+                            <table className="w-full">
+                                <tbody>
+                                    <tr>
+                                        <th className="text-left pr-2 align-top pt-2">Imprimir en:</th>
+                                        <td className="py-2 text-center">
+                                            <div className="flex flex-col items-center">
+                                                <img src="/src/assets/glosa_pdf_inicio.gif" width="35" height="35" alt="Inicio" className="mb-2" />
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <span className="text-base">Inicio</span>
+                                                    <input
+                                                        type="radio"
+                                                        name="posicion"
+                                                        value="0"
+                                                        checked={posicion === '0'}
+                                                        onChange={(e) => setPosicion(e.target.value)}
+                                                    />
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td className="py-2 text-center">
+                                            <div className="flex flex-col items-center">
+                                                <img src="/src/assets/glosa_pdf_arriba.gif" width="35" height="35" alt="Superior" className="mb-2" />
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <span className="text-base">Superior</span>
+                                                    <input
+                                                        type="radio"
+                                                        name="posicion"
+                                                        value="1"
+                                                        checked={posicion === '1'}
+                                                        onChange={(e) => setPosicion(e.target.value)}
+                                                    />
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td className="py-2 text-center">
+                                            <div className="flex flex-col items-center">
+                                                <img src="/src/assets/glosa_pdf_medio.gif" width="35" height="35" alt="Medio" className="mb-2" />
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <span className="text-base">Medio</span>
+                                                    <input
+                                                        type="radio"
+                                                        name="posicion"
+                                                        value="2"
+                                                        checked={posicion === '2'}
+                                                        onChange={(e) => setPosicion(e.target.value)}
+                                                    />
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td className="py-2 text-center">
+                                            <div className="flex flex-col items-center">
+                                                <img src="/src/assets/glosa_pdf_abajo.gif" width="35" height="35" alt="Inferior" className="mb-2" />
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <span className="text-base">Inferior</span>
+                                                    <input
+                                                        type="radio"
+                                                        name="posicion"
+                                                        value="3"
+                                                        checked={posicion === '3'}
+                                                        onChange={(e) => setPosicion(e.target.value)}
+                                                    />
+                                                </label>
+                                            </div>
+                                        </td>
+                                        <td className="py-2 text-center">
+                                            <div className="flex flex-col items-center">
+                                                <img src="/src/assets/glosa_pdf_final.gif" width="35" height="35" alt="Final" className="mb-2" />
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <span className="text-base">Final</span>
+                                                    <input
+                                                        type="radio"
+                                                        name="posicion"
+                                                        value="4"
+                                                        checked={posicion === '4'}
+                                                        onChange={(e) => setPosicion(e.target.value)}
+                                                    />
+                                                </label>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
