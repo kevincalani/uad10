@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import api from '../api/axios';
 import { TIPO_TRAMITE_INVERTIDO } from '../Constants/tramiteDatos';
-
 
 // Convierte fecha ISO (YYYY-MM-DD) -> DD/MM/YYYY
 const toDMY = (isoDate) => {
@@ -9,16 +8,15 @@ const toDMY = (isoDate) => {
     return `${day}/${month}/${year}`;
 };
 
-export function useTramitesLegalizacion(selectedDate) {
-    const [tramites, setTramites] = useState([]);
+export function useTramitesLegalizacion() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [success, setSuccess] = useState(null);
+
     // -------------------------
-    //  🔹 Obtener trámites
+    // 📋 LISTAR TRÁMITES POR FECHA
     // -------------------------
-    const fetchTramites = async (date) => {
-        if (!date) return;
+    const listarTramites = async (date) => {
+        if (!date) return { ok: false, error: 'Fecha requerida' };
 
         setLoading(true);
         setError(null);
@@ -31,25 +29,21 @@ export function useTramitesLegalizacion(selectedDate) {
             });
 
             const tramitas = res.data?.data?.tramitas || [];
-            setTramites(tramitas);
+
+            return { ok: true, tramites: tramitas };
 
         } catch (err) {
             console.error("Error cargando trámites:", err);
-            setError("No se pudieron cargar los trámites.");
-            setTramites([]);
+            const errorMsg = "No se pudieron cargar los trámites.";
+            setError(errorMsg);
+            return { ok: false, error: errorMsg, tramites: [] };
         } finally {
             setLoading(false);
         }
     };
 
-    // Cargar al cambiar fecha
-    useEffect(() => {
-        fetchTramites(selectedDate);
-    }, [selectedDate]);
-
-
     // -------------------------
-    //  🔹 Buscar por número de trámite
+    // 🔍 BUSCAR POR NÚMERO DE TRÁMITE
     // -------------------------
     const buscarPorNumero = async (numero) => {
         try {
@@ -57,10 +51,6 @@ export function useTramitesLegalizacion(selectedDate) {
 
             const lista = res.data?.data?.tramitas || [];
 
-            // 🔹 Actualizar la tabla con el resultado
-            setTramites(lista);
-
-            // 🔹 Retornar resultado para que la vista muestre toast
             return {
                 ok: true,
                 tramites: lista,
@@ -70,7 +60,6 @@ export function useTramitesLegalizacion(selectedDate) {
         } catch (err) {
             console.error("Error buscando trámite:", err);
 
-            // Retornar el estado del error a la vista (sin toast aquí)
             if (err.response?.status === 422) {
                 return { ok: false, error: "Número de trámite inválido" };
             }
@@ -79,34 +68,29 @@ export function useTramitesLegalizacion(selectedDate) {
         }
     };
 
-
     // -------------------------
-    //  🔹 GENERAR NUEVO TRÁMITE
+    // ➕ GENERAR NUEVO TRÁMITE
     // -------------------------
-    const generarTramite = async (tipoTexto) => {
+    const generarTramite = async (tipoTexto, fecha) => {
         try {
-            const fechaDMY = toDMY(selectedDate);
-            const tipoCodigo = TIPO_TRAMITE_INVERTIDO[tipoTexto]; // "Legalizacion" → "L"
+            const fechaDMY = toDMY(fecha);
+            const tipoCodigo = TIPO_TRAMITE_INVERTIDO[tipoTexto];
 
             const res = await api.post("/api/generar-numero", {
                 fecha: fechaDMY,
                 tipo: tipoCodigo,
             });
 
-            const nuevo = res.data?.data;
-
-            // Agregar al estado sin refetch
-            setTramites((prev) => [...prev, nuevo]);
-
-            return nuevo;
+            return { ok: true, tramite: res.data?.data };
 
         } catch (error) {
             console.error("Error generando trámite:", error);
-            throw error;
+            return { ok: false, error: "Error al generar trámite" };
         }
     };
-        // -------------------------
-    // 🔹 GUARDAR DATOS PERSONALES DEL TRÁMITE
+
+    // -------------------------
+    // 💾 GUARDAR DATOS PERSONALES DEL TRÁMITE
     // -------------------------
     const guardarDatosTramite = async (formData) => {
         try {
@@ -114,15 +98,6 @@ export function useTramitesLegalizacion(selectedDate) {
 
             if (res.data.status === "success") {
                 const { tramite: t, persona: p } = res.data.data;
-
-                // 🔹 Actualizar la lista fusionando datos de persona y tramite
-                setTramites(prev =>
-                    prev.map(x =>
-                        x.cod_tra === t.cod_tra
-                            ? { ...x, ...t, per_nombre: p.per_nombre, per_apellido: p.per_apellido, per_ci: p.per_ci }
-                            : x
-                    )
-                );
 
                 return {
                     ok: true,
@@ -143,51 +118,67 @@ export function useTramitesLegalizacion(selectedDate) {
             };
         }
     };
-    // Cargar formulario cambiar tipo de trámite
+
+    // -------------------------
+    // 🔄 CAMBIAR TIPO DE TRÁMITE
+    // -------------------------
     const cargarFormularioCambioTramite = async (cod_tra) => {
         try {
-            setLoading(true);
             const res = await api.get(`/api/f-cambiar-tipo-tramite/${cod_tra}`);
-            return res.data.data;
+            return { ok: true, data: res.data.data };
         } catch (err) {
             console.error("Error al cargar formulario:", err);
-            setError(err.response?.data?.message || err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            return { ok: false, error: err.response?.data?.message || "Error al cargar formulario" };
         }
     };
 
-    // Cambiar tipo de trámite
     const cambiarTipoTramite = async (formData) => {
         try {
-            setLoading(true);
             const res = await api.post('/api/e-tipo-tramite', formData);
-            setSuccess(res.data.message);
-            return res.data;
+            return { ok: true, message: res.data.message, data: res.data };
         } catch (err) {
             console.error("Error al cambiar tipo de trámite:", err);
-            setError(err.response?.data?.message || err.message);
-            throw err;
-        } finally {
-            setLoading(false);
+            return { ok: false, error: err.response?.data?.message || "Error al cambiar tipo" };
         }
     };
 
+    // -------------------------
+    // 🗑️ ELIMINAR TRÁMITE
+    // -------------------------
+    const cargarFormularioEliminarTramite = async (cod_tra) => {
+        try {
+            const res = await api.get(`/api/f-eli-tra-legalizacion/${cod_tra}`);
+            return { ok: true, data: res.data.data };
+        } catch (err) {
+            console.error("Error al cargar datos para eliminar:", err);
+            return { ok: false, error: err.response?.data?.message || "Error al cargar datos" };
+        }
+    };
 
+    // -------------------------
+    // 📦 PANEL DE ENTREGA
+    // -------------------------
+    const cargarPanelEntrega = async (cod_tra) => {
+        try {
+            const res = await api.get(`/api/panel-entrega-legalizacion/${cod_tra}`);
+            return { ok: true, data: res.data.data };
+        } catch (err) {
+            console.error("Error al cargar panel de entrega:", err);
+            return { ok: false, error: err.response?.data?.message || "Error al cargar panel" };
+        }
+    };
 
     return {
-        tramites,
-        setTramites,
         loading,
         error,
-        reload: () => fetchTramites(selectedDate),
-
-        // 🆕 Nuevas funciones
+        // Funciones de API
+        listarTramites,
         buscarPorNumero,
         generarTramite,
         guardarDatosTramite,
         cargarFormularioCambioTramite,
         cambiarTipoTramite,
+        cargarFormularioEliminarTramite,
+        cargarPanelEntrega,
     };
 }

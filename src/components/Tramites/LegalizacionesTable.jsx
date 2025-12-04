@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState } from "react";
 import LegalizacionesColumns from "./LegalizacionesColums";
 
 export default function LegalizacionesTable({ tramites, loading, error, selectedDate, setTramites, guardarDatosTramite }) {

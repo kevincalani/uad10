@@ -188,12 +188,15 @@ export default function useDocleg() {
     // Cambiar posición de PDF
     const cambiarPosicionPDF = async (cdtra, posicion) => {
         try {
-            const res = await api.post('/api/cambiar-posicion-pdf', {
-                cdtra,
-                posicion
+            const res = await api.get('/api/cambiar-posicion-pdf', {
+                params:{
+                    cdtra,
+                    posicion
+                }
             });
             return res.data;
         } catch (err) {
+            console.log(cdtra,posicion)
             console.error("Error al cambiar posición:", err);
             throw err;
         }
