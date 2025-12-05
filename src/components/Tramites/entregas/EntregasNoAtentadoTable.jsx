@@ -1,22 +1,41 @@
 // 📁 components/entregas/TablaEntregasNoAtentado.jsx
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { useModal } from '../../../hooks/useModal';
 import DataTable from 'react-data-table-component';
 import EntregaNoAtentadoModal from '../../../modals/servicios/entrega/EntregaNoAtentadoModal';
+import { useNoAtentado } from '../../../hooks/useNoAtentados';
+import { ArrowRightCircle } from 'lucide-react';
 
 export default function EntregasNoAtentadoTable ({ noAtentado }) {
   const { openModal } = useModal();
+  const { obtenerCandidatos, formatearCandidatosTexto } = useNoAtentado();
+  const [candidatosPorTramite, setCandidatosPorTramite] = useState({});
+  const [cargandoCandidatos, setCargandoCandidatos] = useState(false);
+
+   useEffect(() => {
+    if (noAtentado && noAtentado.length > 0) {
+      cargarTodosCandidatos();
+    }
+  }, [noAtentado]);
+
+  const cargarTodosCandidatos = async () => {
+    setCargandoCandidatos(true);
+    const candidatosTemp = {};
+
+    // Cargar candidatos para todos los trámites
+    for (const tramite of noAtentado) {
+      const candidatos = await obtenerCandidatos(tramite.cod_dtra);
+      candidatosTemp[tramite.cod_dtra] = candidatos;
+    }
+
+    setCandidatosPorTramite(candidatosTemp);
+    setCargandoCandidatos(false);
+  };
 
   const formatearFecha = (fecha) => {
     if (!fecha) return '';
     const date = new Date(fecha);
     return date.toLocaleDateString('es-BO');
-  };
-
-  // Función para obtener candidatos (similar a la del blade)
-  const obtenerCandidatos = (cod_dtra) => {
-    // Esto debe venir desde el backend, por ahora retornamos placeholder
-    return 'Candidatos...';
   };
 
   const columns = [
@@ -52,11 +71,22 @@ export default function EntregasNoAtentadoTable ({ noAtentado }) {
     },
     {
       name: 'Nombres',
-      cell: (row) => (
-        <span className="font-bold text-gray-800 text-xs" style={{ fontFamily: 'Times New Roman' }}>
-          {obtenerCandidatos(row.cod_dtra)}
-        </span>
-      ),
+      cell: (row) => {
+        const candidatos = candidatosPorTramite[row.cod_dtra] || [];
+        const textoFormateado = formatearCandidatosTexto(candidatos);
+        
+        return (
+          <div className="text-xs" style={{ fontFamily: 'Times New Roman' }} title={textoFormateado}>
+            {cargandoCandidatos ? (
+              <span className="text-gray-400 italic">Cargando...</span>
+            ) : candidatos.length > 0 ? (
+              <CandidatosList candidatos={candidatos} />
+            ) : (
+              <span className="text-gray-500 italic">Sin candidatos</span>
+            )}
+          </div>
+        );
+      },
       grow: 2
     },
     {
@@ -69,10 +99,10 @@ export default function EntregasNoAtentadoTable ({ noAtentado }) {
       cell: (row) => (
         <button
           onClick={() => openModal(EntregaNoAtentadoModal, { cod_dtra: row.cod_dtra })}
-          className="text-green-600 hover:text-green-800 text-xl"
+          className="p-1 rounded-full shadow-sm text-green-600 hover:bg-gray-300 cursor-pointer"
           title="Entregar trámite"
         >
-          <i className="fas fa-hand-point-right"></i>
+          <ArrowRightCircle />
         </button>
       ),
       center: true,
@@ -124,6 +154,36 @@ export default function EntregasNoAtentadoTable ({ noAtentado }) {
           rangeSeparatorText: 'de'
         }}
       />
+    </div>
+  );
+};
+// Componente auxiliar para mostrar la lista de candidatos
+const CandidatosList = ({ candidatos }) => {
+  if (!candidatos || candidatos.length === 0) {
+    return <span className="text-gray-500 italic">Sin candidatos</span>;
+  }
+
+  // Si hay muchos candidatos, mostrar solo los primeros 3 con un indicador
+  const candidatosAMostrar = candidatos.slice(0, 3);
+  const hayMas = candidatos.length > 3;
+
+  return (
+    <div className="space-y-1">
+      {candidatosAMostrar.map((candidato, index) => (
+        <div key={index} className="text-gray-800 font-bold">
+          {candidato.nombre_completo}
+          {candidato.carg_nombre && (
+            <span className="text-blue-600 ml-1 font-normal">
+              - {candidato.carg_nombre}
+            </span>
+          )}
+        </div>
+      ))}
+      {hayMas && (
+        <div className="text-gray-500 italic text-xs">
+          +{candidatos.length - 3} más...
+        </div>
+      )}
     </div>
   );
 };

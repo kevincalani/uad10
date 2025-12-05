@@ -7,15 +7,21 @@ import { toast } from '../../utils/toast';
 import EntregasLegalizacionTable from '../../components/Tramites/entregas/EntregasLegalizacionTable';
 import EntregasNoAtentadoTable from '../../components/Tramites/entregas/EntregasNoAtentadoTable';
 import { BookText, Search } from 'lucide-react';
+import { useNoAtentado } from '../../hooks/useNoAtentados';
 
 export default function EntregasTramites () {
   const { loading, entregas, noAtentado, obtenerListaEntregas } = useEntregas();
+  const { limpiarCache } = useNoAtentado()  
   const { buscarPorNumero } = useTramitesLegalizacion();
   const [tabActiva, setTabActiva] = useState('legalizaciones');
   const [numeroBusqueda, setNumeroBusqueda] = useState('');
 
   useEffect(() => {
     cargarDatos();
+      // Limpiar cache al desmontar
+    return () => {
+      limpiarCache();
+      };
   }, []);
 
   const cargarDatos = async () => {

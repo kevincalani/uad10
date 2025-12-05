@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { useModal } from '../../../hooks/useModal';
 import DataTable from 'react-data-table-component';
 import EntregaModal from '../../../modals/servicios/entrega/EntregaModal';
+import { ArrowRightCircle } from 'lucide-react';
 
 export default function EntregasLegalizacionTable ({ entregas }) {
   const { openModal } = useModal();
@@ -85,10 +86,10 @@ export default function EntregasLegalizacionTable ({ entregas }) {
       cell: (row) => (
         <button
           onClick={() => openModal(EntregaModal, { cod_tra: row.cod_tra })}
-          className="text-green-600 hover:text-green-800 text-xl"
+          className="p-1 rounded-full shadow-sm text-green-600 hover:bg-gray-300"
           title="Entregar legalizaciones"
         >
-          <i className="fas fa-hand-point-right"></i>
+          <ArrowRightCircle/>
         </button>
       ),
       center: true,
