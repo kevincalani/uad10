@@ -1,33 +1,39 @@
 // 📁 components/reportes/ModalReporteGeneral.jsx
-import React, { useState, useEffect } from 'react';
-import { useReporteServicios } from '../../../hooks/useReporteServicios';
-//import LoadingSpinner from '../common/LoadingSpinner';
-import ResultadoReporteGeneral from '../../../components/Tramites/reportes/ResultadoReporteGeneral';
-import { ChartLine } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { useReporteServicios } from "../../../hooks/useReporteServicios";
+import ResultadoReporteGeneral from "../../../components/Tramites/reportes/ResultadoReporteGeneral";
+import { ChartLine, X } from "lucide-react";
+import LoadingSpinner from "../../../components/common/LoadingSpinner";
 
-export default function ReporteGeneralModal ({ onClose }){
-  const { loading, tramites, obtenerTramites, generarReporteGeneral, resultado } = useReporteServicios();
-  
+export default function ReporteGeneralModal({ onClose }) {
+  const {
+    loading,
+    tramites,
+    obtenerTramites,
+    generarReporteGeneral,
+    resultado,
+  } = useReporteServicios();
+
   const [formData, setFormData] = useState({
-    tramite: '',
-    tipo: '',
-    fecha_inicial: '',
-    fecha_final: ''
+    tramite: "",
+    tipo: "",
+    fecha_inicial: "",
+    fecha_final: "",
   });
 
   useEffect(() => {
-    obtenerTramites('general');
+    obtenerTramites("general");
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Limpiar el otro campo cuando se selecciona uno
-    if (name === 'tramite' && value) {
-      setFormData(prev => ({ ...prev, tipo: '' }));
-    } else if (name === 'tipo' && value) {
-      setFormData(prev => ({ ...prev, tramite: '' }));
+    if (name === "tramite" && value) {
+      setFormData((prev) => ({ ...prev, tipo: "" }));
+    } else if (name === "tipo" && value) {
+      setFormData((prev) => ({ ...prev, tramite: "" }));
     }
   };
 
@@ -40,14 +46,14 @@ export default function ReporteGeneralModal ({ onClose }){
       {/* Header */}
       <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
         <h5 className="text-white text-xl font-semibold flex items-center">
-          <ChartLine className='mr-2'/>
+          <ChartLine className="mr-2" />
           Reporte general
         </h5>
         <button
           onClick={onClose}
-          className="text-white hover:text-gray-200 text-2xl font-bold transition"
+          className="p-1 rounded-full text-white hover:bg-gray-50/25 text-2xl font-bold transition cursor-pointer"
         >
-          ×
+          <X/>
         </button>
       </div>
 
@@ -61,11 +67,11 @@ export default function ReporteGeneralModal ({ onClose }){
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Formulario */}
-          <div className="lg:col-span-1 border rounded shadow-lg p-4">
+          <div className="lg:col-span-1 border border-gray-300 rounded-lg shadow-sm p-4">
             <span className="text-blue-600 font-bold block text-center mb-4">
               * DATOS PARA EL REPORTE
             </span>
-            
+
             <table className="w-full text-sm">
               <tbody>
                 <tr>
@@ -78,7 +84,7 @@ export default function ReporteGeneralModal ({ onClose }){
                       className="w-full px-2 py-1 text-sm border-0 focus:outline-none"
                     >
                       <option value=""></option>
-                      {tramites.map(t => (
+                      {tramites.map((t) => (
                         <option key={t.cod_tre} value={t.cod_tre}>
                           {t.tre_nombre}
                         </option>
@@ -104,7 +110,9 @@ export default function ReporteGeneralModal ({ onClose }){
                   </td>
                 </tr>
                 <tr>
-                  <th className="text-right italic pr-2 py-2">Periodo inicial:</th>
+                  <th className="text-right italic pr-2 py-2">
+                    Periodo inicial:
+                  </th>
                   <td className="border-b border-gray-800">
                     <input
                       type="date"
@@ -116,7 +124,9 @@ export default function ReporteGeneralModal ({ onClose }){
                   </td>
                 </tr>
                 <tr>
-                  <th className="text-right italic pr-2 py-2">Periodo final:</th>
+                  <th className="text-right italic pr-2 py-2">
+                    Periodo final:
+                  </th>
                   <td className="border-b border-gray-800">
                     <input
                       type="date"
@@ -133,45 +143,38 @@ export default function ReporteGeneralModal ({ onClose }){
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="mt-4 float-right px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm disabled:bg-blue-300"
+              className="mt-4 float-right px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm disabled:bg-blue-300 cursor-pointer"
             >
-              {loading ? 'Generando...' : 'Generar'}
+              {loading ? "Generando..." : "Generar"}
             </button>
           </div>
 
           {/* Panel de resultados*/}
-<div className="lg:col-span-2">
-<div className="border border-gray-200 rounded p-4">
-{loading ? (
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl p-6">
-                <div className="flex items-center justify-center h-64">
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-                        <p className="text-gray-600 font-medium">Cargando configuración...</p>
-                    </div>
-                </div>
+          <div className="lg:col-span-2">
+            <div className="border border-gray-300 rounded-lg shadow-sm p-4">
+              {loading ? (
+                <LoadingSpinner />
+              ) : resultado ? (
+                <ResultadoReporteGeneral resultado={resultado} />
+              ) : (
+                <p className="text-gray-500 text-center mt-10">
+                  Complete los datos y presione "Generar" para ver los
+                  resultados
+                </p>
+              )}
             </div>
-        
-) : resultado ? (
-<ResultadoReporteGeneral resultado={resultado} />
-) : (
-<p className="text-gray-500 text-center mt-10">
-Complete los datos y presione "Generar" para ver los resultados
-</p>
-)}
-</div>
-</div>
-</div>
-</div>
- {/* Footer */}
-  <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
-    <button
-      onClick={onClose}
-      className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition text-sm"
-    >
-      Cerrar
-    </button>
-  </div>
-</div>
-);
-};
+          </div>
+        </div>
+      </div>
+      {/* Footer */}
+      <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-400">
+        <button
+          onClick={onClose}
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition text-sm cursor-pointer"
+        >
+          Cerrar
+        </button>
+      </div>
+    </div>
+  );
+}

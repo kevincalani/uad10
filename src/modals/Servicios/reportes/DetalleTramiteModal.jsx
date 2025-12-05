@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useReporteServicios } from '../../../hooks/useReporteServicios';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { ChartLine } from 'lucide-react';
+import { ChartLine, X } from 'lucide-react';
 
 export default function DetalleTramiteModal ({ onClose, cod_dtra }){
   const { loading, obtenerDetalleTramite } = useReporteServicios();
@@ -90,9 +90,9 @@ export default function DetalleTramiteModal ({ onClose, cod_dtra }){
         </h5>
         <button
           onClick={onClose}
-          className="text-white hover:text-gray-200 text-2xl font-bold transition"
+          className="p-1 rounded-full text-white hover:bg-gray-50/25 text-2xl font-bold transition cursor-pointer"
         >
-          ×
+          <X/>
         </button>
       </div>
 

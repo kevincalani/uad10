@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useReporteServicios } from '../../../hooks/useReporteServicios';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { toast } from '../../../utils/toast';
-import { ChartLineIcon } from 'lucide-react';
+import { ChartLineIcon, X } from 'lucide-react';
 
 export default function ReporteEntregasPDFModal ({ onClose }) {
   const { loading, tramites, obtenerTramites, descargarPDFEntregas } = useReporteServicios();
@@ -45,9 +45,9 @@ export default function ReporteEntregasPDFModal ({ onClose }) {
         </h5>
         <button
           onClick={onClose}
-          className="text-white hover:text-gray-200 text-2xl font-bold transition"
+          className="p-1 rounded-full text-white hover:bg-gray-50/25 text-2xl font-bold transition cursor-pointer"
         >
-          ×
+          <X/>
         </button>
       </div>
 
@@ -59,9 +59,9 @@ export default function ReporteEntregasPDFModal ({ onClose }) {
 
         <hr className="my-4 border-gray-300" />
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Formulario */}
-          <div className="lg:col-span-1 border rounded shadow-lg p-4">
+          <div className="lg:col-span-1 border border-gray-300 rounded-lg shadow-sm p-4">
             <span className="text-blue-600 font-bold block text-center mb-4">
               * DATOS PARA EL REPORTE
             </span>
@@ -148,7 +148,7 @@ export default function ReporteEntregasPDFModal ({ onClose }) {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm disabled:bg-blue-300"
+                  className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition text-sm disabled:bg-blue-300 cursor-pointer"
                 >
                   {loading ? 'Generando...' : 'Generar'}
                 </button>
@@ -157,8 +157,8 @@ export default function ReporteEntregasPDFModal ({ onClose }) {
           </div>
 
           {/* Panel de información */}
-          <div className="lg:col-span-3">
-            <div className="h-[600px] border border-gray-200 rounded p-4 flex items-center justify-center">
+          <div className="lg:col-span-2">
+            <div className="h-[350px] border border-gray-300 rounded-lg shadow-sm p-4 flex items-center justify-center">
               {loading ? (
                 <LoadingSpinner />
               ) : (
@@ -175,10 +175,10 @@ export default function ReporteEntregasPDFModal ({ onClose }) {
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
+      <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-300">
         <button
           onClick={onClose}
-          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition text-sm"
+          className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition text-sm cursor-pointer"
         >
           Cerrar
         </button>
