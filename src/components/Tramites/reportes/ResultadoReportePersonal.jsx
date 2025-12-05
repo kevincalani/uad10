@@ -131,7 +131,7 @@ export default function ResultadoReportePersonal({ resultado, formData, onRegene
                   ) : tramite.dtra_generado === 't' ? (
                     <div className="flex flex-wrap items-center">
                       <span className="text-green-600">Por entregar</span>
-                      <div>
+                      <div className='flex flex-nowrap'>
                       <button
                         onClick={() => openModal(DetalleTramiteModal, { cod_dtra: tramite.cod_dtra })}
                         className="p-1 rounded-full shadow-sm text-blue-600 hover:bg-gray-300"

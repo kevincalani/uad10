@@ -3,6 +3,7 @@ import React, { useState} from 'react';
 import { useReporteServicios } from '../../../hooks/useReporteServicios';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import ResultadoReportePersonal from '../../../components/Tramites/reportes/ResultadoReportePersonal';
+import { ChartLine } from 'lucide-react';
 
 export default function ReportePersonalModal ({ onClose }) {
   const { loading, generarReportePersonal, cargarDatosPersona, resultado } = useReporteServicios();
@@ -51,7 +52,7 @@ export default function ReportePersonalModal ({ onClose }) {
       {/* Header */}
       <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
         <h5 className="text-white text-xl font-semibold flex items-center">
-          <i className="fas fa-chart-line mr-2"></i>
+          <ChartLine className='mr-2'/>
           Reporte
         </h5>
         <button

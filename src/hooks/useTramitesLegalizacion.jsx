@@ -155,7 +155,17 @@ export function useTramitesLegalizacion() {
         }
     };
 
-    // -------------------------
+    const eliminarTramite = async (cod_tra) => {
+        try {
+            const res = await api.post('/api/eli-traleg', { ctra: cod_tra });
+            return { ok: true, message: res.data.message, fecha: res.data.data.fecha };
+        } catch (err) {
+            console.error("Error al eliminar trámite:", err);
+            return { ok: false, error: err.response?.data?.message || "Error al eliminar" };
+        }
+    };
+
+// -------------------------
     // 📦 PANEL DE ENTREGA
     // -------------------------
     const cargarPanelEntrega = async (cod_tra) => {
@@ -165,6 +175,26 @@ export function useTramitesLegalizacion() {
         } catch (err) {
             console.error("Error al cargar panel de entrega:", err);
             return { ok: false, error: err.response?.data?.message || "Error al cargar panel" };
+        }
+    };
+
+    const cargarConfirmacionEntrega = async (varios, cod_dtra) => {
+        try {
+            const res = await api.get(`/api/datos-legalizado/${varios}/${cod_dtra}`);
+            return { ok: true, data: res.data.data };
+        } catch (err) {
+            console.error("Error al cargar confirmación:", err);
+            return { ok: false, error: err.response?.data?.message || "Error al cargar" };
+        }
+    };
+
+    const registrarEntrega = async (formData) => {
+        try {
+            const res = await api.post('/api/g-entrega', formData);
+            return { ok: true, message: res.data.message, data: res.data.data };
+        } catch (err) {
+            console.error("Error al registrar entrega:", err);
+            return { ok: false, error: err.response?.data?.message || "Error al registrar" };
         }
     };
 
@@ -179,6 +209,9 @@ export function useTramitesLegalizacion() {
         cargarFormularioCambioTramite,
         cambiarTipoTramite,
         cargarFormularioEliminarTramite,
+        eliminarTramite,
         cargarPanelEntrega,
+        cargarConfirmacionEntrega,
+        registrarEntrega
     };
 }

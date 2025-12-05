@@ -11,7 +11,7 @@ export default function ReportesPage(){
   const { openModal } = useModal();
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gray-100">
       {/* Header */}
       <div className="bg-white shadow-md rounded-lg mb-6">
         <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
@@ -40,7 +40,7 @@ export default function ReportesPage(){
 
           {/* Card de reportes */}
           <div className="bg-white shadow-sm rounded-lg ">
-            <div className="p-4">
+            <div className="p-1">
               <div className="bg-blue-600 text-white px-4 py-2 rounded shadow-md w-fit mx-auto mb-4">
                 <h5 className="text-lg text-center font-semibold">Reportes y estadísticas</h5>
               </div>

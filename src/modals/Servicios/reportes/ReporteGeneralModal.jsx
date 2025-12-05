@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useReporteServicios } from '../../../hooks/useReporteServicios';
 //import LoadingSpinner from '../common/LoadingSpinner';
 import ResultadoReporteGeneral from '../../../components/Tramites/reportes/ResultadoReporteGeneral';
+import { ChartLine } from 'lucide-react';
 
 export default function ReporteGeneralModal ({ onClose }){
   const { loading, tramites, obtenerTramites, generarReporteGeneral, resultado } = useReporteServicios();
@@ -39,7 +40,7 @@ export default function ReporteGeneralModal ({ onClose }){
       {/* Header */}
       <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
         <h5 className="text-white text-xl font-semibold flex items-center">
-          <i className="fas fa-chart-line mr-2"></i>
+          <ChartLine className='mr-2'/>
           Reporte general
         </h5>
         <button

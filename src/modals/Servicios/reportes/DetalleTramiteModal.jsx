@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useReporteServicios } from '../../../hooks/useReporteServicios';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import { ChartLine } from 'lucide-react';
 
 export default function DetalleTramiteModal ({ onClose, cod_dtra }){
   const { loading, obtenerDetalleTramite } = useReporteServicios();
@@ -14,7 +15,12 @@ export default function DetalleTramiteModal ({ onClose, cod_dtra }){
   const cargarDetalle = async () => {
     const data = await obtenerDetalleTramite(cod_dtra);
     if (data) {
-      setDetalle(data);
+      // Normalizar bitácora para evitar estructura anidada
+      const bitacoraReal = data.bitacora?.original?.data || [];
+      setDetalle({
+        ...data,
+      bitacora:bitacoraReal
+      });
     }
   };
 
@@ -77,9 +83,9 @@ export default function DetalleTramiteModal ({ onClose, cod_dtra }){
   return (
     <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="bg-gradient-to-r from-green-700 to-green-600 px-6 py-4 flex items-center justify-between">
+      <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
         <h5 className="text-white text-xl font-semibold flex items-center">
-          <i className="fas fa-chart-line mr-2"></i>
+          <ChartLine className='mr-2'/>
           Reporte
         </h5>
         <button
@@ -92,7 +98,7 @@ export default function DetalleTramiteModal ({ onClose, cod_dtra }){
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto p-6 text-sm">
-        <div className="bg-gradient-to-r from-green-700 to-green-600 text-white px-4 py-2 rounded shadow-md w-2/3 mx-auto mb-6">
+        <div className="bg-blue-600 text-white px-4 py-2 rounded shadow-md w-2/3 mx-auto mb-6">
           <h5 className="text-center font-semibold">Detalle del trámite</h5>
         </div>
 
@@ -120,11 +126,11 @@ export default function DetalleTramiteModal ({ onClose, cod_dtra }){
               <tbody>
                 <tr>
                   <th className="text-right italic pr-2 py-1 align-top">Trámite:</th>
-                  <td className="border-b border-gray-800 py-1">{tramite.tre_nombre}</td>
+                  <td className="border-b border-gray-600 py-1">{tramite.tre_nombre}</td>
                 </tr>
                 <tr>
                   <th className="text-right italic pr-2 py-1 align-top">Tipo de trámite:</th>
-                  <td className="border-b border-gray-800 py-1">
+                  <td className="border-b border-gray-600 py-1">
                     <span className="bg-red-600 text-white px-2 py-1 rounded text-xs font-bold italic">
                       {tipoTramiteNombre(tramite.tre_tipo)}
                     </span>
@@ -215,33 +221,33 @@ export default function DetalleTramiteModal ({ onClose, cod_dtra }){
             <div className="overflow-x-auto">
               <table className="w-full text-xs border-collapse">
                 <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border px-2 py-1">#</th>
-                    <th className="border px-2 py-1">Operación</th>
-                    <th className="border px-2 py-1">Antiguo</th>
-                    <th className="border px-2 py-1">Nuevo</th>
-                    <th className="border px-2 py-1">Fecha y hora</th>
-                    <th className="border px-2 py-1">Usuario</th>
+                  <tr className="bg-gray-300">
+                    <th className="border border-gray-600 px-2 py-1">#</th>
+                    <th className="border border-gray-600 px-2 py-1">Operación</th>
+                    <th className="border border-gray-600 px-2 py-1">Antiguo</th>
+                    <th className="border border-gray-600 px-2 py-1 w-2">Nuevo</th>
+                    <th className="border border-gray-600 px-2 py-1">Fecha y hora</th>
+                    <th className="border border-gray-600 px-2 py-1">Usuario</th>
                   </tr>
                 </thead>
                 <tbody>
                   {bitacora && bitacora.length > 0 ? (
                     bitacora.map((b, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
-                        <td className="border px-2 py-1">{index + 1}</td>
-                        <td className="border px-2 py-1">
+                      <tr key={index} className="hover:bg-gray-200 text-gray-800">
+                        <td className="border border-gray-300 px-2 py-1">{index + 1}</td>
+                        <td className="border border-gray-300 px-2 py-1">
                           {operacionBitacora(b.eve_operacion)}
                         </td>
-                        <td className="border px-2 py-1">{b.eve_antiguo}</td>
-                        <td className="border px-2 py-1">
+                        <td className="border border-gray-300 px-2 py-1">{b.eve_antiguo}</td>
+                        <td className="border border-gray-300 px-2 py-1 w-[200px] break-all">
                           {typeof b.eve_nuevo === 'object'
                             ? JSON.stringify(b.eve_nuevo)
                             : b.eve_nuevo}
                         </td>
-                        <td className="border px-2 py-1">
+                        <td className="border border-gray-300 px-2 py-1">
                           {formatearFechaHora(b.created_at)}
                         </td>
-                        <td className="border px-2 py-1 text-blue-600">
+                        <td className="border border-gray-300 px-2 py-1 text-blue-600">
                           * {b.bit_usuario}
                         </td>
                       </tr>
