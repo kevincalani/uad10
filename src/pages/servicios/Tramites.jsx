@@ -127,12 +127,14 @@ export default function Tramites() {
 
     return (
         <div className="p-6 bg-gray-100 min-h-screen">
-            <div className="p-8 bg-white rounded-lg shadow-md">
+            <div className=" bg-white rounded-lg shadow-md">
                 {/* Título */}
-                <h1 className="text-3xl font-bold mb-6 text-gray-800 border-b pb-2 flex items-center">
-                    <BookText className="mr-3" size={32} /> LEGALIZACIONES
-                </h1>
-
+                <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg">    
+                    <h1 className="text-2xl font-bold flex items-center">
+                        <BookText className="mr-2" size={32} /> LEGALIZACIONES
+                    </h1>
+                </div>
+            <div className="p-6">
                 {/* Controles principales */}
                 <div className="flex flex-col lg:flex-row justify-between items-start gap-4 mb-4 border-b pb-6">
                     {/* PARTE IZQUIERDA: Búsqueda de Fecha y Botones de Acción */}
@@ -220,7 +222,7 @@ export default function Tramites() {
                         </span>
                     </div>
                 </div>
-
+            
                 {/* Tabla de trámites */}
                 <LegalizacionesTable
                     tramites={tramites}
@@ -231,6 +233,7 @@ export default function Tramites() {
                     error={error}
                     selectedDate={selectedDate}
                 />
+                </div>
             </div>
         </div>
     );

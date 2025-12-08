@@ -3,8 +3,6 @@ import { BookText } from "lucide-react";
 import TramiteActionButton from "../../components/TramiteActionButton";
 import { useModal } from "../../hooks/useModal";
 import AddEditTramiteModal from "../../modals/AddEditTramiteModal";
-import GlosaModal from "../../modals/GlosaModal";
-import DeleteConfirmModal from "../../modals/DeleteConfirmModal";
 import TramitesTable from "../../components/Tramites/TramitesTable";
 import api from "../../api/axios";
 import {
@@ -102,7 +100,7 @@ export default function ConfigurarTramites() {
   // --- Render principal ---
   return (
     <div className="p-6 bg-gray-100">
-      <div className="p-8 bg-white rounded-lg shadow-md">
+      <div className="p-6 bg-white rounded-lg shadow-md">
         {/* Título */}
         <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center">
           <BookText className="mr-3 text-gray-800" size={32} />

@@ -1,4 +1,3 @@
-// 📁 pages/EntregasPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useEntregas } from '../../hooks/useEntregas';
 import { useTramitesLegalizacion } from '../../hooks/useTramitesLegalizacion';
@@ -49,7 +48,7 @@ export default function EntregasTramites () {
   };
 
   return (
-    <div className="p-6 bg-gray-200">
+    <div className="p-6 bg-gray-100">
       {/* Header */}
       <div className="bg-white shadow-md rounded-lg mb-6">
         <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
@@ -88,7 +87,7 @@ export default function EntregasTramites () {
           {/* Card de entregas */}
           <div className="bg-white shadow-sm rounded-lg border border-gray-300">
             <div className="p-6">
-              <div className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md w-fit mb-4">
+              <div className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-md w-fit mb-4 mx-auto">
                 <h5 className="text-lg font-semibold">Lista de Entrega de trámites</h5>
               </div>
 
@@ -104,7 +103,7 @@ export default function EntregasTramites () {
                 <nav className="flex space-x-4">
                   <button
                     onClick={() => setTabActiva('legalizaciones')}
-                    className={`py-2 px-4 font-medium text-sm transition ${
+                    className={`py-2 px-4 font-medium text-sm transition cursor-pointer ${
                       tabActiva === 'legalizaciones'
                         ? 'border-b-2 border-blue-600 text-blue-600'
                         : 'text-gray-600 hover:text-gray-800'
@@ -114,7 +113,7 @@ export default function EntregasTramites () {
                   </button>
                   <button
                     onClick={() => setTabActiva('noatentado')}
-                    className={`py-2 px-4 font-medium text-sm transition ${
+                    className={`py-2 px-4 font-medium text-sm transition cursor-pointer ${
                       tabActiva === 'noatentado'
                         ? 'border-b-2 border-blue-600 text-blue-600'
                         : 'text-gray-600 hover:text-gray-800'

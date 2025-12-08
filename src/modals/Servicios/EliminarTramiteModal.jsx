@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { X, AlertCircle, Trash2 } from 'lucide-react';
-import { useTramitesLegalizacion } from '../../../hooks/useTramitesLegalizacion';
-import { toast } from '../../../utils/toast';
-import { TIPO_TRAMITE, TRAMITE_COLORS } from '../../../Constants/tramiteDatos';
+import { X, AlertCircle, Trash2, CircleQuestionMark, CircleQuestionMarkIcon } from 'lucide-react';
+import { toast } from '../../utils/toast';
+import { TIPO_TRAMITE, TRAMITE_COLORS } from '../../Constants/tramiteDatos';
+import { useTramitesLegalizacion } from '../../hooks/useTramitesLegalizacion';
 
 export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
     const { cargarFormularioEliminarTramite, eliminarTramite } = useTramitesLegalizacion();
@@ -17,7 +17,7 @@ export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
             try {
                 setLoading(true);
                 const result = await cargarFormularioEliminarTramite(cod_tra);
-                
+                console.log(result.data)
                 if (result.ok) {
                     setData(result.data);
                 } else {
@@ -127,16 +127,16 @@ export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
     return (
         <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col">
             {/* Header - bg-danger */}
-            <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center border-b-4 border-red-700">
+            <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold flex items-center gap-2">
-                    <img src="/img/icon/eliminar.png" alt="Eliminar" className="w-6 h-6" />
+                    <X size={32} className='p-1 rounded-full shadow-sm'/>
                     Eliminar trámite
                 </h2>
                 <button
                     onClick={onClose}
                     className="text-white hover:text-gray-200 transition"
                 >
-                    <X className="w-6 h-6" />
+                    <X size={32} className="rounded-full shadow-sm p-1 hover:bg-white/20 cursor-pointer" />
                 </button>
             </div>
 
@@ -150,11 +150,11 @@ export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
                 {/* Contenedor principal con ícono */}
                 <div className="flex items-start gap-4">
                     {/* Información del trámite - alert-danger */}
-                    <div className="flex-1 bg-red-100 border-2 border-red-500 rounded-lg shadow p-4">
+                    <div className="flex-1 bg-red-100 border border-red-300 rounded-lg shadow p-4">
                         {tiene_documentos ? (
                             // Si tiene documentos asociados - NO se puede eliminar
                             <div className="text-center py-6">
-                                <AlertCircle className="w-16 h-16 text-red-600 mx-auto mb-3" />
+                                <CircleQuestionMark className="w-16 h-16 text-red-600 mx-auto mb-3" />
                                 <p className="font-bold text-gray-800">
                                     No puede eliminar este trámite debido a que tiene documentos asociados
                                 </p>
@@ -193,7 +193,7 @@ export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
                                         </th>
                                         <td className="text-left py-2 border-b border-gray-800">
                                             <span
-                                                className={`inline-block px-3 py-1 rounded text-white text-xs font-bold ${
+                                                className={`inline-block px-3 py-1 rounded text-white text-xs font-bold uppercase ${
                                                     TRAMITE_COLORS[tipoTramite]?.base || 'bg-gray-500'
                                                 }`}
                                             >
@@ -208,12 +208,12 @@ export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
 
                     {/* Ícono de pregunta */}
                     <div className="text-red-600">
-                        <AlertCircle className="w-16 h-16" strokeWidth={2.5} />
+                        <CircleQuestionMark className="w-16 h-16" strokeWidth={2} />
                     </div>
                 </div>
 
                 {/* Advertencia */}
-                <div className="mt-4 border-2 border-red-500 rounded-lg p-3 text-red-600 font-bold italic text-xs max-w-2xl">
+                <div className="mt-4 border border-red-500 rounded-lg p-3 text-red-600 font-bold italic text-xs max-w-2xl">
                     * Esta acción se quedará registrado en el sistema
                 </div>
             </div>

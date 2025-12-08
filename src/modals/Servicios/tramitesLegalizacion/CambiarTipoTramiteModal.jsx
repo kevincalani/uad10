@@ -39,8 +39,8 @@ export default function CambiarTipoTramiteModal({ cod_tra, onClose, onSuccess })
             try {
                 setLoading(true);
                 const result = await cargarFormularioCambioTramite(cod_tra);
-                setData(result);
-                setTipoTramite(result.tramita.tra_tipo_tramite);
+                setData(result.data);
+                setTipoTramite(result.data.tramita.tra_tipo_tramite);
             } catch (error) {
                 console.error('Error al cargar datos:', error);
                 toast.error('Error al cargar los datos del trámite');
@@ -71,7 +71,7 @@ export default function CambiarTipoTramiteModal({ cod_tra, onClose, onSuccess })
 
             const result = await cambiarTipoTramite(formData);
 
-            if (result.success) {
+            if (result.ok) {
                 toast.success(result.message || 'Tipo de trámite modificado correctamente');
 
                 // Ejecutar callback de éxito

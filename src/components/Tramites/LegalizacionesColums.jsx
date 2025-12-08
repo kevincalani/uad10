@@ -3,9 +3,8 @@ import { TRAMITE_COLORS, TIPO_TRAMITE } from "../../Constants/tramiteDatos";
 import EditLegalizacionModal from "../../modals/EditLegalizacionModal";
 import { useModal } from "../../hooks/useModal";
 import CambiarTipoTramiteModal from "../../modals/servicios/tramitesLegalizacion/CambiarTipoTramiteModal";
-// 🔥 Importar los modales cuando los creemos
-// import EliminarTramiteModal from "../../modals/servicios/tramitesLegalizacion/EliminarTramiteModal";
-// import PanelEntregaModal from "../../modals/servicios/tramitesLegalizacion/PanelEntregaModal";
+import EntregaModal from "../../modals/servicios/entrega/EntregaModal";
+import EliminarTramiteModal from "../../modals/servicios/EliminarTramiteModal";
 
 export default function LegalizacionesColumns({
     setTramites,
@@ -110,12 +109,13 @@ export default function LegalizacionesColumns({
                     {/* Editar trámite */}
                     <button
                         title="Insertar Datos Trámite"
-                        className="p-2 bg-white rounded-full shadow-md text-blue-600 hover:bg-blue-50 transition"
+                        className="p-2 bg-white rounded-full shadow-md text-blue-600 hover:bg-blue-50 transition cursor-pointer"
                         onClick={() =>
                             openModal(EditLegalizacionModal, {
                                 tramiteData: row,
                                 setTramites,
                                 guardarDatosTramite,
+                                recargarTramites
                             })
                         }
                     >
@@ -123,7 +123,7 @@ export default function LegalizacionesColumns({
                     </button>{/* Cambiar tipo de trámite */}
                     <button
                         title="Cambiar Tipo de Trámite"
-                        className="p-2 bg-white rounded-full shadow-md text-purple-600 hover:bg-purple-50 transition"
+                        className="p-2 bg-white rounded-full shadow-md text-purple-600 hover:bg-purple-50 transition cursor-pointer"
                         onClick={() =>
                             openModal(CambiarTipoTramiteModal, {
                                 cod_tra: row.cod_tra,
@@ -137,14 +137,12 @@ export default function LegalizacionesColumns({
                     {/* Eliminar trámite */}
                     <button
                         title="Eliminar Trámite"
-                        className="p-2 bg-white rounded-full shadow-md text-red-600 hover:bg-red-50 transition"
+                        className="p-2 bg-white rounded-full shadow-md text-red-600 hover:bg-red-50 transition cursor-pointer"
                         onClick={() => {
-                            // 🔥 TODO: Crear EliminarTramiteModal
-                            console.log("Eliminar trámite:", row.cod_tra);
-                            // openModal(EliminarTramiteModal, {
-                            //     cod_tra: row.cod_tra,
-                            //     onSuccess: recargarTramites
-                            // });
+                            openModal(EliminarTramiteModal, {
+                                cod_tra: row.cod_tra,
+                                onSuccess: recargarTramites,
+                            })
                         }}
                     >
                         <Trash2 size={16} />
@@ -162,14 +160,12 @@ export default function LegalizacionesColumns({
                 return (
                     <button
                         title="Panel de Entrega"
-                        className="p-2 bg-white rounded-full shadow-md text-green-600 hover:bg-green-50 transition"
+                        className="p-2 bg-white rounded-full shadow-md text-green-600 hover:bg-green-50 transition cursor-pointer"
                         onClick={() => {
-                            // 🔥 TODO: Crear PanelEntregaModal
-                            console.log("Panel de entrega:", row.cod_tra);
-                            // openModal(PanelEntregaModal, {
-                            //     cod_tra: row.cod_tra,
-                            //     onSuccess: recargarTramites
-                            // });
+                            openModal(EntregaModal, {
+                                cod_tra: row.cod_tra,
+                                onSuccess: recargarTramites,
+                            })
                         }}
                     >
                         <CircleArrowRight size={16} />

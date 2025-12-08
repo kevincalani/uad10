@@ -8,7 +8,7 @@ import { usePersona } from "../hooks/usePersona";
 import api from "../api/axios";
 import { toast } from "../utils/toast";
 
-export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite,onClose }) {
+export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite,onClose, recargarTramites }) {
     if (!tramiteData) return null;
 
     const { cargarPersona, cargarApoderadoPorCi, cargarApoderadoPorTramite, guardarApoderado } = usePersona();
@@ -146,6 +146,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                 setIsDatosPersonalesSaved(true);
                 toast.success(res.message);
                 fetchData()
+                recargarTramites(tramiteData.tra_fecha_solicitud)
             } else {
                 toast.error(res.error);
             }
@@ -222,6 +223,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                             onSave={handleDatosPersonalesSubmit}
                             isDatosPersonalesSaved={isDatosPersonalesSaved}
                             ptaang={ptaang}
+                            recargarTramites={recargarTramites}
                         />
 
                         <DatosApoderadoForm

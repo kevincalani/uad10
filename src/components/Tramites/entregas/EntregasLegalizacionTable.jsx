@@ -1,146 +1,319 @@
-// 📁 components/entregas/TablaEntregasLegalizacion.jsx
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useCallback } from 'react';
+import {
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Input,
+  Button,
+  Pagination,
+  Chip,
+  Tooltip,
+} from '@heroui/react';
 import { useModal } from '../../../hooks/useModal';
-import DataTable from 'react-data-table-component';
 import EntregaModal from '../../../modals/servicios/entrega/EntregaModal';
-import { ArrowRightCircle } from 'lucide-react';
+import { ArrowRightCircle, Search } from 'lucide-react';
 
-export default function EntregasLegalizacionTable ({ entregas }) {
+export default function EntregasLegalizacionTable({ entregas }) {
   const { openModal } = useModal();
 
+  // Estados
+  const [filterValue, setFilterValue] = useState('');
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(500);
+  const [sortDescriptor, setSortDescriptor] = useState({
+    column: null,
+    direction: null,
+  });
+
   const tipoTramiteConfig = {
-    L: { nombre: 'LEGALIZACIÓN', clase: 'bg-blue-500 text-white' },
-    F: { nombre: 'CONFRONTACIÓN', clase: 'bg-red-600 text-white' },
-    C: { nombre: 'CERTIFICACIÓN', clase: 'bg-yellow-500 text-gray-900' },
-    B: { nombre: 'BÚSQUEDA', clase: 'bg-green-600 text-white' },
-    E: { nombre: 'CONSEJO', clase: 'bg-gray-600 text-white' }
+    L: { nombre: 'LEGALIZACIÓN', color: 'primary' },
+    F: { nombre: 'CONFRONTACIÓN', color: 'danger' },
+    C: { nombre: 'CERTIFICACIÓN', color: 'warning' },
+    B: { nombre: 'BÚSQUEDA', color: 'success' },
+    E: { nombre: 'CONSEJO', color: 'default' },
   };
 
+  // Definición de columnas
+  const columns = [
+    { key: 'numero', label: 'Nº', sortable: false },
+    { key: 'dtra_tipo', label: 'Tipo', sortable: true },
+    { key: 'per_ci', label: 'CI', sortable: true },
+    { key: 'per_nombre', label: 'Nombre', sortable: true },
+    { key: 'tra_numero', label: 'Número Atención', sortable: true },
+    { key: 'dtra_numero_tramite', label: 'Número trámite', sortable: true },
+    { key: 'tra_fecha_solicitud', label: 'Fecha solicitud', sortable: true },
+    { key: 'dtra_fecha_firma', label: 'Fecha firma', sortable: true },
+    { key: 'entrega', label: 'Entrega', sortable: false },
+  ];
+
+  // Filtrado
+  const filteredItems = useMemo(() => {
+    let filtered = [...entregas];
+
+    if (filterValue) {
+      filtered = filtered.filter(
+        (item) =>
+          item.per_ci?.toLowerCase().includes(filterValue.toLowerCase()) ||
+          item.per_nombre?.toLowerCase().includes(filterValue.toLowerCase()) ||
+          item.per_apellido?.toLowerCase().includes(filterValue.toLowerCase()) ||
+          item.tra_numero?.toString().includes(filterValue) ||
+          item.dtra_numero_tramite?.toString().includes(filterValue)
+      );
+    }
+
+    return filtered;
+  }, [entregas, filterValue]);
+
+  // Ordenamiento
+  const sortedItems = useMemo(() => {
+    if (!sortDescriptor.column) return filteredItems;
+
+    return [...filteredItems].sort((a, b) => {
+      let first = a[sortDescriptor.column];
+      let second = b[sortDescriptor.column];
+
+      // Para nombre completo
+      if (sortDescriptor.column === 'per_nombre') {
+        first = `${a.per_apellido ?? ''} ${a.per_nombre ?? ''}`.trim();
+        second = `${b.per_apellido ?? ''} ${b.per_nombre ?? ''}`.trim();
+      }
+
+      // Manejar valores nulos
+      if (first == null) return 1;
+      if (second == null) return -1;
+
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      return sortDescriptor.direction === 'descending' ? -cmp : cmp;
+    });
+  }, [filteredItems, sortDescriptor]);
+
+  // Paginación
+  const pages = Math.ceil(sortedItems.length / rowsPerPage);
+  const items = useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+    return sortedItems.slice(start, end).map((item, idx) => ({
+      ...item,
+      _uniqueKey: `${item.cod_tra}-${item.cod_dtra}-${start + idx}`,
+      _rowIndex: start + idx
+    }));
+  }, [page, sortedItems, rowsPerPage]);
+
+  // Handlers
+  const onSearchChange = useCallback((value) => {
+    setFilterValue(value);
+    setPage(1);
+  }, []);
+
+  const onRowsPerPageChange = useCallback((e) => {
+    setRowsPerPage(Number(e.target.value));
+    setPage(1);
+  }, []);
+
   const formatearFecha = (fecha) => {
-    if (!fecha) return '';
+    if (!fecha) return '-';
     const date = new Date(fecha);
     return date.toLocaleDateString('es-BO');
   };
 
-  const columns = [
-    {
-      name: 'Nº',
-      selector: (row, index) => index + 1,
-      width: '60px',
-      center: true
-    },
-    {
-      name: 'Tipo',
-      cell: (row) => {
-        const config = tipoTramiteConfig[row.dtra_tipo] || { nombre: row.dtra_tipo, clase: 'bg-gray-500 text-white' };
-        return (
-          <span className={`font-bold rounded px-2 py-1 text-xs ${config.clase}`}>
-            {config.nombre}
-          </span>
-        );
-      },
-      width: '150px'
-    },
-    {
-      name: 'CI',
-      selector: (row) => row.per_ci,
-      width: '100px'
-    },
-    {
-      name: 'Nombre',
-      cell: (row) => (
-        <div>
-          {row.per_apellido} {row.per_nombre}
-          {row.tra_tipo_apoderado === 'p' && (
-            <span className="ml-2 bg-red-600 text-white rounded px-1 text-xs">Pod</span>
-          )}
-          {row.tra_tipo_apoderado === 'd' && (
-            <span className="ml-2 bg-green-600 text-white rounded px-1 text-xs">Dec</span>
-          )}
-        </div>
-      ),
-      grow: 2
-    },
-    {
-      name: 'Número Atención',
-      selector: (row) => row.tra_numero,
-      width: '130px'
-    },
-    {
-      name: 'Número trámite',
-      selector: (row) => `${row.dtra_numero_tramite} / ${row.dtra_gestion_tramite}`,
-      width: '150px'
-    },
-    {
-      name: 'Fecha solicitud',
-      selector: (row) => formatearFecha(row.tra_fecha_solicitud),
-      width: '130px'
-    },
-    {
-      name: 'Fecha firma',
-      selector: (row) => formatearFecha(row.dtra_fecha_firma),
-      width: '130px'
-    },
-    {
-      name: 'Entrega',
-      cell: (row) => (
-        <button
-          onClick={() => openModal(EntregaModal, { cod_tra: row.cod_tra })}
-          className="p-1 rounded-full shadow-sm text-green-600 hover:bg-gray-300"
-          title="Entregar legalizaciones"
-        >
-          <ArrowRightCircle/>
-        </button>
-      ),
-      center: true,
-      width: '100px'
-    }
-  ];
+  // Renderizado de celdas
+  const renderCell = useCallback(
+    (item, columnKey) => {
+      switch (columnKey) {
+        case 'numero':
+          return (
+            <span className="text-sm font-semibold">
+              {item._rowIndex + 1}
+            </span>
+          );
 
-  const customStyles = {
-    headRow: {
-      style: {
-        backgroundColor: '#4B5563',
-        color: '#fff',
-        fontSize: '0.9em',
-        fontWeight: 'bold'
+        case 'dtra_tipo':
+          const config = tipoTramiteConfig[item.dtra_tipo] || {
+            nombre: item.dtra_tipo,
+            color: 'default',
+          };
+          return (
+            <Chip color={config.color} size="sm" variant="flat">
+              {config.nombre}
+            </Chip>
+          );
+
+        case 'per_ci':
+          return <span className="text-sm">{item.per_ci}</span>;
+
+        case 'per_nombre':
+          const nombreCompleto = `${item.per_apellido} ${item.per_nombre}`;
+          let badge = null;
+
+          if (item.tra_tipo_apoderado === 'p') {
+            badge = (
+              <Chip size="sm" color="danger" variant="flat" className="ml-2">
+                Pod
+              </Chip>
+            );
+          } else if (item.tra_tipo_apoderado === 'd') {
+            badge = (
+              <Chip size="sm" color="success" variant="flat" className="ml-2">
+                Dec
+              </Chip>
+            );
+          }
+
+          return (
+            <div className="flex items-center">
+              <span className="text-sm">{nombreCompleto}</span>
+              {badge}
+            </div>
+          );
+
+        case 'tra_numero':
+          return <span className="text-sm">{item.tra_numero}</span>;
+
+        case 'dtra_numero_tramite':
+          return (
+            <span className="text-sm">
+              {item.dtra_numero_tramite} / {item.dtra_gestion_tramite}
+            </span>
+          );
+
+        case 'tra_fecha_solicitud':
+          return (
+            <span className="text-sm">{formatearFecha(item.tra_fecha_solicitud)}</span>
+          );
+
+        case 'dtra_fecha_firma':
+          return (
+            <span className="text-sm">{formatearFecha(item.dtra_fecha_firma)}</span>
+          );
+
+        case 'entrega':
+          return (
+            <Tooltip content="Entregar legalizaciones">
+              <Button
+                isIconOnly
+                size="sm"
+                variant="light"
+                color="success"
+                onPress={() => openModal(EntregaModal, { cod_tra: item.cod_tra })}
+              >
+                <ArrowRightCircle size={20} />
+              </Button>
+            </Tooltip>
+          );
+
+        default:
+          return item[columnKey];
       }
     },
-    rows: {
-      style: {
-        fontSize: '0.85em',
-        '&:hover': {
-          backgroundColor: '#F3F4F6'
-        }
-      }
-    }
-  };
+    [openModal]
+  );
+
+  // Contenido superior
+  const topContent = useMemo(() => {
+    return (
+      <div className="flex justify-between items-center gap-4 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-700">Mostrando</span>
+          <select
+            className="border border-gray-300 rounded px-2 py-1 text-sm"
+            value={rowsPerPage}
+            onChange={onRowsPerPageChange}
+          >
+            {[50, 100, 200, 500].map((size) => (
+              <option key={size} value={size}>
+                {size}
+              </option>
+            ))}
+          </select>
+          <span className="text-sm text-gray-700">entradas</span>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-700">Filtro:</span>
+          <Input
+            isClearable
+            size="sm"
+            placeholder="Buscar por nombre, CI, número..."
+            startContent={<Search className="w-4 h-4" />}
+            value={filterValue}
+            onClear={() => onSearchChange('')}
+            onValueChange={onSearchChange}
+            className="w-80"
+          />
+        </div>
+      </div>
+    );
+  }, [filterValue, rowsPerPage, onSearchChange, onRowsPerPageChange]);
+
+  // Contenido inferior
+  const bottomContent = useMemo(() => {
+    const start = (page - 1) * rowsPerPage + 1;
+    const end = Math.min(page * rowsPerPage, sortedItems.length);
+
+    return (
+      <div className="flex justify-between items-center mt-4">
+        <span className="text-sm text-gray-600">
+          Mostrando {start} a {end} de {sortedItems.length} entradas
+        </span>
+        {pages > 1 && (
+          <Pagination
+            showControls
+            page={page}
+            total={pages}
+            onChange={setPage}
+            size="sm"
+          />
+        )}
+      </div>
+    );
+  }, [page, pages, rowsPerPage, sortedItems.length]);
 
   if (!entregas || entregas.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500">
-        <p>No hay trámites pendientes de entrega</p>
+      <div className="text-center py-8">
+        <p className="text-gray-500">No hay trámites pendientes de entrega</p>
       </div>
     );
   }
 
   return (
-    <div className="overflow-x-auto">
-      <DataTable
-        columns={columns}
-        data={entregas}
-        customStyles={customStyles}
-        pagination
-        paginationPerPage={500}
-        paginationRowsPerPageOptions={[50, 100, 200, 500]}
-        highlightOnHover
-        responsive
-        noDataComponent="No hay registros para mostrar"
-        paginationComponentOptions={{
-          rowsPerPageText: 'Filas por página:',
-          rangeSeparatorText: 'de'
+    <div className="w-full">
+      {topContent}
+      <Table
+        aria-label="Tabla de entregas de legalización"
+        sortDescriptor={sortDescriptor}
+        onSortChange={setSortDescriptor}
+        classNames={{
+          wrapper: 'shadow-md',
+          th: 'bg-gray-500 text-white',
+          td: 'text-gray-600',
         }}
-      />
+      >
+        <TableHeader columns={columns}>
+          {(column) => (
+            <TableColumn
+              key={column.key}
+              allowsSorting={column.sortable}
+              align={column.key === 'entrega' ? 'center' : 'start'}
+            >
+              {column.label}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody items={items} emptyContent="No hay registros para mostrar">
+          {(item) => (
+            <TableRow key={item._uniqueKey} className="hover:bg-gray-50">
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      {bottomContent}
     </div>
   );
-};
+}
