@@ -215,42 +215,20 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
         });
     };
 
-    // Formatear fecha
-    const formatearFecha = (fecha) => {
-        if (!fecha || fecha === '') return '-';
+    // Formatear fecha 
+   const formatearFecha = (fecha) => {
+        if (!fecha) return "";
 
-        try {
-            const partes = fecha.split(/[-T\s]/)[0].split('-');
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
 
-            if (partes.length === 3) {
-                const [anio, mes, dia] = partes;
-                return `${dia.padStart(2, '0')}/${mes.padStart(2, '0')}/${anio}`;
-            }
-
-            return '-';
-        } catch (error) {
-            return '-';
-        }
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
     };
-
-    // Formatear fecha con hora
-    const formatearFechaHora = (fecha) => {
-        if (!fecha || fecha === '') return '-';
-
-        try {
-            const date = new Date(fecha);
-            const dia = String(date.getDate()).padStart(2, '0');
-            const mes = String(date.getMonth() + 1).padStart(2, '0');
-            const anio = date.getFullYear();
-            const hora = String(date.getHours()).padStart(2, '0');
-            const minutos = String(date.getMinutes()).padStart(2, '0');
-            const segundos = String(date.getSeconds()).padStart(2, '0');
-
-            return `${dia}/${mes}/${anio} ${hora}:${minutos}:${segundos}`;
-        } catch (error) {
-            return '-';
-        }
-    };
+    
 
     // Loading state
     if (loading) {
@@ -634,7 +612,7 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
                                                                             Fecha entrega:{' '}
                                                                         </span>
                                                                         <span className="text-blue-600 font-bold">
-                                                                            {formatearFechaHora(
+                                                                            {formatearFecha(
                                                                                 doc.dtra_fecha_recojo
                                                                             )}
                                                                         </span>

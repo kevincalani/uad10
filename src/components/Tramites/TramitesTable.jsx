@@ -10,6 +10,7 @@ import {
   Button,
   Pagination,
   Chip,
+  Tooltip,
 } from "@heroui/react";
 import {
   SquarePen,
@@ -156,6 +157,7 @@ export default function TramitesTable({
         case "acciones":
           return (
             <div className="flex gap-1 items-center justify-center">
+                <Tooltip content="Editar Tramite" >
               <Button
                 isIconOnly
                 size="sm"
@@ -173,7 +175,8 @@ export default function TramitesTable({
               >
                 <SquarePen className="w-4 h-4 text-blue-600" />
               </Button>
-
+              </Tooltip>
+                <Tooltip content="Glosas" >
               <Button
                 isIconOnly
                 size="sm"
@@ -182,7 +185,9 @@ export default function TramitesTable({
               >
                 <AlignJustify className="w-4 h-4 text-purple-600" />
               </Button>
+              </Tooltip>
 
+                <Tooltip content={tramite.tre_hab ? "Deshabilitar": "Habilitar"} >
               <Button
                 isIconOnly
                 size="sm"
@@ -195,20 +200,23 @@ export default function TramitesTable({
                   <SquareX className="w-4 h-4 text-red-600" />
                 )}
               </Button>
-
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                onPress={() =>
-                  openModal(DeleteTramiteModal, {
-                    itemData: tramite,
-                    onConfirm: () => onDelete(tramite.cod_tre),
-                  })
-                }
-              >
-                <Trash2 className="w-4 h-4 text-red-600" />
-              </Button>
+              
+              </Tooltip>
+                <Tooltip content="Eliminar Tramite" color="danger">
+                  <Button
+                    isIconOnly
+                    size="sm"
+                    variant="light"
+                    onPress={() =>
+                      openModal(DeleteTramiteModal, {
+                        itemData: tramite,
+                        onConfirm: () => onDelete(tramite.cod_tre),
+                      })
+                    }
+                  >
+                    <Trash2 className="w-4 h-4 text-red-600" />
+                  </Button>
+              </Tooltip>
             </div>
           );
 
@@ -287,7 +295,7 @@ export default function TramitesTable({
         sortDescriptor={sortDescriptor}
         onSortChange={setSortDescriptor}
         classNames={{
-          wrapper: "shadow-md p-0",
+          wrapper: "shadow-md border border-gray-300 p-0",
           th: "bg-gray-500 text-white",
           td: "text-gray-600",
         }}

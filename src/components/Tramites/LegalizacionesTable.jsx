@@ -61,6 +61,20 @@ export default function LegalizacionesTable({
     { key: "entrega", label: "Entrega", sortable: false },
   ];
 
+      // Formatear fecha 
+   const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
+
   // Filtrado
   const filteredItems = useMemo(() => {
     let filtered = [...tramites];
@@ -196,7 +210,7 @@ export default function LegalizacionesTable({
         case "tra_fecha_solicitud":
         case "tra_fecha_firma":
         case "tra_fecha_recojo":
-          return <span>{row[columnKey] || "-"}</span>;
+          return <span>{formatearFecha(row[columnKey]) || "-"}</span>;
 
         case "opciones":
           return (
@@ -301,16 +315,25 @@ export default function LegalizacionesTable({
           <div className="bg-blue-600 text-white px-4 py-2 rounded shadow-md">
             <h2 className="text-xl font-semibold">Trámites de Legalización</h2>
           </div>
-          <span className="text-sm font-medium text-blue-600">
-            Fecha:{" "}
-            {new Date(selectedDate).toLocaleDateString("es-ES", {
-              day: "2-digit",
-              month: "2-digit",
-              year: "numeric",
-            })}
-          </span>
+          
         </div>
+            <div>
+              <span className="text-sm font-medium text-blue-600">
+            Fecha:{" "}
+            {(() => {
+              if (!selectedDate) return "";
 
+              const [year, month, day] = selectedDate.split("-"); // "2023-07-13"
+              const date = new Date(year, month - 1, day);
+
+              return date.toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+            })()}
+          </span>
+            </div>
         {/* Controles */}
         <div className="flex justify-between items-center gap-4">
           <div className="flex items-center gap-2">
@@ -395,7 +418,7 @@ export default function LegalizacionesTable({
         sortDescriptor={sortDescriptor}
         onSortChange={setSortDescriptor}
         classNames={{
-          wrapper: "shadow-md",
+          wrapper: "p-0 border border-gray-300 shadow-md",
           th: "bg-gray-500 text-white",
           td: "text-gray-600",
         }}

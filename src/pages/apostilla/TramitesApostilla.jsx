@@ -1,5 +1,5 @@
 // 📁 components/apostilla/TramitesApostilla.jsx
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Table,
   TableHeader,
@@ -9,24 +9,24 @@ import {
   TableCell,
   Input,
   Pagination,
-  Tooltip
-} from '@heroui/react';
-import { 
-  Search, 
-  FileText, 
-  Edit2, 
-  Trash2, 
-  PenTool, 
-  HandCoins, 
-  Download 
-} from 'lucide-react';
-import { useApostilla } from '../../hooks/useApostilla';
-import { useModal } from '../../hooks/useModal';
-import EliminarTramiteModal from '../../modals/apostilla/EliminarTramiteModal';
-import EntregaTramiteModal from '../../modals/apostilla/EntregaTramiteModal';
-import BusquedaModal from '../../modals/apostilla/BusquedaModal';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import TramiteModal from '../../modals/apostilla/tramiteModal';
+  Tooltip,
+} from "@heroui/react";
+import {
+  Search,
+  FileText,
+  Edit2,
+  Trash2,
+  PenTool,
+  HandCoins,
+  Download,
+} from "lucide-react";
+import { useApostilla } from "../../hooks/useApostilla";
+import { useModal } from "../../hooks/useModal";
+import EliminarTramiteModal from "../../modals/apostilla/EliminarTramiteModal";
+import EntregaTramiteModal from "../../modals/apostilla/EntregaTramiteModal";
+import BusquedaModal from "../../modals/apostilla/BusquedaModal";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import TramiteModal from "../../modals/apostilla/tramiteModal";
 
 export default function TramitesApostilla() {
   const { openModal } = useModal();
@@ -36,14 +36,13 @@ export default function TramitesApostilla() {
     listarTramitesPorFecha,
     actualizarTablaTramites,
     firmarTramite,
-    generarPDFTramite,
-    registrarEntrega
+    registrarEntrega,
   } = useApostilla();
 
   const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split('T')[0]
+    new Date().toISOString().split("T")[0]
   );
-  const [filterValue, setFilterValue] = useState('');
+  const [filterValue, setFilterValue] = useState("");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(500);
   const [sortDescriptor, setSortDescriptor] = useState({
@@ -60,15 +59,15 @@ export default function TramitesApostilla() {
 
   // Definición de columnas con sorting
   const columns = [
-    { key: 'numero_orden', label: 'Nº', sortable: false },
-    { key: 'apos_numero', label: 'NÚMERO', sortable: true },
-    { key: 'per_ci', label: 'CI', sortable: true },
-    { key: 'per_apellido', label: 'NOMBRE', sortable: true },
-    { key: 'apos_fecha_ingreso', label: 'FECHA SOLICITUD', sortable: true },
-    { key: 'apos_fecha_firma', label: 'FECHA FIRMA', sortable: true },
-    { key: 'apos_fecha_recojo', label: 'FECHA RECOJO', sortable: true },
-    { key: 'opciones', label: 'OPCIONES', sortable: false },
-    { key: 'entrega', label: 'ENTREGA', sortable: false },
+    { key: "numero_orden", label: "Nº", sortable: false },
+    { key: "apos_numero", label: "NÚMERO", sortable: true },
+    { key: "per_ci", label: "CI", sortable: true },
+    { key: "per_apellido", label: "NOMBRE", sortable: true },
+    { key: "apos_fecha_ingreso", label: "FECHA SOLICITUD", sortable: true },
+    { key: "apos_fecha_firma", label: "FECHA FIRMA", sortable: true },
+    { key: "apos_fecha_recojo", label: "FECHA RECOJO", sortable: true },
+    { key: "opciones", label: "OPCIONES", sortable: false },
+    { key: "entrega", label: "ENTREGA", sortable: false },
   ];
 
   // Filtrado
@@ -76,11 +75,16 @@ export default function TramitesApostilla() {
     let filtered = [...tramites];
 
     if (filterValue) {
-      filtered = filtered.filter((tramite) =>
-        tramite.per_apellido?.toLowerCase().includes(filterValue.toLowerCase()) ||
-        tramite.per_nombre?.toLowerCase().includes(filterValue.toLowerCase()) ||
-        tramite.per_ci?.toLowerCase().includes(filterValue.toLowerCase()) ||
-        tramite.apos_numero?.toString().includes(filterValue)
+      filtered = filtered.filter(
+        (tramite) =>
+          tramite.per_apellido
+            ?.toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          tramite.per_nombre
+            ?.toLowerCase()
+            .includes(filterValue.toLowerCase()) ||
+          tramite.per_ci?.toLowerCase().includes(filterValue.toLowerCase()) ||
+          tramite.apos_numero?.toString().includes(filterValue)
       );
     }
 
@@ -94,17 +98,17 @@ export default function TramitesApostilla() {
     return [...filteredItems].sort((a, b) => {
       let first = a[sortDescriptor.column];
       let second = b[sortDescriptor.column];
-      
+
       // Convertir fechas para comparación
-      if (sortDescriptor.column.includes('fecha') && first && second) {
+      if (sortDescriptor.column.includes("fecha") && first && second) {
         first = new Date(first).getTime();
         second = new Date(second).getTime();
       }
-      
+
       // Manejar valores nulos o undefined
       if (first == null) return 1;
       if (second == null) return -1;
-      
+
       const cmp = first < second ? -1 : first > second ? 1 : 0;
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
@@ -135,8 +139,8 @@ export default function TramitesApostilla() {
   };
 
   const handleFirmar = async (cod_apos) => {
-    if (!confirm('¿Está seguro de firmar este trámite?')) return;
-    
+    if (!confirm("¿Está seguro de firmar este trámite?")) return;
+
     const result = await firmarTramite(cod_apos);
     if (result) {
       await actualizarTablaTramites(selectedDate);
@@ -144,22 +148,18 @@ export default function TramitesApostilla() {
   };
 
   const handleEntregaRapida = async (tramite) => {
-    const formData = { ca: tramite.cod_apos, apo: 'T' };
+    const formData = { ca: tramite.cod_apos, apo: "T" };
     const result = await registrarEntrega(formData);
     if (result) {
       await actualizarTablaTramites(selectedDate);
     }
   };
 
-  const handleGenerarPDF = async (cod_apos) => {
-    await generarPDFTramite(cod_apos);
-  };
-
   const handleNuevoTramite = () => {
     openModal(TramiteModal, {
       cod_apos: 0,
       fecha: selectedDate,
-      onSuccess: () => actualizarTablaTramites(selectedDate)
+      onSuccess: () => actualizarTablaTramites(selectedDate),
     });
   };
 
@@ -167,21 +167,21 @@ export default function TramitesApostilla() {
     openModal(TramiteModal, {
       cod_apos,
       fecha: selectedDate,
-      onSuccess: () => actualizarTablaTramites(selectedDate)
+      onSuccess: () => actualizarTablaTramites(selectedDate),
     });
   };
 
   const handleEliminarTramite = (cod_apos) => {
     openModal(EliminarTramiteModal, {
       cod_apos,
-      onSuccess: () => actualizarTablaTramites(selectedDate)
+      onSuccess: () => actualizarTablaTramites(selectedDate),
     });
   };
 
   const handleEntregarTramite = (cod_apos) => {
     openModal(EntregaTramiteModal, {
       cod_apos,
-      onSuccess: () => actualizarTablaTramites(selectedDate)
+      onSuccess: () => actualizarTablaTramites(selectedDate),
     });
   };
 
@@ -190,124 +190,136 @@ export default function TramitesApostilla() {
   };
 
   // Renderizado de celdas
-  const renderCell = useCallback((tramite, columnKey, index) => {
-    const cellValue = tramite[columnKey];
+  const renderCell = useCallback(
+    (tramite, columnKey, index) => {
+      const cellValue = tramite[columnKey];
 
-    switch (columnKey) {
-      case 'numero_orden':
-        return (
-          <span className="text-blue-600 font-bold">
-            {(page - 1) * rowsPerPage + index + 1}
-          </span>
-        );
-
-      case 'apos_numero':
-        return (
-          <span className="font-semibold text-sm">UAD{tramite.apos_numero}</span>
-        );
-      
-      case 'per_ci':
-        return <span className="text-sm">{tramite.per_ci}</span>;
-      
-      case 'per_apellido':
-        return (
-          <div className="flex flex-col gap-1">
-            <span className="text-sm font-medium">
-              {tramite.per_apellido} {tramite.per_nombre}
+      switch (columnKey) {
+        case "numero_orden":
+          return (
+            <span className="text-blue-600 font-bold">
+              {(page - 1) * rowsPerPage + index + 1}
             </span>
-            {tramite.apos_apoderado === 'p' && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 w-fit">
-                Pod
-              </span>
-            )}
-            {tramite.apos_apoderado === 'd' && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 w-fit">
-                Dec
-              </span>
-            )}
-          </div>
-        );
-      
-      case 'apos_fecha_ingreso':
-      case 'apos_fecha_firma':
-      case 'apos_fecha_recojo':
-        return (
-          <span className="text-sm text-right">
-            {tramite[columnKey] ? 
-              new Date(tramite[columnKey]).toLocaleDateString('es-ES') : 
-              '-'
-            }
-          </span>
-        );
-      
-      case 'opciones':
-        return (
-          <div className="flex items-center justify-center gap-1">
-            <Tooltip content="Editar trámite">
-              <button
-                onClick={() => handleEditarTramite(tramite.cod_apos)}
-                className="p-1.5 hover:bg-blue-50 rounded-full transition-colors text-blue-600"
-              >
-                <Edit2 size={16} />
-              </button>
-            </Tooltip>
+          );
 
-            {tramite.apos_estado == 1 ? (
-              <Tooltip content="Firmar trámite">
+        case "apos_numero":
+          return (
+            <span className="font-semibold text-sm">
+              UAD{tramite.apos_numero}
+            </span>
+          );
+
+        case "per_ci":
+          return <span className="text-sm">{tramite.per_ci}</span>;
+
+        case "per_apellido":
+          return (
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-medium">
+                {tramite.per_apellido} {tramite.per_nombre}
+              </span>
+              {tramite.apos_apoderado === "p" && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800 w-fit">
+                  Pod
+                </span>
+              )}
+              {tramite.apos_apoderado === "d" && (
+                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800 w-fit">
+                  Dec
+                </span>
+              )}
+            </div>
+          );
+
+        case "apos_fecha_ingreso":
+        case "apos_fecha_firma":
+        case "apos_fecha_recojo":
+          return (
+            <span className="text-sm text-right">
+              {tramite[columnKey]
+                ? new Date(tramite[columnKey]).toLocaleDateString("es-ES")
+                : "-"}
+            </span>
+          );
+
+        case "opciones":
+          return (
+            <div className="flex items-center justify-center gap-1">
+              <Tooltip content="Editar trámite">
                 <button
-                  onClick={() => handleFirmar(tramite.cod_apos)}
+                  onClick={() => handleEditarTramite(tramite.cod_apos)}
                   className="p-1.5 hover:bg-blue-50 rounded-full transition-colors text-blue-600"
                 >
-                  <PenTool size={16} />
+                  <Edit2 size={16} />
                 </button>
               </Tooltip>
-            ) : (
-              <span className="p-1.5">
-                <PenTool 
-                  size={16} 
-                  className={tramite.apos_estado >= 2 ? 'text-green-600' : 'text-gray-400'} 
-                />
-              </span>
-            )}
 
-            <Tooltip content="Eliminar trámite" color="danger">
-              <button
-                onClick={() => handleEliminarTramite(tramite.cod_apos)}
-                className="p-1.5 hover:bg-red-50 rounded-full transition-colors text-red-600"
-              >
-                <Trash2 size={16} />
-              </button>
-            </Tooltip>
-          </div>
-        );
-      
-      case 'entrega':
-        if (tramite.apos_estado == 2) {
-          return (
-            <div className="flex justify-center">
-              <Tooltip content="Entregar trámite">
+              {tramite.apos_estado == 1 ? (
+                <Tooltip content="Firmar trámite">
+                  <button
+                    onClick={() => handleFirmar(tramite.cod_apos)}
+                    className="p-1.5 hover:bg-blue-50 rounded-full transition-colors text-blue-600"
+                  >
+                    <PenTool size={16} />
+                  </button>
+                </Tooltip>
+              ) : (
+                <span className="p-1.5">
+                  <PenTool
+                    size={16}
+                    className={
+                      tramite.apos_estado >= 2
+                        ? "text-green-600"
+                        : "text-gray-400"
+                    }
+                  />
+                </span>
+              )}
+
+              <Tooltip content="Eliminar trámite" color="danger">
                 <button
-                  onClick={() => !tramite.cod_apo ? handleEntregaRapida(tramite) : handleEntregarTramite(tramite.cod_apos)}
-                  className="p-1.5 hover:bg-green-50 rounded-full transition-colors text-green-600"
+                  onClick={() => handleEliminarTramite(tramite.cod_apos)}
+                  className="p-1.5 hover:bg-red-50 rounded-full transition-colors text-red-600"
                 >
-                  <HandCoins size={18} />
+                  <Trash2 size={16} />
                 </button>
               </Tooltip>
             </div>
           );
-        } else if (tramite.apos_estado == 3) {
-          return (
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
-              Entregado
-            </span>
-          );
-        }
-        return null;
-      
-      default:
-        return cellValue;
-    }
-  }, [page, rowsPerPage]);
+
+        case "entrega":
+          if (tramite.apos_estado == 2) {
+            return (
+              <div className="flex justify-center">
+                <Tooltip content="Entregar trámite">
+                  <button
+                    onClick={() =>
+                      !tramite.cod_apo
+                        ? handleEntregaRapida(tramite)
+                        : handleEntregarTramite(tramite.cod_apos)
+                    }
+                    className="p-1.5 hover:bg-green-50 rounded-full transition-colors text-green-600"
+                  >
+                    <HandCoins size={18} />
+                  </button>
+                </Tooltip>
+              </div>
+            );
+          } else if (tramite.apos_estado == 3) {
+            return (
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+                Entregado
+              </span>
+            );
+          }
+          return null;
+
+        default:
+          return cellValue;
+      }
+    },
+    [page, rowsPerPage]
+  );
 
   // Contenido superior (toolbar)
   const topContent = useMemo(() => {
@@ -327,10 +339,10 @@ export default function TramitesApostilla() {
                 className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
-            
+
             <span className="text-gray-400">|</span>
 
-            {selectedDate === new Date().toISOString().split('T')[0] && (
+            {selectedDate === new Date().toISOString().split("T")[0] && (
               <>
                 <button
                   onClick={handleNuevoTramite}
@@ -355,22 +367,29 @@ export default function TramitesApostilla() {
         </div>
 
         {/* Segunda fila: info de fecha */}
-        <div className="flex items-center gap-4 text-sm">
-          <div className="bg-blue-600 text-white px-4 py-2 rounded shadow-md">
-            <h5 className="text-sm font-semibold">Trámites de apostilla</h5>
-          </div>
-          <div>
-            <span className="font-bold italic text-blue-600">Fecha:</span>
-            <span className="italic text-gray-700 ml-2">
-              {new Date(selectedDate).toLocaleDateString('es-ES', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </span>
+        <div className="flex items-center justify-center gap-4 text-sm">
+          <div className="bg-blue-600 it text-white px-4 py-2 rounded shadow-md w-auto">
+            <h5 className="text-xl font-semibold">Trámites de apostilla</h5>
           </div>
         </div>
 
+        <div className="flex items-center gap-2 text-sm">
+          <span className="font-bold italic text-blue-600">Fecha:</span>
+          <span className="italic text-gray-700 ml-2">
+            {(() => {
+              if (!selectedDate) return "";
+
+              const [year, month, day] = selectedDate.split("-"); // "2023-07-13"
+              const date = new Date(year, month - 1, day);
+
+              return date.toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              });
+            })()}
+          </span>
+        </div>
         <hr className="border-gray-300" />
 
         {/* Tercera fila: controles de tabla */}
@@ -407,7 +426,13 @@ export default function TramitesApostilla() {
         </div>
       </div>
     );
-  }, [selectedDate, filterValue, rowsPerPage, onSearchChange, onRowsPerPageChange]);
+  }, [
+    selectedDate,
+    filterValue,
+    rowsPerPage,
+    onSearchChange,
+    onRowsPerPageChange,
+  ]);
 
   // Contenido inferior (paginación)
   const bottomContent = useMemo(() => {
@@ -417,7 +442,8 @@ export default function TramitesApostilla() {
     return (
       <div className="flex justify-between items-center mt-4">
         <span className="text-sm text-gray-600">
-          Mostrando {sortedItems.length > 0 ? start : 0} a {end} de {sortedItems.length} entradas
+          Mostrando {sortedItems.length > 0 ? start : 0} a {end} de{" "}
+          {sortedItems.length} entradas
         </span>
         {pages > 1 && (
           <Pagination
@@ -457,7 +483,7 @@ export default function TramitesApostilla() {
               sortDescriptor={sortDescriptor}
               onSortChange={setSortDescriptor}
               classNames={{
-                wrapper: "shadow-none",
+                wrapper: "shadow-sm p-0 border-gray-300",
                 th: "bg-gray-600 text-white",
                 td: "text-gray-700",
               }}
@@ -468,24 +494,26 @@ export default function TramitesApostilla() {
                     key={column.key}
                     allowsSorting={column.sortable}
                     align={
-                      column.key === 'numero_orden' || 
-                      column.key === 'opciones' || 
-                      column.key === 'entrega'
-                        ? 'center'
-                        : column.key.includes('fecha')
-                        ? 'end'
-                        : 'start'
+                      column.key === "numero_orden" ||
+                      column.key === "opciones" ||
+                      column.key === "entrega"
+                        ? "center"
+                        : column.key.includes("fecha")
+                        ? "end"
+                        : "start"
                     }
                   >
                     {column.label}
                   </TableColumn>
                 )}
               </TableHeader>
-              <TableBody 
+              <TableBody
                 items={items}
                 emptyContent={
                   <div className="text-center py-8">
-                    <p className="text-gray-500">No hay trámites registrados para esta fecha</p>
+                    <p className="text-gray-500">
+                      No hay trámites registrados para esta fecha
+                    </p>
                   </div>
                 }
               >
@@ -494,13 +522,13 @@ export default function TramitesApostilla() {
                     {(columnKey) => (
                       <TableCell
                         className={
-                          columnKey === 'numero_orden' || 
-                          columnKey === 'opciones' || 
-                          columnKey === 'entrega'
-                            ? 'text-center'
-                            : columnKey.includes('fecha')
-                            ? 'text-right'
-                            : ''
+                          columnKey === "numero_orden" ||
+                          columnKey === "opciones" ||
+                          columnKey === "entrega"
+                            ? "text-center"
+                            : columnKey.includes("fecha")
+                            ? "text-right"
+                            : ""
                         }
                       >
                         {renderCell(item, columnKey, items.indexOf(item))}

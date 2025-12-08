@@ -229,6 +229,7 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
 
             return '-';
         } catch (error) {
+            console.log(error)
             return '-';
         }
     };
@@ -248,6 +249,7 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
 
             return `${dia}/${mes}/${anio} ${hora}:${minutos}:${segundos}`;
         } catch (error) {
+            console.log(error)
             return '-';
         }
     };

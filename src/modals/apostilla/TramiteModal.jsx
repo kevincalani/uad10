@@ -224,7 +224,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
 
                 {/* Formulario de datos personales - SOLO EN CREACIÓN */}
                 {isCreating ? (
-                  <div className="space-y-3">
+                  <div className="lg:col-span-1 space-y-3">
                     <h3 className="text-right text-blue-600 font-semibold text-sm">
                       * DATOS PERSONALES
                     </h3>
@@ -236,7 +236,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         value={formPersona.ci}
                         onChange={(e) => setFormPersona({ ...formPersona, ci: e.target.value })}
                         onBlur={(e) => handleBuscarPersona(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className=" w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -246,7 +246,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         type="text"
                         value={formPersona.nombre}
                         onChange={(e) => setFormPersona({ ...formPersona, nombre: e.target.value })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -256,7 +256,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         type="text"
                         value={formPersona.apellido}
                         onChange={(e) => setFormPersona({ ...formPersona, apellido: e.target.value })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -267,7 +267,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         value={formPersona.celular}
                         onChange={(e) => setFormPersona({ ...formPersona, celular: e.target.value })}
                         maxLength={8}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -283,7 +283,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         value={formApoderado.ci_apoderado}
                         onChange={(e) => setFormApoderado({ ...formApoderado, ci_apoderado: e.target.value })}
                         onBlur={(e) => handleBuscarApoderado(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -293,7 +293,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         type="text"
                         value={formApoderado.apellido_apoderado}
                         onChange={(e) => setFormApoderado({ ...formApoderado, apellido_apoderado: e.target.value })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -303,7 +303,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         type="text"
                         value={formApoderado.nombre_apoderado}
                         onChange={(e) => setFormApoderado({ ...formApoderado, nombre_apoderado: e.target.value })}
-                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       />
                     </div>
 
@@ -332,15 +332,16 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                         </label>
                       </div>
                     </div>
-
+                    <div className='flex justify-end'>
                     <button
                       onClick={handleGuardarNuevo}
                       disabled={loading}
-                      className="w-full mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                      className=" mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors cursor-pointer"
                     >
                       {loading ? 'Guardando...' : 'Guardar'}
                     </button>
-                  </div>
+                      </div>
+                    </div>
                 ) : (
                   // Vista de solo lectura en edición
                   <div className="space-y-2 text-sm">
@@ -385,7 +386,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                             value={formApoderado.ci_apoderado}
                             onChange={(e) => setFormApoderado({ ...formApoderado, ci_apoderado: e.target.value })}
                             onBlur={(e) => handleBuscarApoderado(e.target.value)}
-                            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
 
@@ -395,7 +396,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                             type="text"
                             value={formApoderado.apellido_apoderado}
                             onChange={(e) => setFormApoderado({ ...formApoderado, apellido_apoderado: e.target.value })}
-                            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
 
@@ -405,7 +406,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                             type="text"
                             value={formApoderado.nombre_apoderado}
                             onChange={(e) => setFormApoderado({ ...formApoderado, nombre_apoderado: e.target.value })}
-                            className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                           />
                         </div>
 
@@ -434,21 +435,22 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                             </label>
                           </div>
                         </div>
-
+                        <div className='flex justify-end'>
                         <button
                           onClick={handleGuardarApoderado}
                           disabled={loading}
-                          className="w-full mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                          className="mt-2 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
                         >
                           {loading ? 'Guardando...' : 'Guardar Apoderado'}
                         </button>
+                      </div>  
                       </div>
                     ) : (
                       // Botón para mostrar formulario de apoderado
-                      <div className="mt-2">
+                      <div className="mt-2 flex justify-end">
                         <button
                           onClick={handleMostrarFormApoderado}
-                          className="w-full px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                          className=" px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
                         >
                           + Agregar Apoderado
                         </button>
@@ -460,7 +462,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
 
               {/* Columna 2: Documentos agregados */}
               {tramite && (
-                <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div className="border border-gray-200 rounded-lg p-1 space-y-3">
                   <h3 className="text-red-600 font-bold italic text-sm">
                     * Trámites seleccionados
                   </h3>

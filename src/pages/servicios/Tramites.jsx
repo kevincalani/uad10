@@ -9,12 +9,23 @@ import { toastTramite } from "../../utils/toastTramite";
 import BuscarValoradoModal from "../../modals/BuscarValoradoModal";
 import { toast } from "../../utils/toast";
 
-const formatDate = (d) => {
+const formatDate = (input) => {
+    if (!input) return "";
+
+    // Si el input es string: YYYY-MM-DD → devolver tal cual
+    if (typeof input === "string" && /^\d{4}-\d{2}-\d{2}$/.test(input)) {
+        return input;
+    }
+
+    // Si es Date, formatearlo normal
+    const d = new Date(input);
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
+
     return `${year}-${month}-${day}`;
 };
+
 
 export default function Tramites() {
     const today = useMemo(() => formatDate(new Date()), []);
@@ -50,7 +61,10 @@ export default function Tramites() {
     // 📋 CARGAR TRÁMITES AL CAMBIAR FECHA
     // -------------------------
     useEffect(() => {
-        const cargarDatos = async () => {
+        
+        cargarDatos();
+    }, [selectedDate]);
+    const cargarDatos = async () => {
             const res = await listarTramites(selectedDate);
             if (res.ok) {
                 setTramites(res.tramites);
@@ -59,9 +73,6 @@ export default function Tramites() {
                 setTramites([]);
             }
         };
-
-        cargarDatos();
-    }, [selectedDate]);
 
     // -------------------------
     // ➕ AÑADIR NUEVO TRÁMITE
@@ -76,7 +87,7 @@ export default function Tramites() {
 
         if (res.ok) {
             // Agregar al estado local
-            setTramites((prev) => [...prev, res.tramite]);
+            cargarDatos()
 
             toastTramite({
                 type,

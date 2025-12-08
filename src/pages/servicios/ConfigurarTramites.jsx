@@ -100,13 +100,15 @@ export default function ConfigurarTramites() {
   // --- Render principal ---
   return (
     <div className="p-6 bg-gray-100">
-      <div className="p-6 bg-white rounded-lg shadow-md">
+      <div className=" bg-white rounded-lg shadow-md">
         {/* Título */}
-        <h1 className="text-3xl font-bold mb-6 text-gray-800 flex items-center">
-          <BookText className="mr-3 text-gray-800" size={32} />
-          Configuración de Trámites
-        </h1>
-
+        <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
+          <h1 className="text-3xl font-bold flex items-center">
+            <BookText className="mr-2" size={32} />
+            Configuración de Trámites
+          </h1>
+        </div>
+        <div className="p-6">
         {/* Botones para añadir */}
         <div className="flex flex-wrap gap-4 mb-8 justify-start">
           {Object.values(TIPO_TRAMITE).map((type) => (
@@ -133,6 +135,7 @@ export default function ConfigurarTramites() {
           onDelete={handleDelete}
           onSubmit={handleFormSubmit}
         />
+        </div>
       </div>
     </div>
   );

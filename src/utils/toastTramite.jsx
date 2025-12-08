@@ -1,8 +1,14 @@
 import { toast } from "react-hot-toast";
 
+const formatDateISO = (iso) => {
+    if (!iso) return "";
+    const [y, m, d] = iso.split("-");
+    return `${d}/${m}/${y}`;
+};
+
 export function toastTramite({ type, tramiteNumber, date }) {
     const formattedDate = date
-        ? new Date(date).toLocaleDateString()
+        ? formatDateISO(date)
         : "N/A";
 
     toast.custom(
@@ -40,7 +46,7 @@ export function toastTramite({ type, tramiteNumber, date }) {
             </div>
         ),
         {
-            duration: 1000, // mismo tiempo que el modal original
+            duration: 500, // mismo tiempo que el modal original
             position: "top-center",
         }
     );
