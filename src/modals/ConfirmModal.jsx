@@ -1,31 +1,28 @@
 import React, { useEffect } from 'react';
 
-export default function ConfirmModal({ 
-    isOpen, 
+export default function ConfirmModal({  
     onClose, 
     type, // Tipo de trámite (Legalizacion, Certificacion, etc.)
     tramiteNumber, // Número consecutivo
     date 
 }) {
-    if (!isOpen) return null;
-
     // Cierre automático después de 2 segundos
     useEffect(() => {
-        if (isOpen) {
+        
             const timer = setTimeout(() => {
                 onClose();
             }, 1000); // 2 segundos
 
             return () => clearTimeout(timer); // Limpiar timer al desmontar o cerrar
-        }
-    }, [isOpen, onClose]);
+        
+    }, [onClose]);
 
     // Formatear la fecha
     const formattedDate = date ? new Date(date).toLocaleDateString() : 'N/A';
     const title = `Nueva ${type}`;
 
     return (
-        <div className="fixed inset-0 bg-gray-500/50 bg-opacity-50 flex justify-center items-center z-50 p-4">
+        
             <div className="bg-white rounded-lg shadow-xl w-full max-w-sm p-0 overflow-hidden">
                 
                 {/* Header */}
@@ -52,6 +49,6 @@ export default function ConfirmModal({
                 </div>
 
             </div>
-        </div>
+       
     );
 }

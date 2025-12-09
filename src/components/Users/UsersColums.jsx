@@ -1,5 +1,5 @@
 import { ArrowRight, UserCheck, UserLock } from "lucide-react";
-import { useModal } from "../../Hooks/useModal";
+import { useModal } from "../../hooks/useModal";
 import HabilitarUsuarioModal from "../../modals/HabilitarUsuarioModal";
 import { useNavigate } from "react-router-dom";
 

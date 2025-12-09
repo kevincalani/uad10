@@ -7,8 +7,12 @@ export const TIPO_TRAMITE ={
   F: "Confrontacion",
   B: "Busqueda",
   A: "No atentado",
-  E: "Consejero "
+  E: "Consejo"
 }
+// 🔁 Conversión inversa
+export const TIPO_TRAMITE_INVERTIDO = Object.fromEntries(
+  Object.entries(TIPO_TRAMITE).map(([k, v]) => [v, k])
+);
 
 export const TRAMITE_COLORS = {
   // Tipo: { color base, color hover (para botones), color de texto (si se necesita) }
@@ -47,7 +51,7 @@ export const TRAMITE_COLORS = {
     text: 'text-indigo-500' 
   }, // btn-primary
   
-  Consejero: { 
+  Consejo: { 
     base: 'bg-gray-500', 
     border: 'border-gray-500', 
     hover: 'hover:bg-gray-600', 
@@ -77,31 +81,19 @@ export const BUSCAR_EN_OPTIONS = [
     { value: 'su-ant', label: 'SU-ANTECEDENTE' },
     
   ];
-  // ... (TRAMITE_COLORS y BUSCAR_EN_OPTIONS se mantienen)
-
-export const GLOSAS_MOCK_DATA = [
-    { 
-      id: 101, 
-      tramiteId: 1, // Pertenece a Legalizacion
-      titulo: 'Glosa Estandar Título', 
-      cuerpo: 'El título del trámite debe ser revisado por la unidad legal antes de su procesamiento final.',
-      interno: true // Simulación de glosa interna
-    },
-    { 
-      id: 102, 
-      tramiteId: 1, 
-      titulo: 'Revisión de Antecedentes', 
-      cuerpo: 'Verificar la presentación de antecedentes penales y policiales actualizados.',
-      interno: false 
-    },
-    { 
-      id: 201, 
-      tramiteId: 2, // Pertenece a Certificacion
-      titulo: 'Notas Finales Aprobadas', 
-      cuerpo: 'Certificado solo emitible si el estudiante tiene todas las materias aprobadas.',
-      interno: false 
-    },
-];
+  /**
+ * Opciones para el campo "Buscar en" en los modales de trámites.
+ */
+export const BUSCAR_EN_DOCUMENTOS = [
+    { value: 'db', label: 'DB' },
+    { value: 'ca', label: 'CA' },
+    { value: 'da', label: 'DA' },
+    { value: 'tp', label: 'TP' },
+    { value: 'di', label: 'DI' },
+    { value: 'tpos', label: 'TPOS' },
+    { value: 're', label: 'RE' },
+    { value: 'su', label: 'SU' },
+  ];
 export const TIPOS_LEGALIZACION = [
   { value: 'LEG. FOTOC. RR QUE CONCEDE DIPL. ACADEMICO', label: 'LEG. FOTOC. RR QUE CONCEDE DIPL. ACADEMICO' },
   { value: 'LEG. FOTOC. DIPL. ACADEMICO EXTRANJERO', label: 'LEG. FOTOC. DIPL. ACADEMICO EXTRANJERO' },
@@ -126,3 +118,11 @@ export const TIPO_APODERADO = [
     { value: 'declaracion_jurada', label: 'Declaración Jurada' },
     { value: 'poder_notariado', label: 'Poder Notariado' },
 ];
+export const TIPO_DOCUMENTO ={
+    db: "Diploma de Bachiller",
+    da: "Diploma Academico",
+    tp: "Titulo Profesional",
+    ca: "Certificado Academico",
+    re: "Revalida",
+    su: "Supletorio"
+}

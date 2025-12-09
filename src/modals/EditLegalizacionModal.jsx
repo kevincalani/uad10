@@ -1,386 +1,286 @@
-import React, { useState,useEffect,useMemo } from 'react';
-import {X,BookText, Eye,Info } from 'lucide-react';
-import { TIPOS_LEGALIZACION } from '../Constants/tramiteDatos';
-import DatosPersonalesForm from '../components/forms/DatosPersonalesForm';
-import DatosApoderadoForm from '../components/forms/DatosApoderadoForm';
-import DocumentoTable from '../components/DocumentoTable';
-import ObservarTramiteModal from './ObservarTramiteModal';
+import React, { useState, useEffect } from "react";
+import { X, BookText } from "lucide-react";
+import DatosPersonalesForm from "../components/Forms/DatosPersonalesForm";
+import DatosApoderadoForm from "../components/Forms/DatosApoderadoForm";
+import DocumentoTable from "../components/DocumentoTable";
+import { useModal } from "../hooks/useModal";
+import { usePersona } from "../hooks/usePersona";
+import api from "../api/axios";
+import { toast } from "../utils/toast";
 
+export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite,onClose, recargarTramites }) {
+    if (!tramiteData) return null;
 
+    const { cargarPersona, cargarApoderadoPorCi, cargarApoderadoPorTramite, guardarApoderado } = usePersona();
 
-// Simulación: Número de trámites en la BD para generar el Nro. Trámite consecutivo
-const BASE_TRAMITES_COUNT = 250; 
-
-// Componente principal del Modal
-export default function EditLegalizacionModal({ 
-    isOpen, 
-    onClose, 
-    tramiteData, 
-    onUpdateTramite,
-    isObserveModalOpen,
-    openObserveModal,
-    closeObserveModal,
-    tramiteToObserve, // Trámite completo (solo usado para el Modal de Observación)
-    docToObserve,
- }) {
-    if (!isOpen || !tramiteData) return null;
-
-    // --- ESTADOS ---
-    const [isDatosPersonalesSaved, setIsDatosPersonalesSaved] = useState(!!tramiteData.nombre);
-    const [documentos, setDocumentos] = useState(tramiteData.documentos || []);
+    // ---------------------------------------
+    //  ESTADOS
+    // ---------------------------------------
+    const [isDatosPersonalesSaved, setIsDatosPersonalesSaved] = useState(!!tramiteData.per_nombre);
+    const [listaTramites, setListaTramites] = useState([])
+    const [documentos, setDocumentos] = useState([]);
+    const [ptaang,setPtaang] = useState([]);
+    const [confrontacion,setConfrontacion] = useState([]);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
 
-    // Formulario de Documento
-    const [newDocForm, setNewDocForm] = useState({
-        tipoLegalizacion: TIPOS_LEGALIZACION[0].value,
-        tipoTramite: 'EXTERNO',
-        isPtag: false,
-        isCuadis: false,
-        nroTitulo1: '',
-        nroTitulo2: '',
-        isTituloSupletorio: false,
-        nroControl: '',
-        reintegro: '',
-        nroControlBusqueda: '',
-        nroControlReimpresion: '',
-    });
-
-    // --- Lógica de inicialización de Apellidos y Nombres (simplificada) ---
-    const initialName = tramiteData.nombre || '';
-    const initialNameParts = initialName.trim().split(/\s+/);
-    // Asume que la última palabra es el nombre, el resto son apellidos
-    const initialNombres = initialNameParts.length > 0 ? initialNameParts.slice(-1).join(' ') : '';
-    const initialApellidos = initialNameParts.length > 1 ? initialNameParts.slice(0, -1).join(' ') : initialName;
-
-    // Formulario de Datos Personales (Simulación de autocompletado)
     const [datosPersonales, setDatosPersonales] = useState({
-        ci: tramiteData.ci || '', 
-        pasaporte: tramiteData.pasaporte || '',
-        apellidos: initialApellidos,
-        nombres: initialNombres,
+        ci: tramiteData.per_ci || "",
+        pasaporte: tramiteData.per_pasaporte || "",
+        apellidos: tramiteData.per_apellido || "",
+        nombres: tramiteData.per_nombre || ""
     });
-    
-    // Formulario de Apoderado
+
     const [datosApoderado, setDatosApoderado] = useState({
-        ci: '',
-        apellidos: '',
-        nombres: '',
-        tipoApoderado: '',
+        ci: "",
+        apellidos: "",
+        nombres: "",
+        tipoApoderado: ""
     });
 
-    // 2. LÓGICA DE CÁLCULO DE ESTADO CONSOLIDADO DEL TRÁMITE
-    const isTramiteBlocked = useMemo(() => 
-        documentos.some(doc => doc.isBlocked)
-    , [documentos]);
-    
-    const isTramiteObserved = useMemo(() => 
-        documentos.some(doc => doc.isObserved)
-    , [documentos]);
-    
-    const observacionConsolidada = useMemo(() => 
-        documentos.filter(doc => doc.isObserved)
-                  .map(doc => doc.observacion)
-                  .join(' | ')
-    , [documentos]);
-    const updateParentTramite = (updatedFields = {}) => {
-         onUpdateTramite(tramiteData.id, { 
-            // Campos principales del trámite
-            ...tramiteData, 
-            // Documentos actualizados
-            documentos: documentos,
-            // Estado consolidado (Calculado)
-            isObserved: isTramiteObserved,
-            isBlocked: isTramiteBlocked,
-            observacion: observacionConsolidada,
-            // Otros campos que vengan de los formularios (ej. Datos Personales)
-            ...updatedFields
-        });
-    };
-    // Sincronizar documentos al abrir el modal
+    // ---------------------------------------
+    //  CARGAR DATOS INICIALES
+    // ---------------------------------------
     useEffect(() => {
-        if (isOpen && tramiteData) {
-            setDocumentos(tramiteData.documentos || []);
-            setIsDatosPersonalesSaved(!!tramiteData.nombre);
-        }
-    }, [isOpen, tramiteData]);
-    
-    // --- HANDLERS ---
-    
-    const handleDatosPersonalesSubmit = () => {
+        fetchData();
+    }, [tramiteData.cod_tra]);
 
-        const { ci, apellidos, nombres } = datosPersonales;
+    const fetchData = async () => {
+            try {
+                // 1️⃣ Datos del trámite y documentos
+                const res = await api.get(`/api/datos-tramite-legalizacion/${tramiteData.cod_tra}`);
+                if (res.data.status === "success") {
+                    const data = res.data.data;
+                    console.log(res.data)
+                    // DATOS PERSONALES
+                    if (data.tramite) {
+                        setDatosPersonales({
+                            ci: data.tramite.per_ci || "",
+                            pasaporte: data.tramite.per_pasaporte || "",
+                            apellidos: data.tramite.per_apellido || "",
+                            nombres: data.tramite.per_nombre || "",
+                        });
+                        setIsDatosPersonalesSaved(!!data.tramite.per_nombre);
+                    }
+                    //CONFRONTACION
+                    setConfrontacion(data.confrontacion)
+                    // DOCUMENTOS
+                    setDocumentos(data.documentos || []);
+                    // PTANG 
+                    setPtaang(data.ptaang)
+                    //LISTA TRAMITES
+                    setListaTramites(data.lista_tramites)
+                    // APODERADO (si ya viene en la respuesta)
+                    if (data.apoderado) {
+                        setDatosApoderado({
+                            ci: data.apoderado.apo_ci || "",
+                            apellidos: data.apoderado.apo_apellido || "",
+                            nombres: data.apoderado.apo_nombre || "",
+                            tipoApoderado: data.tramite.tra_tipo_apoderado || "",
+                        });
+                        setIsApoderadoFormVisible(true);
+                    }
+                }
 
-        // Concatenar Apellidos y Nombres
-        const newNombre = `${apellidos.trim()} ${nombres.trim()}`.replace(/\s+/g, ' ');
+                // 2️⃣ Si hay cod_apo pero no vino apoderado en la respuesta
+                if (tramiteData.cod_apo && (!res.data.data.apoderado || Object.keys(res.data.data.apoderado).length === 0)) {
+                    const ap = await cargarApoderadoPorTramite(tramiteData.cod_tra);
+                    console.log(ap,"edit")
+                    if (ap) {
+                        setDatosApoderado({
+                            ci: ap.ap_ci,
+                            apellidos: ap.ap_apellido,
+                            nombres: ap.ap_nombre,
+                            tipoApoderado: ap.ap_tipo || "",
+                        });
+                        setIsApoderadoFormVisible(true);
+                    }
+                }
 
-        // Simular la actualización de los datos del trámite en la tabla padre
-        if (onUpdateTramite) {
-            onUpdateTramite(tramiteData.id, {
-                ci: ci.trim(),
-                nombre: newNombre, // El campo nombre actualizado
-            });
-        }
-        
-        // Bloquear el formulario
-        setIsDatosPersonalesSaved(true);
-        // Opcional: alert(`Datos personales guardados: ${newNombre} (${ci.trim()}).`);
-    };
-    // Simulación de Autocompletado de CI (Datos Personales)
-    const handleCiChange = (e) => {
+            } catch (err) {
+                console.error(err);
+                toast.error("Error al cargar los datos del trámite");
+            }
+        };
+    // ---------------------------------------
+    //  AUTOCOMPLETADO DE PERSONA
+    // ---------------------------------------
+    const handleCiChange = async (e) => {
         const ci = e.target.value;
-        setDatosPersonales(prev => ({ ...prev, ci }));
-        
-        // Simulación: Si CI = 123, autocompleta.
-        if (ci === '123') {
-            setDatosPersonales(prev => ({ 
-                ...prev, 
-                apellidos: 'García López', 
-                nombres: 'María' 
+        setDatosPersonales(p => ({ ...p, ci }));
+
+        if (ci.length < 3) return;
+
+        const persona = await cargarPersona(ci);
+        if (persona) {
+            setDatosPersonales(p => ({
+                ...p,
+                apellidos: persona.per_apellido,
+                nombres: persona.per_nombre,
+                pasaporte: persona.per_pasaporte || p.pasaporte
             }));
-            //
+        } else {
+            setDatosPersonales(p => ({ ...p, apellidos: "", nombres: "" }));
         }
     };
-    
-    // Simulación de Autocompletado de CI (Apoderado)
-    const handleApoderadoCiChange = (e) => {
-        const ci = e.target.value;
-        setDatosApoderado(prev => ({ ...prev, ci }));
-        
-        // Simulación: Si CI = 456, autocompleta.
-        if (ci === '456') {
-            setDatosApoderado(prev => ({ 
-                ...prev, 
-                apellidos: 'Mamani Quispe', 
-                nombres: 'Carlos' 
-            }));
-        } 
-    };
-    // Generic Change Handler para Datos Personales
+
     const handleDatosPersonalesChange = (e) => {
         const { name, value } = e.target;
         setDatosPersonales(prev => ({ ...prev, [name]: value }));
     };
-    // Generic Change Handler para Apoderado
-    const handleDatosApoderadoChange = (e) => {
-        const { name, value } = e.target;
-        setDatosApoderado(prev => ({ ...prev, [name]: value }));
-    };
 
-    const handleBackdropClick = (e) => {
-        // Si el clic ocurrió directamente sobre el DIV principal (el backdrop),
-        // y no sobre un hijo, cerramos el modal.
-        if (e.target === e.currentTarget) {
-        onClose();
+    // ---------------------------------------
+    //  GUARDAR DATOS PERSONALES
+    // ---------------------------------------
+    const handleDatosPersonalesSubmit = async () => {
+        try {
+            const form = new FormData();
+            form.append("ctra", tramiteData.cod_tra);
+            form.append("ci", datosPersonales.ci);
+            form.append("nombre", datosPersonales.nombres);
+            form.append("apellido", datosPersonales.apellidos);
+            form.append("pasaporte", datosPersonales.pasaporte);
+
+            const res = await guardarDatosTramite(form);
+            if (res.ok) {
+                setIsDatosPersonalesSaved(true);
+                toast.success(res.message);
+                fetchData()
+                recargarTramites(tramiteData.tra_fecha_solicitud)
+            } else {
+                toast.error(res.error);
+            }
+        } catch (err) {
+            console.error(err);
+            toast.error("Error inesperado al guardar los datos del trámite");
         }
     };
-    // Generic Change Handler para Documento/Trámite
-    const handleNewDocFormChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        setNewDocForm(prev => ({ 
-            ...prev, 
-            [name]: type === 'checkbox' ? checked : value 
-        }));
-    };
-    
-    /** * MANEJADOR DE AGREGAR DOCUMENTO (Solo guarda y bloquea)
-     * Lo llamará el componente hijo *después* de que la validación sea exitosa.
-     */
-    const handleAddDocumento = (newDocData) => {
-        // ... (Tu lógica existente para añadir documento) ...
-        const newId = Date.now();
-        const newDoc = {
-            id: newId, 
-            nombre: newDocData.nombre, 
-            numeroBd: BASE_TRAMITES_COUNT + documentos.length + 1, 
-            nroTitulo: newDocData.nroTitulo,
-            sitraVerificado: newDocData.sitraVerificado, 
-            tipoTramite: 'EXTERNO', // Valor inicial
-            isObserved: false, // Valor inicial
-            isBlocked: false, // Valor inicial
-            observacion: '',
-        };
 
-        const updatedDocs = [...documentos, newDoc];
-        setDocumentos(updatedDocs);
-        setIsAddDocumentoFormVisible(false);
+    // ---------------------------------------
+    //  AUTOCOMPLETADO DE APODERADO
+    // ---------------------------------------
+    {/* --- SOLO LA PARTE CORREGIDA --- */}
 
-        // 🆕 Actualizar el estado consolidado del trámite principal
-        // Usamos la nueva lista de documentos para forzar el recálculo y guardado
-        onUpdateTramite(tramiteData.id, { 
-            documentos: updatedDocs,
-            isObserved: updatedDocs.some(doc => doc.isObserved),
-            isBlocked: updatedDocs.some(doc => doc.isBlocked),
-            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
-        });
-    };
-    
-    // Toggle para EXTERNO/INTERNO
-    const handleToggleDestino = (id) => {
-        // No hay bloqueo aquí, se ejecuta normalmente
-        const updatedDocs = documentos.map(doc => {
-            if (doc.id === id) {
-                 return {
-                     ...doc,
-                     tipoTramite: doc.tipoTramite === 'EXTERNO' ? 'INTERNO' : 'EXTERNO'
-                    };
-            }
-            return doc;
-        });
-        setDocumentos(updatedDocs);
+    const handleApoderadoCiChange = async (ci) => {
+        setDatosApoderado(prev => ({ ...prev, ci }));
 
-        // 🆕 Actualizar el estado consolidado del trámite principal (aunque no cambie)
-        onUpdateTramite(tramiteData.id, { 
-            documentos: updatedDocs,
-            isObserved: updatedDocs.some(doc => doc.isObserved),
-            isBlocked: updatedDocs.some(doc => doc.isBlocked),
-            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
-        });
-    };
-    
-    // Eliminar fila de la tabla
-    const handleDeleteDocumento = (id) => {
-        const updatedDocs = documentos.filter(doc => doc.id !== id);
-        setDocumentos(updatedDocs);
+        if (ci.length < 3) return null;
 
-        // 🆕 Actualizar el estado consolidado del trámite principal
-        onUpdateTramite(tramiteData.id, { 
-            documentos: updatedDocs,
-            isObserved: updatedDocs.some(doc => doc.isObserved),
-            isBlocked: updatedDocs.some(doc => doc.isBlocked),
-            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
-        });
-    };
-    const handleObserveDocumento = (documento) => {
-        // Abrir el modal de observación global, pero pasándole el documento específico
-        openObserveModal(tramiteData, documento);
-    };
-    // HANDLER PARA GUARDAR OBSERVACIÓN DEL DOCUMENTO
-    const handleSaveObservation = (data) => {
-        // data contiene { observacion: string, bloquear: boolean }
-        if (!docToObserve) return;
-        
-        const isObserved = !!data.observacion;
-        
-        // 1. Actualizar el documento en el estado local 'documentos'
-        const updatedDocs = documentos.map(doc => 
-            doc.id === docToObserve.id 
-                ? { 
-                    ...doc, 
-                    isObserved: isObserved,
-                    isBlocked: data.bloquear,
-                    observacion: data.observacion,
-                  } 
-                : doc
-        );
-        setDocumentos(updatedDocs);
+        const ap = await cargarApoderadoPorCi(ci);
 
-        // 2. 🆕 Actualizar el estado consolidado del trámite principal
-        onUpdateTramite(tramiteData.id, { 
-            documentos: updatedDocs,
-            isObserved: updatedDocs.some(doc => doc.isObserved),
-            isBlocked: updatedDocs.some(doc => doc.isBlocked),
-            observacion: updatedDocs.filter(doc => doc.isObserved).map(doc => doc.nombre + ': ' + doc.observacion).join(' | '),
-        });
-        
-        // 3. Cerrar el modal de observación
-        closeObserveModal();
-    };
+        if (ap) {
+            const datos = {
+            ci: ci,
+            apellidos: ap.apo_apellido,
+            nombres: ap.apo_nombre,
+            tipoApoderado: "",
+            };
+            setDatosApoderado(datos);
+            console.log(ap)
+            return datos;
+        } else {
+            const datos = {
+            ci,
+            apellidos: "",
+            nombres: "",
+            tipoApoderado: "",
+            };
 
-    const handleSaveDatosPersonales = (datos) => {
-        setIsDatosPersonalesSaved(true);
-        // Cuando se guardan datos, también actualizamos el estado del trámite principal
-        onUpdateTramite(tramiteData.id, { 
-            nombre: datos.nombre, 
-            ci: datos.ci,
-        });
+            setDatosApoderado(datos);
+            return null;
+        }
     };
-    
-    const handleSaveDocumentos = () => {
-        // Si el usuario guarda el modal de edición, enviamos el estado de documentos y el estado consolidado
-        onUpdateTramite(tramiteData.id, {
-            documentos: documentos,
-            isObserved: isTramiteObserved,
-            isBlocked: isTramiteBlocked,
-            observacion: observacionConsolidada,
-        });
-        onClose();
-    };
-
+    // ---------------------------------------
+    //  RENDER
+    // ---------------------------------------
     return (
-    <>
-        <div className="fixed inset-0 bg-gray-500/50 bg-opacity-50 flex justify-center items-center z-50 p-4"
-            onClick={handleBackdropClick}>
-            <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[95vh] overflow-y-auto">
-        
-                {/* 1. Header */}
-                <div className="bg-blue-600 text-white p-4 flex justify-between items-center ">
-                    <h3 className="text-xl font-semibold flex items-center">
-                        <BookText className="mr-3 " size={32} />LEGALIZACIÓN
-                        </h3>
-                    <button onClick={onClose} className="text-white hover:text-gray-200">
-                        <X size={24} />
-                    </button>
-                </div>
+        <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[95vh] overflow-y-auto">
 
-                {/* Contenido del Modal (Cuerpo) */}
-                <div className="p-6 flex-grow overflow-y-auto">
-                    
-                    {/* 2. Título del Formulario */}
-                    <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Formulario para editar Legalización</h2>
+            {/* HEADER */}
+            <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
+                <h3 className="text-xl font-semibold flex items-center">
+                    <BookText size={32} className="mr-3" /> LEGALIZACIÓN
+                </h3>
+                <X size={24} className="cursor-pointer" onClick={onClose} />
+            </div>
 
-                    {/* 3. Cuerpo en Dos Partes */}
-                    <div className="flex flex-col lg:flex-row gap-6">
-                        
-                        {/* PARTE IZQUIERDA: Datos Personales y Apoderado */}
-                        <div className="w-full lg:w-4/12 space-y-6">
-                            
-                            {/* Datos Personales Componente */}
-                            <DatosPersonalesForm
-                                tramiteData={tramiteData}
-                                datosPersonales={datosPersonales}
-                                handleCiChange={handleCiChange}
-                                handleDatosPersonalesChange={handleDatosPersonalesChange}
-                                handleDatosPersonalesSubmit={handleDatosPersonalesSubmit} // <-- Nuevo Handler
-                                isDatosPersonalesSaved={isDatosPersonalesSaved} // <-- Nuevo Estado
-                            />
-                            
-                            {/* Datos del Apoderado Componente */}
-                            <DatosApoderadoForm
-                                isApoderadoFormVisible={isApoderadoFormVisible}
-                                setIsApoderadoFormVisible={setIsApoderadoFormVisible}
-                                datosApoderado={datosApoderado}
-                                handleApoderadoCiChange={handleApoderadoCiChange}
-                                handleDatosApoderadoChange={handleDatosApoderadoChange}
-                            />
-                        </div>
+            {/* BODY */}
+            <div className="p-6 flex-grow overflow-y-auto">
+                <h2 className="text-2xl font-bold text-center mb-6">
+                    Formulario Para Editar Legalización
+                </h2>
 
-                        {/* PARTE DERECHA: Documentos del Trámite (Sección Combinada) */}
-                        <DocumentoTable
-                            documentos={documentos}
-                            isAddDocumentoFormVisible={isAddDocumentoFormVisible}
-                            setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
-                            newDocForm={newDocForm}
-                            setNewDocForm={setNewDocForm}
-                            handleToggleDestino={handleToggleDestino}
-                            handleDeleteDocumento={handleDeleteDocumento}
-                            handleAddDocumento={handleAddDocumento}
+                <div className="flex flex-col lg:flex-row gap-6">
+
+                    {/* IZQUIERDA */}
+                    <div className="w-full lg:w-4/12 space-y-6">
+
+                        <DatosPersonalesForm
+                            tramiteData={tramiteData}
+                            datosPersonales={datosPersonales}
+                            handleCiChange={handleCiChange}
+                            handleDatosPersonalesChange={handleDatosPersonalesChange}
+                            onSave={handleDatosPersonalesSubmit}
                             isDatosPersonalesSaved={isDatosPersonalesSaved}
-                            onObserve={handleObserveDocumento}
-                             isTramiteBlocked={isTramiteBlocked}
+                            ptaang={ptaang}
+                            recargarTramites={recargarTramites}
                         />
 
+                        <DatosApoderadoForm
+                            datosApoderado={datosApoderado}
+                            handleApoderadoCiChange={handleApoderadoCiChange}
+                            handleDatosApoderadoChange={(e) => {
+                                const { name, value } = e.target;
+                                setDatosApoderado(prev => ({ ...prev, [name]: value }));
+                            }}
+                            onSave={async (nuevoApoderado) => {
+                                try {
+                                    const form = new FormData();
+                                    form.append("ctra", tramiteData.cod_tra);
+                                    form.append("ci", nuevoApoderado.ci);
+                                    form.append("nombre", nuevoApoderado.nombres);
+                                    form.append("apellido", nuevoApoderado.apellidos);
+                                    form.append("tipo", nuevoApoderado.tipoApoderado);  // 🔥 CORRECTO
+
+                                    const res = await guardarApoderado(form);
+
+                                    if (res.ok) {
+                                    const apo = res.data.apoderado;
+
+                                    setDatosApoderado({
+                                        ci: apo.apo_ci,
+                                        apellidos: apo.apo_apellido,
+                                        nombres: apo.apo_nombre,
+                                        tipoApoderado: apo.apo_tipo,
+                                    });
+
+                                    toast.success("Apoderado guardado correctamente");
+                                    } else {
+                                    toast.error(res.error);
+                                    }
+                                } catch (err) {
+                                    console.log(err)
+                                    toast.error("Error guardando apoderado");
+                                }
+                                }}
+                        />
                     </div>
-                    </div>
+
+                    {/* DERECHA */}
+                    <DocumentoTable
+                        documentos={documentos}
+                        isAddDocumentoFormVisible={isAddDocumentoFormVisible}
+                        setIsAddDocumentoFormVisible={setIsAddDocumentoFormVisible}
+                        fetchData={fetchData}
+                        setDocumentos={setDocumentos}
+                        tramiteData={tramiteData}
+                        listaTramites={listaTramites}
+                        isDatosPersonalesSaved={isDatosPersonalesSaved}
+                        confrontacion={confrontacion}
+                    />
+
                 </div>
             </div>
-            <ObservarTramiteModal
-                isOpen={isObserveModalOpen}
-                onClose={closeObserveModal}
-                // Se pasa el documento específico que se va a observar
-                tramiteData={docToObserve} 
-                onSave={handleSaveObservation}
-            />
-        </>
+        </div>
     );
 }

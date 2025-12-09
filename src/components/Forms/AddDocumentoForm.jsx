@@ -1,221 +1,305 @@
-import React from 'react';
-import { X } from 'lucide-react';
-// Asumiendo que TIPOS_LEGALIZACION está aquí o en src/constants/tramiteDatos
-import { TIPOS_LEGALIZACION } from '../../Constants/tramiteDatos'; 
+import React, { useState } from "react";
+import { CloudCog, Plus, XCircle } from "lucide-react";
+import { toast } from "../../utils/toast";
+import { BUSCAR_EN_DOCUMENTOS } from "../../Constants/tramiteDatos";
 
-/**
- * Formulario para añadir un nuevo documento al listado.
- */
-export default function AddDocumentoForm({
-    setIsAddDocumentoFormVisible,
-    newDocForm,
-    setNewDocForm,
-    handleAddDocumento
+export default function AddDocumentoForm({ 
+  tramiteData,
+  listaTramites, 
+  setIsAddDocumentoFormVisible,
+  createDocumento, 
+  fetchData
 }) {
-    
-    // Generic Change Handler for new document form (local logic)
-    const handleNewDocChange = (e) => {
-         const { name, value, type, checked } = e.target;
-         setNewDocForm(prev => ({ 
-             ...prev, 
-             [name]: type === 'checkbox' ? checked : value    }));
-     };
+  // Detectar si es trámite de Búsqueda (Tipo B)
+  const esTipoB = tramiteData?.tra_tipo_tramite === 'B';
 
-    // 🆕 Nuevo Handler para el Submit:
-    const handleSubmit = (e) => {
-        e.preventDefault(); // 🛑 CLAVE: Previene el envío del formulario nativo y la recarga de página
-        
-        // 1. Validar y preparar los datos (combinar nroTitulo1 y nroTitulo2)
-        const finalDocData = {
-            ...newDocForm,
-            // Asumiendo que el campo 'nombre' se mapea desde el 'tipoLegalizacion' o debe definirse.
-            // Aquí lo dejamos como 'nombre' (es la convención de tus datos de documento)
-            nombre: newDocForm.tipoLegalizacion, // Usamos tipoLegalizacion como nombre
-            nroTitulo: `${newDocForm.nroTitulo1 || ''}/${newDocForm.nroTitulo2 || ''}`,
-            // También asumimos valores iniciales por defecto para campos no cubiertos en el form
-            isObserved: false, 
-            isBlocked: false,
-            observacion: '',
-            // Simulamos el campo de verificación SITRA
-            sitraVerificado: true, // O false, dependiendo de tu lógica de negocio
-        };
-        
-        // 2. Llamar al handler del componente padre
-        handleAddDocumento(finalDocData); 
-        
-        // Opcional: Limpiar el formulario después de añadir
-        setNewDocForm({
-            tipoLegalizacion: TIPOS_LEGALIZACION[0].value, // Valor por defecto
-            tipoTramite: 'EXTERNO',
-            isPtag: false,
-            isCuadis: false,
-            nroTitulo1: '',
-            nroTitulo2: '',
-            isTituloSupletorio: false,
-            nroControl: '',
-            reintegro: '',
-            nroControlBusqueda: '',
-            nroControlReimpresion: '',
-        });
+  const [formData, setFormData] = useState({
+    ctra:tramiteData.cod_tra,
+    tipo: listaTramites[0].cod_tre,
+    tipo_tramite: "EXTERNO",
+    ptaang: false,
+    cuadis: false,
+    numero: "",
+    gestion: "",
+    supletorio: false,
+    control: "",
+    reintegro: "",
+    valorado_bus: "",
+    reimpresion: "",
+    buscar_en: "",
+    documentos: ""
+  });
+
+  const [loading, setLoading] = useState(false);
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+  };
+
+  // Seleccionar el trámite y actualizar el campo "tipo"
+    const handleTramiteSelect = (e) => {
+      console.log(e.target.value)
+      const codTreSeleccionado = e.target.value;
+      setFormData(prev => ({
+        ...prev,
+        tipo: codTreSeleccionado
+      }));
     };
-    
-     return (
-         <div className="mt-4 p-4 border border-blue-300 rounded-lg bg-blue-50 flex-shrink-0">
-             <div className="flex justify-between items-center mb-3">
-                 <div className="flex-grow text-center">
-                     <h4 className="font-semibold text-gray-700">Añadir Trámite</h4>
-                 </div>
-                 <button onClick={() => setIsAddDocumentoFormVisible(false)} className="text-red-500 hover:text-red-700 ml-auto">
-                     <X size={18} />
-                 </button>
-             </div>
+  // Enviar los datos del formulario
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      setLoading(true);
 
-             {/* 🛑 Actualizar onSubmit para usar el nuevo handler local */}
-             <form onSubmit={handleSubmit} className="space-y-2 text-sm">
+      // Solo enviar los campos de búsqueda si es un formulario de tipo B
+      const formDataToSend = {
+        ...formData,
+        ...(esTipoB && { 
+          buscar_en: formData.buscar_en, 
+          documentos: formData.documentos 
+        })
+      };
 
-                 {/* Fila 1: Tipo de Legalización */}
-                <div className="flex items-center">
-                    <label className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-40">Tipo de Legalización:</label>
-                    <select
-                        name="tipoLegalizacion"
-                        value={newDocForm.tipoLegalizacion}
-                        onChange={handleNewDocChange}
-                        className="p-1 border border-gray-300 rounded bg-white w-full"
-                    >
-                        {TIPOS_LEGALIZACION.map(tipo => (
-                            <option key={tipo.value} value={tipo.value}>{tipo.label}</option>
-                        ))}
-                    </select>
-                </div>
-                    
-                {/* Fila 2: Tipo de Trámite (Radio) y Checkboxes */}
-                <div className="flex items-center space-x-4">
-                    <span className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-40">Tipo de Trámite:</span>
-                    
-                    <label className="flex items-center space-x-1">
-                        <input 
-                            type="radio" 
-                            name="tipoTramite"
-                            value="EXTERNO"
-                            checked={newDocForm.tipoTramite === 'EXTERNO'}
-                            onChange={handleNewDocChange}
-                        />
-                        <span>EXTERNO</span>
-                    </label>
-                    <label className="flex items-center space-x-1">
-                        <input 
-                            type="radio" 
-                            name="tipoTramite"
-                            value="INTERNO"
-                            checked={newDocForm.tipoTramite === 'INTERNO'}
-                            onChange={handleNewDocChange}
-                        />
-                        <span>INTERNO</span>
-                    </label>
+      const response = await createDocumento(formDataToSend);
+      if (response?.status === 'success') {
+        toast.success("Documento añadido correctamente");
+        await fetchData();
+        setIsAddDocumentoFormVisible(false);
+      } else {
+        toast.error(response.response.data.message);
+      }
 
-                    <div className="h-5 w-px bg-red-500 mx-3"></div>
-                    
-                    <label className="flex items-center space-x-1">
-                        <input 
-                            type="checkbox" 
-                            name="isPtag"
-                            checked={newDocForm.isPtag} 
-                            onChange={handleNewDocChange} 
-                        />
-                        <span>PTAG</span>
-                    </label>
-                    <label className="flex items-center space-x-1">
-                        <input 
-                            type="checkbox" 
-                            name="isCuadis"
-                            checked={newDocForm.isCuadis} 
-                            onChange={handleNewDocChange} 
-                        />
-                        <span>CUADIS</span>
-                    </label>
-                </div>
+      setLoading(false);
+    };
 
-                {/* Fila 3: Nro Título o Resolución y Supletorio */}
-                <div className="flex items-center text-sm">
-                    <label className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-40">Nro. Título/Res.:</label>
-                    <input 
-                        type="text" 
-                        name="nroTitulo1"
-                        value={newDocForm.nroTitulo1}
-                        onChange={handleNewDocChange}
-                        className="p-1 border border-gray-300 rounded w-16 text-center" 
-                    />
-                    <span className="font-bold mx-1">/</span>
-                    <input 
-                        type="text" 
-                        name="nroTitulo2"
-                        value={newDocForm.nroTitulo2}
-                        onChange={handleNewDocChange}
-                        className="p-1 border border-gray-300 rounded w-16 text-center" 
-                    />
-                    <span className="text-xs text-gray-500 whitespace-nowrap ml-2">(ej. 1999)</span>
-                    <label className="flex items-center space-x-1 ml-4">
-                        <input 
-                            type="checkbox" 
-                            name="isTituloSupletorio"
-                            checked={newDocForm.isTituloSupletorio} 
-                            onChange={handleNewDocChange} 
-                        />
-                        <span className="whitespace-nowrap">Título Supletorio</span>
-                    </label>
-                </div>
+
+  // --- ESTILOS AJUSTADOS ---
+  const labelClass = "text-right font-bold text-gray-600 italic text-sm leading-tight pr-2 w-28 flex-shrink-0 self-center";
+  const inputClass = "border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:border-blue-400 w-full";
+
+  return (
+    <div className="relative bg-white p-4 rounded-lg shadow-md border border-gray-200 animate-fadeIn">
+      {/* Botón cerrar */}
+      <button 
+        onClick={() => setIsAddDocumentoFormVisible(false)}
+        className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+      >
+        <XCircle size={18} />
+      </button>
+
+      {/* Título */}
+      <div className="flex justify-center mb-4">
+        <div className="bg-blue-100 text-gray-700 font-bold text-center py-1.5 px-8 rounded shadow-sm border border-blue-200 text-sm">
+          {esTipoB ? "Añadir documento para Búsqueda" : "Añadir documento"}
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="px-1">
+        
+        {/* FILA 1: Selector de Trámite */}
+        <div className="flex items-center mb-2">
+          <label className={labelClass}>
+            {esTipoB ? "Trámite :" : "Tipo de legalización :"}
+          </label>
+          <div className="flex items-center w-full pb-2 border-b border-gray-300">
+          <select
+            name="tipo"
+            value={formData.tipo}
+            onChange={handleTramiteSelect}
+            className={`${inputClass} bg-white`}
+            required
+          >
+            {listaTramites.map((t) => (
+              <option key={t.cod_tre} value={t.cod_tre}>
+                {t.tre_nombre}
+              </option>
+            ))}
+          </select>
+          </div>
+        </div>
+
+        {esTipoB ? (
+          /* --- FORMULARIO BÚSQUEDA --- */
+          <>
+            {/* Fila Control y Reimpresión */}
+            <div className="flex items-center mb-2">
+              {/* Lado Izquierdo */}
+                <label className={labelClass}>Nº control valorado:</label>
+                <div className="flex items-center w-full pb-2  ">
+                <input
+                  type="text"
+                  name="control"
+                  value={formData.control}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              {/* Lado Derecho */}
+                <label className={labelClass}>Nro. control Reimpresión :</label>
+                <input
+                  type="text"
+                  name="reimpresion"
+                  value={formData.reimpresion}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div className="flex items-center mb-2 ">
+               <div className="w-28 flex-shrink-0 "></div> {/* Espaciador para alinear con labels */}
+               <label className="flex items-center text-xs font-semibold text-gray-600 w-full pb-2 border-b border-gray-300 ">
+                  CUADIS :
+                  <input type="checkbox" name="cuadis" checked={formData.cuadis} onChange={handleChange} className="ml-2 h-4 w-4"/>
+               </label>
+            </div>
+
+            <div className="flex items-center mb-2">
+              <label className={labelClass}>Nro. Título:</label>
+              <div className="flex items-center gap-2 w-full pb-2 border-b border-gray-300">
+                <input name="numero" value={formData.numero} onChange={handleChange} className={`${inputClass} !w-24`} />
+                <span className="font-bold text-gray-500">/</span>
+                <input name="gestion" value={formData.gestion} onChange={handleChange} className={`${inputClass} !w-24`} />
+                <span className="text-gray-400 text-xs whitespace-nowrap">(e.j. 1999)</span>
+              </div>
+            </div>
+
+            <div className="flex items-center mb-2">
+              <label className={labelClass}>Buscar en :</label>
+              <div className="flex items-center w-full pb-2 border-b border-gray-300">
+              <select name="buscar_en" value={formData.buscar_en} onChange={handleChange} className={inputClass}>
+                {BUSCAR_EN_DOCUMENTOS.map(opt => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
+              </select>
+              </div>
+            </div>
+
+            <div className="flex items-start mb-2">
+              <label className={`${labelClass} mt-1`}>Documentos :</label>
+              <textarea name="documentos" value={formData.documentos} onChange={handleChange} rows="3" className={`${inputClass} resize-y`} />
+            </div>
+          </>
+        ) : (
+          /* --- FORMULARIO ESTÁNDAR --- */
+          <>
+            {/* FILA 2: Tipo Trámite | PTAG | CUADIS */}
+            <div className="flex items-center mb-2 overflow-hidden">
+              <label className={labelClass}>Tipo de trámite :</label>
+              
+              <div className="flex items-center flex-1 gap-2 text-xs sm:text-sm pb-2 border-b border-gray-300">
+                <label className="flex items-center cursor-pointer text-gray-600 uppercase text-xs">
+                  <input type="radio" name="tipo_tramite" value="EXTERNO" checked={formData.tipo_tramite === 'EXTERNO'} onChange={handleChange} className="mr-1" />
+                  EXTERNO
+                </label>
+                <label className="flex items-center cursor-pointer text-gray-600 uppercase ml-2 text-xs">
+                  <input type="radio" name="tipo_tramite" value="INTERNO" checked={formData.tipo_tramite === 'INTERNO'} onChange={handleChange} className="mr-1" />
+                  INTERNO
+                </label>
+
+                {/* Separador Rojo */}
+                <div className="h-4 w-[2px] bg-red-500 mx-1"></div>
+
+                <label className="flex items-center cursor-pointer font-bold italic text-gray-700">
+                  PTAG :
+                  <input type="checkbox" name="ptaang" checked={formData.ptaang} onChange={handleChange} className="ml-1 h-4 w-4 border-gray-300" />
+                </label>
+
+                <label className="flex items-center cursor-pointer font-bold italic text-gray-700 ml-2">
+                  CUADIS :
+                  <input type="checkbox" name="cuadis" checked={formData.cuadis} onChange={handleChange} className="ml-1 h-4 w-4 border-gray-300" />
+                </label>
+              </div>
+            </div>
+
+            {/* FILA 3: Nro Título | Supletorio */}
+            <div className="flex items-center mb-2">
+              <label className={labelClass}>Nro. Título o Resolución:</label>
+              
+              <div className="flex items-center w-full pb-2 border-b border-gray-300">
+                {/* Inputs pequeños */}
+                <input name="numero" value={formData.numero} onChange={handleChange} className={`${inputClass} !w-20`} />
+                <span className="mx-1 font-bold text-gray-500">/</span>
+                <input name="gestion" value={formData.gestion} onChange={handleChange} className={`${inputClass} !w-20`} />
                 
-                {/* Fila 4: Nro Control y Reintegro */}
-                <div className="flex items-center space-x-4">
-                    <label className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-40">Nro. Control:</label>
-                    <input 
-                        type="text" 
-                        name="nroControl"
-                        placeholder="" 
-                        className="p-1 border border-gray-300 rounded w-full" 
-                        value={newDocForm.nroControl} 
-                        onChange={handleNewDocChange} 
-                    />
-                    
-                    <label className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-20">Reintegro:</label>
-                    <input 
-                        type="text" 
-                        name="reintegro"
-                        placeholder="" 
-                        className="p-1 border border-gray-300 rounded w-full"
-                        value={newDocForm.reintegro} 
-                        onChange={handleNewDocChange} 
-                    />
-                </div>
+                <span className="text-gray-400 text-xs mx-2 whitespace-nowrap hidden sm:inline">(e.j. 1999)</span>
 
-                {/* Fila 5: Nro control Busqueda y Nro control Reimpresion */}
-                <div className="flex items-center space-x-4">
-                    <label className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-40">Nro Control Busqueda:</label>
-                    <input 
-                        type="text" 
-                        name="nroControlBusqueda"
-                        placeholder="" 
-                        className="p-1 border border-gray-300 rounded w-full"
-                         value={newDocForm.nroControlBusqueda} 
-                         onChange={handleNewDocChange} 
-                    />
+                {/* Supletorio alineado a la derecha o pegado */}
+                <label className="flex items-center cursor-pointer text-xs font-bold text-gray-700 ml-auto sm:ml-2">
+                  Supletorio :
+                  <input type="checkbox" name="supletorio" checked={formData.supletorio} onChange={handleChange} className="ml-1 h-4 w-4 border-gray-300" />
+                </label>
+              </div>
+            </div>
 
-                    <label className="text-gray-600 font-medium whitespace-nowrap text-right mr-2 flex-shrink-0 w-40">Nro Control Reimpresión:</label>
-                    <input 
-                        type="text" 
-                        name="nroControlReimpresion"
-                        placeholder="" 
-                        className="p-1 border border-gray-300 rounded w-full"
-                         value={newDocForm.nroControlReimpresion} 
-                         onChange={handleNewDocChange} 
-                    />
-                </div>
-                 <div className="flex justify-end pt-2">
-                     <button type="submit" className="bg-green-500 text-white py-1 px-4 text-sm rounded font-medium hover:bg-green-600 transition">
-                         + Crear
-                     </button>
-                 </div>
-             </form>
-         </div>
-    );
+            {/* FILA 4: Nro. Control | Reintegro */}
+            <div className="flex items-center mb-2 ">
+              {/* Parte Izquierda: Control */}
+              <label className={labelClass}>Nro. Control:</label>
+              <div className="flex items-center w-full pb-2 border-b border-gray-300">
+              <input 
+                type="text" 
+                name="control" 
+                value={formData.control} 
+                onChange={handleChange} 
+                className={`${inputClass} flex-1`} // Ocupa espacio disponible
+              />
+
+              {/* Parte Derecha: Reintegro */}
+              {/* Etiqueta azul itálica */}
+              <label className="text-blue-600 font-bold italic text-xs ml-2 mr-1 whitespace-nowrap">Reintegro :</label>
+              <input 
+                type="text" 
+                name="reintegro" 
+                value={formData.reintegro} 
+                onChange={handleChange} 
+                className="border border-blue-300 rounded px-2 py-1 text-sm w-24 focus:outline-none focus:border-blue-500" 
+              />
+              </div>
+            </div>
+
+            {/* FILA 5: Control Búsqueda | Reimpresión */}
+            <div className="flex items-start mb-2">
+              {/* Parte Izquierda */}   
+                <label className={labelClass}>
+                  N° control Búsqueda:
+                </label>
+                <div className="flex items-center w-full pb-2 border-b border-gray-300">
+                <input
+                  type="text"
+                  name="valorado_bus"
+                  value={formData.valorado_bus}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+
+              {/* Parte Derecha */}
+                <label className={labelClass}>
+                  Nro. control Reimpresión :
+                </label>
+                <input
+                  type="text"
+                  name="reimpresion"
+                  value={formData.reimpresion}
+                  onChange={handleChange}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Footer Botón */}
+        <div className="flex justify-end mt-4">
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-4 rounded shadow flex items-center gap-2 transition-colors text-sm disabled:opacity-50"
+          >
+            {loading ? "Guardando..." : <><Plus size={16} /> Crear</>}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  );
 }
