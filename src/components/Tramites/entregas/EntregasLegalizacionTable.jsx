@@ -287,7 +287,7 @@ export default function EntregasLegalizacionTable({ entregas }) {
         sortDescriptor={sortDescriptor}
         onSortChange={setSortDescriptor}
         classNames={{
-          wrapper: 'shadow-md',
+          wrapper: 'shadow-md p-0 border border-gray-300',
           th: 'bg-gray-500 text-white',
           td: 'text-gray-600',
         }}

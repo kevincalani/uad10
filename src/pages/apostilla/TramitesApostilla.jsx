@@ -1,5 +1,6 @@
 // 📁 components/apostilla/TramitesApostilla.jsx
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Table,
   TableHeader,
@@ -29,6 +30,8 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 import TramiteModal from "../../modals/apostilla/tramiteModal";
 
 export default function TramitesApostilla() {
+  const { fecha: fechaUrl } = useParams(); // Obtener fecha de la URL
+  const navigate = useNavigate();
   const { openModal } = useModal();
   const {
     tramites,
@@ -39,9 +42,25 @@ export default function TramitesApostilla() {
     registrarEntrega,
   } = useApostilla();
 
-  const [selectedDate, setSelectedDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  // Función para validar formato de fecha
+  const isValidDate = (dateString) => {
+    if (!dateString) return false;
+    const regex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!regex.test(dateString)) return false;
+    
+    const date = new Date(dateString);
+    return date instanceof Date && !isNaN(date);
+  };
+
+  // Inicializar fecha desde URL o usar fecha actual
+  const getInitialDate = () => {
+    if (fechaUrl && isValidDate(fechaUrl)) {
+      return fechaUrl;
+    }
+    return new Date().toISOString().split("T")[0];
+  };
+
+  const [selectedDate, setSelectedDate] = useState(getInitialDate());
   const [filterValue, setFilterValue] = useState("");
   const [page, setPage] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(500);
@@ -50,7 +69,14 @@ export default function TramitesApostilla() {
     direction: null,
   });
 
-  // Cargar trámites al montar o cambiar fecha
+  // Sincronizar fecha de URL con estado
+  useEffect(() => {
+    if (fechaUrl && isValidDate(fechaUrl)) {
+      setSelectedDate(fechaUrl);
+    }
+  }, [fechaUrl]);
+
+  // Cargar trámites cuando cambia la fecha
   useEffect(() => {
     if (selectedDate) {
       listarTramitesPorFecha(selectedDate);
@@ -134,8 +160,11 @@ export default function TramitesApostilla() {
   }, []);
 
   const handleDateChange = (e) => {
-    setSelectedDate(e.target.value);
+    const newDate = e.target.value;
+    setSelectedDate(newDate);
     setPage(1);
+    // Actualizar URL con la nueva fecha
+    navigate(`/apostilla/tramites/${newDate}`, { replace: true });
   };
 
   const handleFirmar = async (cod_apos) => {
@@ -368,7 +397,7 @@ export default function TramitesApostilla() {
 
         {/* Segunda fila: info de fecha */}
         <div className="flex items-center justify-center gap-4 text-sm">
-          <div className="bg-blue-600 it text-white px-4 py-2 rounded shadow-md w-auto">
+          <div className="bg-blue-600 text-white px-4 py-2 rounded shadow-md w-auto">
             <h5 className="text-xl font-semibold">Trámites de apostilla</h5>
           </div>
         </div>
@@ -379,7 +408,7 @@ export default function TramitesApostilla() {
             {(() => {
               if (!selectedDate) return "";
 
-              const [year, month, day] = selectedDate.split("-"); // "2023-07-13"
+              const [year, month, day] = selectedDate.split("-");
               const date = new Date(year, month - 1, day);
 
               return date.toLocaleDateString("es-ES", {

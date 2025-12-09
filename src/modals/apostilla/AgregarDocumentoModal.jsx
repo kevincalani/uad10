@@ -41,6 +41,19 @@ export default function AgregarDocumentoModal({ cod_lis, cod_apos, onClose, onSu
       console.error('Error al agregar documento:', error);
     }
   };
+      // Formatear fecha 
+   const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
 
   if (loading || !datos) {
     return (
@@ -57,14 +70,14 @@ export default function AgregarDocumentoModal({ cod_lis, cod_apos, onClose, onSu
   return (
     <div className="w-full max-w-5xl bg-white rounded-lg shadow-xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-green-700 text-white rounded-t-lg">
+      <div className="flex items-center justify-between px-6 py-4 bg-blue-700 text-white rounded-t-lg">
         <div className="flex items-center gap-2">
           <FileText size={20} />
           <h2 className="text-lg font-bold">Apostilla</h2>
         </div>
         <button
           onClick={onClose}
-          className="p-1 hover:bg-green-800 rounded-full transition-colors"
+          className="p-1 hover:bg-blue-800 rounded-full transition-colors"
         >
           <X size={20} />
         </button>
@@ -72,7 +85,7 @@ export default function AgregarDocumentoModal({ cod_lis, cod_apos, onClose, onSu
 
       {/* Body */}
       <div className="p-6">
-        <div className="bg-green-700 text-white text-center py-2 rounded-lg mb-6">
+        <div className="bg-blue-700 text-white text-center py-2 rounded-lg mb-6 max-w-xl">
           <h6 className="font-semibold">Formulario para agregar trámite de apostilla</h6>
         </div>
 
@@ -102,7 +115,7 @@ export default function AgregarDocumentoModal({ cod_lis, cod_apos, onClose, onSu
               <DataRow 
                 label="Fecha ingreso" 
                 value={tramite_apostilla?.apos_fecha_ingreso 
-                  ? new Date(tramite_apostilla.apos_fecha_ingreso).toLocaleDateString('es-ES')
+                  ? formatearFecha(tramite_apostilla.apos_fecha_ingreso)
                   : '-'
                 } 
               />
@@ -151,7 +164,7 @@ export default function AgregarDocumentoModal({ cod_lis, cod_apos, onClose, onSu
                     placeholder="Número"
                     value={formData.numero}
                     onChange={(e) => setFormData({ ...formData, numero: e.target.value })}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                   <span className="text-gray-600">/</span>
                   <input
@@ -160,7 +173,7 @@ export default function AgregarDocumentoModal({ cod_lis, cod_apos, onClose, onSu
                     value={formData.gestion}
                     onChange={(e) => setFormData({ ...formData, gestion: e.target.value })}
                     maxLength={4}
-                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+                    className="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>

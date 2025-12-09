@@ -5,6 +5,7 @@ import { useModal } from '../../hooks/useModal';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import DocumentosApostillaTable from '../../components/apostilla/DocumentosApostillaTable';
 import EditApostillaModal from '../../modals/apostilla/EditApostillaModal';
+import { Plus } from 'lucide-react';
 
 export default function ConfigurarApostilla () {
   const { loading, documentos, obtenerDocumentos } = useApostilla();
@@ -45,15 +46,15 @@ export default function ConfigurarApostilla () {
                   onClick={handleNuevoDocumento}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow-sm transition text-sm flex items-center gap-2"
                 >
-                  <i className="fas fa-plus"></i>
-                  Trámite apostilla
+                  <Plus/>
+                   Trámite apostilla
                 </button>
               </div>
-
-              <div className="bg-blue-600 text-white px-4 py-2 rounded shadow-md w-fit mb-4">
-                <h5 className="text-lg font-semibold">Lista de Trámites de Apostilla</h5>
+              <div className='flex justify-center'>
+                <div className="bg-blue-600 text-white px-4 py-2 rounded shadow-md w-fit mb-4 ">
+                  <h5 className="text-lg font-semibold">Lista de Trámites de Apostilla</h5>
+                </div>
               </div>
-
               <hr className="my-4 border-gray-300" />
 
               {/* Tabla */}

@@ -190,8 +190,8 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
         ) : (
           <div className="space-y-6">
             {/* Header con título */}
-            <div className="bg-blue-600 rounded-lg shadow-sm">
-              <div className="py-3 px-4">
+            <div className="flex justify-center">
+              <div className=" bg-blue-600 py-3 px-4 max-w-xlbg-blue-600 rounded-lg shadow-sm">
                 <h6 className="text-center text-white font-semibold">
                   {isCreating 
                     ? 'Formulario para crear trámite de apostilla'

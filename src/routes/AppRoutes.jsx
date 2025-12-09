@@ -112,7 +112,9 @@ export default function AppRoutes() {
             <Route path="/servicios/reportes" element={<ReportesServicios />} />
 
             {/* APOSTILLA */}
+            {/* ✨ RUTAS CON FECHA OPCIONAL */}
             <Route path="/apostilla/tramites" element={<TramitesApostilla />} />
+            <Route path="/apostilla/tramites/:fecha" element={<TramitesApostilla />} />
             <Route path="/apostilla/configurar" element={<ConfigurarApostilla />} />
             <Route path="/apostilla/reportes" element={<ReportesApostilla />} />
 
