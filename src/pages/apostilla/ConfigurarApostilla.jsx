@@ -1,5 +1,5 @@
 // 📁 pages/ApostillaConfigPage.jsx
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useApostilla } from '../../hooks/useApostilla';
 import { useModal } from '../../hooks/useModal';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
