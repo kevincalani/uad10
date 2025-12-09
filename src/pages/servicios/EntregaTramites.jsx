@@ -7,6 +7,7 @@ import EntregasLegalizacionTable from '../../components/Tramites/entregas/Entreg
 import EntregasNoAtentadoTable from '../../components/Tramites/entregas/EntregasNoAtentadoTable';
 import { BookText, Search } from 'lucide-react';
 import { useNoAtentado } from '../../hooks/useNoAtentados';
+import { useNavigate } from 'react-router-dom';
 
 export default function EntregasTramites () {
   const { loading, entregas, noAtentado, obtenerListaEntregas } = useEntregas();
@@ -15,6 +16,7 @@ export default function EntregasTramites () {
   const [tabActiva, setTabActiva] = useState('legalizaciones');
   const [numeroBusqueda, setNumeroBusqueda] = useState('');
 
+  const navigate=useNavigate()
   useEffect(() => {
     cargarDatos();
       // Limpiar cache al desmontar
@@ -38,7 +40,7 @@ export default function EntregasTramites () {
     if (resultado.ok) {
       if (resultado.tramites.length > 0) {
         // Redirigir o mostrar resultados
-        window.location.href = `/buscar-tramite-legalizacion/${numeroBusqueda}`;
+        navigate(`/servicios/buscar-tramite-legalizacion/${numeroBusqueda}`);
       } else {
         toast.info('No se encontraron resultados');
       }
@@ -54,12 +56,12 @@ export default function EntregasTramites () {
         <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
           <h5 className="text-xl font-semibold flex items-center">
             <BookText className='mr-2'/>
-            TRÁMITES
+            ENTREGA DE TRÁMITES
           </h5>
         </div>
 
         <div className="p-6">
-          {/* Buscador */}
+          {/* Buscar por numero de tramite*/}
           <div className="mb-4">
             <div className="flex items-center gap-2 w-fit">
               <button
@@ -74,7 +76,7 @@ export default function EntregasTramites () {
                 onChange={(e) => setNumeroBusqueda(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleBuscar()}
                 className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Ej: 123-2022"
+                placeholder="Nro Tramite"
               />
               <span className="text-red-600 font-bold text-xs">
                 Ejm: 123-2022

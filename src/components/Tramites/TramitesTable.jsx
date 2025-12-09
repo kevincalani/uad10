@@ -34,7 +34,7 @@ export default function TramitesTable({
   onSubmit,
 }) {
   const { openModal } = useModal();
-  
+
   // Estados
   const [filterValue, setFilterValue] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -130,7 +130,11 @@ export default function TramitesTable({
 
         case "tre_tipo":
           return (
-            <Chip color={getChipColor(tramite.tre_tipo)} size="sm" variant="flat">
+            <Chip
+              color={getChipColor(tramite.tre_tipo)}
+              size="sm"
+              variant="flat"
+            >
               {tramite.tre_tipo.toUpperCase()}
             </Chip>
           );
@@ -143,9 +147,7 @@ export default function TramitesTable({
 
         case "tre_buscar_en":
           return (
-            <span className="text-sm uppercase">
-              {tramite.tre_buscar_en}
-            </span>
+            <span className="text-sm uppercase">{tramite.tre_buscar_en}</span>
           );
 
         case "tre_duracion":
@@ -157,65 +159,64 @@ export default function TramitesTable({
         case "acciones":
           return (
             <div className="flex gap-1 items-center justify-center">
-                <Tooltip content="Editar Tramite" >
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                onPress={() =>
-                  openModal(AddEditTramiteModal, {
-                    title: `Editar Trámite: ${tramite.tre_tipo}`,
-                    type: tramite.tre_tipo,
-                    initialData: tramite,
-                    onSubmit: (formData) =>
-                      onSubmit(formData, tramite.tre_tipo, tramite.cod_tre),
-                    onSuccess: refresh,
-                  })
-                }
-              >
-                <SquarePen className="w-4 h-4 text-blue-600" />
-              </Button>
+              <Tooltip content="Editar Tramite">
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  onPress={() =>
+                    openModal(AddEditTramiteModal, {
+                      title: `Editar Trámite: ${tramite.tre_tipo}`,
+                      type: tramite.tre_tipo,
+                      initialData: tramite,
+                      onSubmit: (formData) =>
+                        onSubmit(formData, tramite.tre_tipo, tramite.cod_tre),
+                      onSuccess: refresh,
+                    })
+                  }
+                >
+                  <SquarePen className="w-4 h-4 text-blue-600" />
+                </Button>
               </Tooltip>
-                <Tooltip content="Glosas" >
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                onPress={() => openModal(GlosaModal, { tramite })}
-              >
-                <AlignJustify className="w-4 h-4 text-purple-600" />
-              </Button>
+              <Tooltip content="Glosas">
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  onPress={() => openModal(GlosaModal, { tramite })}
+                >
+                  <AlignJustify className="w-4 h-4 text-purple-600" />
+                </Button>
               </Tooltip>
 
-                <Tooltip content={tramite.tre_hab ? "Deshabilitar": "Habilitar"} >
-              <Button
-                isIconOnly
-                size="sm"
-                variant="light"
-                onPress={() => onToggle(tramite.cod_tre)}
-              >
-                {tramite.tre_hab ? (
-                  <SquareCheck className="w-4 h-4 text-green-600" />
-                ) : (
-                  <SquareX className="w-4 h-4 text-red-600" />
-                )}
-              </Button>
-              
+              <Tooltip content={tramite.tre_hab ? "Deshabilitar" : "Habilitar"}>
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  onPress={() => onToggle(tramite.cod_tre)}
+                >
+                  {tramite.tre_hab ? (
+                    <SquareCheck className="w-4 h-4 text-green-600" />
+                  ) : (
+                    <SquareX className="w-4 h-4 text-red-600" />
+                  )}
+                </Button>
               </Tooltip>
-                <Tooltip content="Eliminar Tramite" color="danger">
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    variant="light"
-                    onPress={() =>
-                      openModal(DeleteTramiteModal, {
-                        itemData: tramite,
-                        onConfirm: () => onDelete(tramite.cod_tre),
-                      })
-                    }
-                  >
-                    <Trash2 className="w-4 h-4 text-red-600" />
-                  </Button>
+              <Tooltip content="Eliminar Tramite" color="danger">
+                <Button
+                  isIconOnly
+                  size="sm"
+                  variant="light"
+                  onPress={() =>
+                    openModal(DeleteTramiteModal, {
+                      itemData: tramite,
+                      onConfirm: () => onDelete(tramite.cod_tre),
+                    })
+                  }
+                >
+                  <Trash2 className="w-4 h-4 text-red-600" />
+                </Button>
               </Tooltip>
             </div>
           );

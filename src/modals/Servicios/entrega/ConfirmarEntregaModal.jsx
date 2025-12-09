@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, AlertCircle, Save } from 'lucide-react';
+import { X, AlertCircle, Save, HandCoins } from 'lucide-react';
 import { useTramitesLegalizacion } from '../../../hooks/useTramitesLegalizacion';
 import { toast } from '../../../utils/toast';
 
@@ -135,18 +135,16 @@ export default function ConfirmarEntregaModal({ varios, cod_dtra, onClose, onSuc
     return (
         <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col">
             {/* Header - alert-primary */}
-            <div className="bg-blue-100 border-b-4 border-blue-600 px-6 py-4 flex justify-between items-center">
+            <div className="bg-blue-100 px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold text-gray-800 flex items-center gap-2">
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" />
-                    </svg>
+                    <HandCoins></HandCoins>
                     Entregas
                 </h2>
                 <button
                     onClick={onClose}
                     className="text-gray-600 hover:text-gray-800 transition"
                 >
-                    <X className="w-6 h-6" />
+                    <X className="w-8 h-8 p-1 rounded-full hover:bg-white/25 cursor-pointer" />
                 </button>
             </div>
 
@@ -266,7 +264,7 @@ export default function ConfirmarEntregaModal({ varios, cod_dtra, onClose, onSuc
             <div className="border-t border-gray-200 px-6 py-4 flex justify-end gap-3 bg-gray-50">
                 <button
                     onClick={onClose}
-                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition text-sm"
+                    className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition text-sm cursor-pointer"
                     disabled={procesando}
                 >
                     Cerrar
@@ -276,7 +274,7 @@ export default function ConfirmarEntregaModal({ varios, cod_dtra, onClose, onSuc
                 {!documentoBloqueado && (
                     <button
                         onClick={handleGuardarEntrega}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                         disabled={procesando}
                     >
                         {procesando ? (

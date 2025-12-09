@@ -107,12 +107,17 @@ export default function AppRoutes() {
             
             {/* SERVICIOS */}
             <Route path="/servicios/configurar-tramites" element={<ConfigurarTramites />} />
+            {/* ✨ TRÁMITES DE LEGALIZACIÓN CON FECHA Y BÚSQUEDA */}
             <Route path="/servicios/tramites" element={<Tramites />} />
+            <Route path="/servicios/tramites/:fecha" element={<Tramites />} />
+            <Route path="/servicios/buscar-tramite-legalizacion/:numero" element={<Tramites />} />
             <Route path="/servicios/entrega" element={<EntregaTramites />} />
             <Route path="/servicios/reportes" element={<ReportesServicios />} />
 
             {/* APOSTILLA */}
+            {/* ✨ TRÁMITES DE APOSTILLA CON FECHA OPCIONAL */}
             <Route path="/apostilla/tramites" element={<TramitesApostilla />} />
+            <Route path="/apostilla/tramites/:fecha" element={<TramitesApostilla />} />
             <Route path="/apostilla/configurar" element={<ConfigurarApostilla />} />
             <Route path="/apostilla/reportes" element={<ReportesApostilla />} />
 

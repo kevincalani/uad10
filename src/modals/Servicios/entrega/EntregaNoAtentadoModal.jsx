@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { X, HandCoins, UserCheck, AlertCircle } from "lucide-react";
+import { X, HandCoins, UserCheck, AlertCircle, HandHelping } from "lucide-react";
 import { useNoAtentado } from "../../../hooks/useNoAtentados";
 
 export default function EntregaNoAtentadoModal({
@@ -118,7 +118,7 @@ export default function EntregaNoAtentadoModal({
       {/* Header */}
       <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
-          <HandCoins size={24} />
+          <HandHelping size={24} />
           <h2 className="text-xl font-bold">Entrega - TRAMITE CONVOCATORIA</h2>
         </div>
         <button
@@ -133,7 +133,7 @@ export default function EntregaNoAtentadoModal({
       <div className="p-6">
         {/* Título */}
         <div className="bg-blue-50 border border-blue-200 rounded-lg shadow-sm px-4 py-2 mb-6 w-fit mx-auto">
-          <h4 className="text-center font-bold text-blue-800">Convocatoria</h4>
+          <h4 className="text-center text-xl font-bold text-blue-800">Convocatoria</h4>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
