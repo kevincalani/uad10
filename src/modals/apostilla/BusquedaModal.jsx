@@ -1,6 +1,6 @@
 // 📁 components/modals/apostilla/BusquedaModal.jsx
 import { useState } from 'react';
-import { X, Search, Eye } from 'lucide-react';
+import { X, Search, Eye, CircleArrowRight } from 'lucide-react';
 import { useApostilla } from '../../hooks/useApostilla';
 import { useModal } from '../../hooks/useModal';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -21,6 +21,19 @@ export default function BusquedaModal({ onClose }) {
   const [resultado, setResultado] = useState([]);
   const [buscado, setBuscado] = useState(false);
 
+      // Formatear fecha 
+   const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
   const handleBuscar = async () => {
     setBuscado(true);
     const resultados = await buscarTramites(filtros);
@@ -53,7 +66,7 @@ export default function BusquedaModal({ onClose }) {
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="bg-blue-600 text-white text-center py-2 rounded-lg mb-6">
+        <div className="bg-blue-600 text-white text-center py-2 rounded-lg mb-6 w-full">
           <h6 className="font-semibold">Formulario de búsqueda de apostilla</h6>
         </div>
 
@@ -167,17 +180,17 @@ export default function BusquedaModal({ onClose }) {
                           </td>
                           <td className="p-3">
                             {tramite.apos_fecha_ingreso 
-                              ? new Date(tramite.apos_fecha_ingreso).toLocaleDateString('es-ES')
+                              ? formatearFecha(tramite.apos_fecha_ingreso)
                               : '-'
                             }
                           </td>
                           <td className="p-3 text-center">
                             <button
                               onClick={() => handleVerTramite(tramite.cod_apos)}
-                              className="p-1.5 hover:bg-green-50 rounded-full transition-colors text-green-600"
+                              className="p-1.5 hover:bg-gray-300 rounded-full shadow-sm transition-colors text-green-600 cursor-pointer"
                               title="Ver trámite"
                             >
-                              <Eye size={16} />
+                              <CircleArrowRight size={16} />
                             </button>
                           </td>
                         </tr>

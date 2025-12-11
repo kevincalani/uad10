@@ -13,6 +13,19 @@ export default function VerDatosTramiteModal({ cod_apos, onClose }) {
   useEffect(() => {
     cargarDatos();
   }, []);
+     // Formatear fecha 
+   const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
 
   const cargarDatos = async () => {
     const data = await verDatosTramite(cod_apos);
@@ -34,9 +47,9 @@ export default function VerDatosTramiteModal({ cod_apos, onClose }) {
   const { apostilla, persona, apoderado, detalle_apostilla } = datos;
 
   return (
-    <div className="w-full max-w-6xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="w-full max-w-5xl bg-white rounded-lg shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-green-700 text-white">
+      <div className="flex items-center justify-between px-6 py-4 bg-blue-700 text-white">
         <div className="flex items-center gap-2">
           <FileText size={20} />
           <h2 className="text-lg font-bold">Apostilla - Detalle del trámite</h2>
@@ -51,7 +64,7 @@ export default function VerDatosTramiteModal({ cod_apos, onClose }) {
 
       {/* Body */}
       <div className="flex-1 overflow-y-auto p-6">
-        <div className="bg-green-700 text-white text-center py-2 rounded-lg mb-6">
+        <div className="bg-blue-700 text-white text-center py-2 rounded-lg mb-6">
           <h6 className="font-semibold">Detalle de la búsqueda</h6>
         </div>
 
@@ -82,7 +95,7 @@ export default function VerDatosTramiteModal({ cod_apos, onClose }) {
             <DataRow 
               label="Fecha ingreso" 
               value={apostilla?.apos_fecha_ingreso 
-                ? new Date(apostilla.apos_fecha_ingreso).toLocaleDateString('es-ES')
+                ? formatearFecha(apostilla.apos_fecha_ingreso)
                 : '-'
               } 
             />

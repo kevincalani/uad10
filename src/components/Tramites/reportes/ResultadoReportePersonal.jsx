@@ -4,10 +4,12 @@ import { useModal } from '../../../hooks/useModal';
 import DetalleTramiteModal from '../../../modals/servicios/reportes/DetalleTramiteModal';
 import { CircleArrowRight, Eye, FileText } from 'lucide-react';
 import ObservarTramiteModal from '../../../modals/servicios/ObservarTramiteModal';
+import useDocleg from '../../../hooks/useDocLeg';
 
 export default function ResultadoReportePersonal({ resultado, formData, onRegenerar }) {
   const { openModal } = useModal();
-  console.log(resultado)
+  const {generarPDF} = useDocleg();
+  
   const tipoTramiteNombre = (tipo) => {
     const tipos = {
       'L': 'Legalización',
@@ -18,12 +20,30 @@ export default function ResultadoReportePersonal({ resultado, formData, onRegene
     return tipos[tipo] || tipo;
   };
 
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '';
-    const date = new Date(fecha);
-    return date.toLocaleDateString('es-BO');
-  };
+   const formatearFecha = (fecha) => {
+        if (!fecha) return "";
 
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
+
+    // ver PDF
+    const VerPDF = async (cod_dtra) => {
+        try {          
+                // Generar PDF en nueva ventana
+                await generarPDF(cod_dtra);
+                
+            
+        } catch (error) {
+            console.error('Error al guardar glosa:', error);
+        }
+      }
   // Si es lista de personas (tipo_resultado === 'lista')
   if (resultado.tipo_resultado === 'lista') {
     return (
@@ -80,7 +100,7 @@ export default function ResultadoReportePersonal({ resultado, formData, onRegene
         </h4>
         <table className="w-full text-xs">
           <thead>
-            <tr className="bg-green-800 text-white">
+            <tr className="bg-gray-600 text-white">
               <th className="px-2 py-2">#</th>
               <th className="px-2 py-2">Trámite</th>
               <th className="px-2 py-2">#Trámite</th>
@@ -140,7 +160,7 @@ export default function ResultadoReportePersonal({ resultado, formData, onRegene
                         <CircleArrowRight/>
                       </button>
                       <button
-                        onClick={() => openModal(DetalleTramiteModal, { cod_dtra: tramite.cod_dtra })}
+                        onClick={() => VerPDF(tramite.cod_dtra)}
                         className="p-1 rounded-full shadow-sm text-gray-600 hover:bg-gray-300"
                         title="Ver PDF"
                       >

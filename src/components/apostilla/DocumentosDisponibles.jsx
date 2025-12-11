@@ -7,7 +7,7 @@ import { useModal } from '../../hooks/useModal';
 import AgregarDocumentoModal from '../../modals/apostilla/AgregarDocumentoModal';
 
 
-export default function DocumentosDisponibles({ documentos, cod_apos, tramite, onRefresh }) {
+export default function DocumentosDisponibles({ documentos, cod_apos, onRefresh, onRefreshTable }) {
   const { openModal } = useModal();
   const { agregarDocumentoTramite } = useApostilla();
   const [loadingDoc, setLoadingDoc] = useState(null);
@@ -24,6 +24,7 @@ export default function DocumentosDisponibles({ documentos, cod_apos, tramite, o
           ca: cod_apos
         });
         onRefresh?.();
+        onRefreshTable?.()
       } finally {
         setLoadingDoc(null);
       }
@@ -32,7 +33,7 @@ export default function DocumentosDisponibles({ documentos, cod_apos, tramite, o
       openModal(AgregarDocumentoModal, {
         cod_lis: doc.cod_lis,
         cod_apos,
-        onSuccess: () => onRefresh?.()
+        onSuccess: () => onRefresh?.() && onRefreshTable?.()
       });
     }
   };
@@ -125,14 +126,14 @@ export default function DocumentosDisponibles({ documentos, cod_apos, tramite, o
                     <button
                       onClick={() => handleAgregarDirecto(doc)}
                       disabled={loadingDoc === doc.cod_lis}
-                      className={`w-full text-left px-2 py-1 rounded transition-colors ${
+                      className={`w-full text-left px-2 py-1 rounded transition-colors cursor-pointer hover:underline  ${
                         doc.lis_tipo 
-                          ? 'text-blue-600 hover:bg-blue-50' 
-                          : 'text-gray-700 hover:bg-gray-100'
+                          ? 'text-blue-600 hover:bg-blue-200' 
+                          : 'text-gray-700 hover:bg-gray-200'
                       } disabled:opacity-50 disabled:cursor-not-allowed`}
                     >
                       {loadingDoc === doc.cod_lis ? (
-                        <span className="flex items-center gap-2">
+                        <span className="flex items-center gap-2 ">
                           <span className="w-3 h-3 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></span>
                           {doc.lis_alias}
                         </span>

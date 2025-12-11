@@ -52,6 +52,7 @@ export default function EditApostillaModal ({ onClose, cod_lis = 0, onSuccess })
       if (onSuccess) onSuccess();
       onClose();
     } catch (error) {
+      console.log(error)
       // El error ya se maneja en el hook
     }
   };

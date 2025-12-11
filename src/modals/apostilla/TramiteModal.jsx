@@ -9,7 +9,7 @@ import DocumentosAgregados from '../../components/apostilla/DocumentosAgregados'
 import DocumentosDisponibles from '../../components/apostilla/DocumentosDisponibles';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
-export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }) {
+export default function TramiteModal({ cod_apos = 0, onClose, onSuccess }) {
   const { openModal } = useModal();
   const {
     loading: loadingApostilla,
@@ -45,7 +45,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
     ci_apoderado: '',
     nombre_apoderado: '',
     apellido_apoderado: '',
-    tipo: 'd'
+    tipo: ''
   });
 
   // Control de estados
@@ -92,6 +92,19 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
       setIsCreating(false);
     }
   };
+
+     const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
 
   const handleBuscarPersona = async (ci) => {
     if (!ci || ci.length < 3) return;
@@ -150,8 +163,9 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
     }
   };
 
-  const handleGenerarPDF = async () => {
-    await generarPDFTramite(codAposActual);
+  const handleGenerarPDF = async (apos_numero) => {
+    console.log(codAposActual)
+    await generarPDFTramite(codAposActual, apos_numero);
   };
 
   const handleMostrarObservacion = () => {
@@ -215,7 +229,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                     </h1>
                     <span className="text-sm text-gray-600 italic">
                       {tramite.apos_fecha_ingreso 
-                        ? new Date(tramite.apos_fecha_ingreso).toLocaleDateString('es-ES')
+                        ? formatearFecha(tramite.apos_fecha_ingreso)
                         : ''
                       }
                     </span>
@@ -354,7 +368,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                     <DataRow 
                       label="Fecha ingreso" 
                       value={tramite?.apos_fecha_ingreso 
-                        ? new Date(tramite.apos_fecha_ingreso).toLocaleDateString('es-ES')
+                        ? formatearFecha(tramite.apos_fecha_ingreso)
                         : '-'
                       } 
                     />
@@ -450,7 +464,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                       <div className="mt-2 flex justify-end">
                         <button
                           onClick={handleMostrarFormApoderado}
-                          className=" px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors"
+                          className=" px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                         >
                           + Agregar Apoderado
                         </button>
@@ -471,6 +485,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                     documentos={documentosAgregados}
                     tramite={tramite}
                     onRefresh={cargarDatosTramite}
+                    onRefreshTable={onSuccess}
                   />
 
                   <div className="space-y-2">
@@ -491,11 +506,11 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                       Observar
                     </button>
                     <button
-                      onClick={handleGenerarPDF}
+                      onClick={()=> handleGenerarPDF(tramite.apos_numero)}
                       className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors flex items-center gap-2"
                     >
                       <Download size={16} />
-                      PDF
+                      Generar PDF
                     </button>
                   </div>
                 </div>
@@ -509,6 +524,7 @@ export default function TramiteModal({ cod_apos = 0, fecha, onClose, onSuccess }
                     cod_apos={codAposActual}
                     tramite={tramite}
                     onRefresh={cargarDatosTramite}
+                    onRefreshTable={onSuccess}
                   />
                 </div>
               )}

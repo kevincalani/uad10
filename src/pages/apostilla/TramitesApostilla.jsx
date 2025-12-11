@@ -83,6 +83,20 @@ export default function TramitesApostilla() {
     }
   }, [selectedDate]);
 
+      // Formatear fecha 
+   const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
+
   // Definición de columnas con sorting
   const columns = [
     { key: "numero_orden", label: "Nº", sortable: false },
@@ -266,7 +280,7 @@ export default function TramitesApostilla() {
           return (
             <span className="text-sm text-right">
               {tramite[columnKey]
-                ? new Date(tramite[columnKey]).toLocaleDateString("es-ES")
+                ? formatearFecha(tramite[columnKey])
                 : "-"}
             </span>
           );
@@ -277,7 +291,7 @@ export default function TramitesApostilla() {
               <Tooltip content="Editar trámite">
                 <button
                   onClick={() => handleEditarTramite(tramite.cod_apos)}
-                  className="p-1.5 hover:bg-blue-50 rounded-full transition-colors text-blue-600"
+                  className="p-1.5 hover:bg-blue-300 rounded-full transition-colors text-blue-600 cursor-pointer"
                 >
                   <Edit2 size={16} />
                 </button>
@@ -287,7 +301,7 @@ export default function TramitesApostilla() {
                 <Tooltip content="Firmar trámite">
                   <button
                     onClick={() => handleFirmar(tramite.cod_apos)}
-                    className="p-1.5 hover:bg-blue-50 rounded-full transition-colors text-blue-600"
+                    className="p-1.5 hover:bg-blue-300 rounded-full transition-colors text-blue-600 cursor-pointer"
                   >
                     <PenTool size={16} />
                   </button>
@@ -308,7 +322,7 @@ export default function TramitesApostilla() {
               <Tooltip content="Eliminar trámite" color="danger">
                 <button
                   onClick={() => handleEliminarTramite(tramite.cod_apos)}
-                  className="p-1.5 hover:bg-red-50 rounded-full transition-colors text-red-600"
+                  className="p-1.5 hover:bg-red-300 rounded-full transition-colors text-red-600 cursor-pointer"
                 >
                   <Trash2 size={16} />
                 </button>
@@ -327,7 +341,7 @@ export default function TramitesApostilla() {
                         ? handleEntregaRapida(tramite)
                         : handleEntregarTramite(tramite.cod_apos)
                     }
-                    className="p-1.5 hover:bg-green-50 rounded-full transition-colors text-green-600"
+                    className="p-1.5 hover:bg-green-300 rounded-full transition-colors text-green-600 cursor-pointer"
                   >
                     <HandCoins size={18} />
                   </button>
