@@ -1,7 +1,10 @@
 import React from 'react'
+import EnConstruction from '../../components/common/EnConstruccion'
 
 export default function ListarTomos() {
   return (
-    <div>LISTARTOMOS</div>
+    <EnConstruction
+      pageName='Listar Tomos'
+    />
   )
 }

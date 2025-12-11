@@ -1,7 +1,10 @@
 import React from 'react'
+import EnConstruction from '../../components/common/EnConstruccion'
 
 export default function Administrativos() {
   return (
-    <div>Administrativos</div>
+    <EnConstruction
+      pageName='Administrativos'
+    />
   )
 }

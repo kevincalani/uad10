@@ -1,7 +1,10 @@
 import React from 'react'
+import EnConstruction from '../../components/common/EnConstruccion'
 
 export default function ImportarResoluciones() {
   return (
-    <div>ImportarResoluciones</div>
+    <EnConstruction
+      pageName='Importar Resoluciones'
+    />
   )
 }

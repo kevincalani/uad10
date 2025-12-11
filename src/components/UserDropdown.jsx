@@ -49,20 +49,20 @@ export function UserDropdown() {
             <p className="text-xs text-gray-500">{user.email}</p>
           </div>
           
-          <button className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+          <button className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer">
             <BarChart3 className="w-4 h-4 text-blue-500" />
             <span>Rendimiento</span>
           </button>
           
-          <button className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+          <button className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150 cursor-pointer">
             <User className="w-4 h-4 text-blue-500" />
             <span>Editar Datos</span>
           </button>
           
-          <div className="border-t border-gray-100 mt-1 pt-1">
+          <div className="border-t border-gray-200 mt-1 pt-1">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors duration-150"
+              className="w-full flex items-center space-x-2 px-4 py-2 text-sm text-red-600 hover:bg-red-100 transition-colors duration-150 cursor-pointer"
             >
               <LogOut className="w-4 h-4" />
               <span>Logout</span>

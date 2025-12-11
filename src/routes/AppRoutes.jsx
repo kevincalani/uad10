@@ -71,6 +71,7 @@ import Dependientes from '../pages/admin/Dependientes';
 //REPORTE
 import ReporteTareas from '../pages/admin/ReporteTareas'
 import RegistroPeriodico from '../pages/admin/RegistroPeriodico'
+import EnConstruction from '../components/common/EnConstruccion';
 
 
 export default function AppRoutes() {
@@ -151,7 +152,7 @@ export default function AppRoutes() {
             <Route path="/administracion/reporte/periodico" element={<RegistroPeriodico />} />
 
             {/*404 Route */}
-            <Route path="*" element={<h1>404 | Página no encontrada</h1>} />
+            <Route path="*" element={<EnConstruction pageName='No Encontrada'/>} />
 
           </Route>
         </Route>

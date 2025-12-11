@@ -142,7 +142,7 @@ export default function Tramites() {
     // -------------------------
     const handleAddTramite = async (type) => {
         if (!isToday) {
-            toast.warning("No se pueden realizar acciones en fechas pasadas");
+            toast.warning("No se puede Agregar Tramites en fechas pasadas");
             return;
         }
 
