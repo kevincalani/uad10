@@ -1,4 +1,4 @@
-// 📁 hooks/useModal.jsx
+
 import { createContext, useContext, useState } from "react";
 import { createPortal } from "react-dom";
 

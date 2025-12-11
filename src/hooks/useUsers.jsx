@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import api from "../api/axios";
 
-
 export const useUsers = (bloqueado = "f") => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
