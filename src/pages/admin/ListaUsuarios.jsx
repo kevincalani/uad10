@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Users, UserPlus } from "lucide-react";
 import UsersTable from "../../components/Users/UsersTable";
-import { useUsers } from "../../Hooks/useUsers";
-import { useModal } from "../../Hooks/useModal";
+import { useUsers } from "../../hooks/useUsers";
+import { useModal } from "../../hooks/useModal";
 import NuevoUsuarioModal from "../../modals/NuevoUsuarioModal";
 
 
