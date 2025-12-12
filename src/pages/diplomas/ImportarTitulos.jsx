@@ -1,7 +1,10 @@
 import React from 'react'
+import EnConstruction from '../../components/common/EnConstruccion'
 
 export default function ImportarTitulos() {
   return (
-    <div>ImportarTitulos</div>
+    <EnConstruction
+      pageName='Importar Titulos'
+    />
   )
 }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, AlertCircle, CircleArrowRight, Edit3, Save, FileText, Minus, FilePen } from 'lucide-react';
+import { X, AlertCircle, CircleArrowRight, Edit3, Save, FileText, Minus, FilePen, HandCoins, HandHelping, CircleCheck } from 'lucide-react';
 import { useTramitesLegalizacion } from '../../../hooks/useTramitesLegalizacion';
 import { toast } from '../../../utils/toast';
 import { useModal } from '../../../hooks/useModal';
@@ -270,9 +270,9 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
     return (
         <div className="bg-white rounded-lg shadow-2xl w-full max-w-7xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header */}
-            <div className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center border-b-4 border-blue-700">
+            <div className="bg-blue-600 text-white px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold flex items-center gap-2">
-                    <CircleArrowRight className="w-6 h-6" />
+                    <HandHelping className="w-6 h-6" />
                     Apoderado
                 </h2>
                 <button
@@ -287,7 +287,7 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
             <div className="flex-1 overflow-y-auto p-6">
                 {/* Título */}
                 <div className="bg-blue-600 rounded shadow p-2 mx-auto max-w-xl mb-4">
-                    <h6 className="text-white text-center font-bold">Datos del apoderado</h6>
+                    <h6 className="text-white text-center font-bold">Entrega de Documentos Legalizacion</h6>
                 </div>
 
                 <hr className="my-4 border-gray-300" />
@@ -542,7 +542,7 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
                         </div>
 
                         {/* Tabla de documentos */}
-                        <div className="overflow-x-auto border rounded">
+                        <div className="overflow-x-auto border border-gray-300 rounded">
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-600">
                                     <tr>
@@ -584,7 +584,7 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
                                                 doc.dtra_entregado === 't' || doc.dtra_entregado === 'a';
 
                                             return (
-                                                <tr key={doc.cod_dtra} className="hover:bg-gray-50 text-xs">
+                                                <tr key={doc.cod_dtra} className="hover:bg-gray-200 text-xs">
                                                     <td className="px-3 py-2">{index + 1}</td>
                                                     <td className="px-3 py-2 text-left">
                                                         <div>
@@ -662,7 +662,7 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
                                                         {yaEntregado ? (
                                                             <div className="flex items-center gap-2">
                                                                 <span className="text-green-600 text-xl border border-red-500 rounded">
-                                                                    ✓
+                                                                    <CircleCheck/>
                                                                 </span>
                                                                 {doc.dtra_entregado === 'a' && (
                                                                     <span className="text-green-600 font-bold italic text-xs">
@@ -677,10 +677,10 @@ export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
                                                                         ? handleEntregarConApoderado(doc.cod_dtra)
                                                                         : handleEntregarDirecto(doc.cod_dtra)
                                                                 }
-                                                                className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition flex items-center gap-1"
+                                                                className="px-2 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 transition flex items-center gap-1"
                                                                 title="Entregar documento"
                                                             >
-                                                                <CircleArrowRight size={14} />
+                                                                <CircleArrowRight size={18} />
                                                                 {tieneApoderado ? 'Entregar +' : 'Entregar'}
                                                             </button>
                                                         )}

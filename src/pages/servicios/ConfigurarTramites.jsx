@@ -103,9 +103,9 @@ export default function ConfigurarTramites() {
       <div className=" bg-white rounded-lg shadow-md">
         {/* Título */}
         <div className="bg-blue-600 text-white px-6 py-4 rounded-t-lg">
-          <h1 className="text-3xl font-bold flex items-center">
+          <h1 className="text-xl font-bold flex items-center">
             <BookText className="mr-2" size={32} />
-            Configuración de Trámites
+            CONFIGURACIÓN DE TRÁMITES
           </h1>
         </div>
         <div className="p-6">

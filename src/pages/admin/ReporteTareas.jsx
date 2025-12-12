@@ -1,7 +1,10 @@
 import React from 'react'
+import EnConstruction from '../../components/common/EnConstruccion'
 
 export default function ReporteTareas() {
   return (
-    <div>ReporteTareas</div>
+    <EnConstruction
+      pageName='Reporte Tareas'
+    />
   )
 }

@@ -143,6 +143,7 @@ export const useApostilla = () => {
       const response = await api.get(`/api/apostilla/listar-tramites/${fecha}`);
       if (response.data.success) {
         setTramites(response.data.data.tramites || []);
+        console.log(response)
         return response.data.data;
       }
     } catch (error) {
@@ -300,7 +301,7 @@ export const useApostilla = () => {
   const eliminarDocumentoAgregado = async (cod_dapo) => {
     setLoading(true);
     try {
-      const response = await api.delete(`/api/apostilla/eliminar-documento-agregado/${cod_dapo}`);
+      const response = await api.get(`/api/apostilla/eliminar-documento-agregado/${cod_dapo}`);
       if (response.data.success) {
         toast.success(response.data.message);
         return response.data.data;
@@ -317,7 +318,7 @@ export const useApostilla = () => {
   /**
    * Generar PDF del trámite
    */
-  const generarPDFTramite = async (cod_apos) => {
+  const generarPDFTramite = async (cod_apos, apos_numero) => {
     setLoading(true);
     try {
       const response = await api.get(`/api/apostilla/generar-pdf/${cod_apos}`, {
@@ -327,7 +328,7 @@ export const useApostilla = () => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `Tramite_Apostilla.pdf`);
+      link.setAttribute('download', `Tramite ${apos_numero}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -573,7 +574,7 @@ export const useApostilla = () => {
   const descargarReportePDF = async (filtros) => {
     setLoading(true);
     try {
-      const response = await api.post('/api/apostilla/generar-reporte', 
+      const response = await api.post('/api/apostilla/ver-reporte', 
         { ...filtros, pdf: 'on' },
         { responseType: 'blob' } // Importante para recibir el archivo
       );

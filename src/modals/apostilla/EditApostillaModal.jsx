@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApostilla } from '../../hooks/useApostilla';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { BookText } from 'lucide-react';
 
 
 export default function EditApostillaModal ({ onClose, cod_lis = 0, onSuccess }) {
@@ -51,6 +52,7 @@ export default function EditApostillaModal ({ onClose, cod_lis = 0, onSuccess })
       if (onSuccess) onSuccess();
       onClose();
     } catch (error) {
+      console.log(error)
       // El error ya se maneja en el hook
     }
   };
@@ -74,7 +76,7 @@ export default function EditApostillaModal ({ onClose, cod_lis = 0, onSuccess })
       {/* Header */}
       <div className="bg-blue-600 px-6 py-4 flex items-center justify-between">
         <h5 className="text-white text-xl font-bold flex items-center">
-          <i className="fas fa-book mr-2"></i>
+          <BookText/>
           Trámite
         </h5>
         <button
@@ -218,7 +220,7 @@ export default function EditApostillaModal ({ onClose, cod_lis = 0, onSuccess })
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
+        <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-300">
           <button
             type="button"
             onClick={onClose}

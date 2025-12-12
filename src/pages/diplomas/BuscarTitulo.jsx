@@ -1,7 +1,10 @@
 import React from 'react'
+import EnConstruction from '../../components/common/EnConstruccion'
 
 export default function BuscarTitulo() {
   return (
-    <div>BuscarTitulo</div>
+    <EnConstruction
+      pageName='Buscar Titulo'
+    />
   )
 }

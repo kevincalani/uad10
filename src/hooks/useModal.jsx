@@ -62,7 +62,7 @@ function ModalOverlay({ children, onClose }) {
 function ModalContainer({ children }) {
   return (
     <div
-      className="relative w-full max-w-4xl flex justify-center animate-scaleIn"
+      className="relative w-auto flex justify-center animate-scaleIn"
       onClick={(e) => e.stopPropagation()} // Evita cerrar al hacer clic dentro
     >
       {children}

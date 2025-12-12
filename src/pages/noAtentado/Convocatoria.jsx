@@ -1,7 +1,10 @@
 import React from 'react'
+import EnConstruction from '../../components/common/EnConstruccion'
 
 export default function Convocatoria() {
   return (
-    <div>Convocatoria</div>
+    <EnConstruction
+    pageName='Convocatoria'
+    />
   )
 }

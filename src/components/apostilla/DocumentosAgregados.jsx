@@ -3,17 +3,16 @@ import { useMemo, useState } from 'react';
 import { Trash2, Search, ArrowUpDown } from 'lucide-react';
 import { useApostilla } from '../../hooks/useApostilla';
 
-export default function DocumentosAgregados({ documentos, tramite, onRefresh }) {
+export default function DocumentosAgregados({ documentos, tramite, onRefresh, onRefreshTable }) {
   const { eliminarDocumentoAgregado } = useApostilla();
   const [filterValue, setFilterValue] = useState('');
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
 
   const handleEliminar = async (cod_dapo) => {
-    if (!confirm('¿Está seguro de eliminar este documento?')) return;
-
     const result = await eliminarDocumentoAgregado(cod_dapo);
     if (result) {
       onRefresh?.();
+      onRefreshTable?.()
     }
   };
 

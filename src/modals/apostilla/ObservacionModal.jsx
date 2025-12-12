@@ -25,6 +25,18 @@ export default function ObservacionModal({ cod_apos, onClose, onSuccess }) {
       setObservacion(data.tramite_apostilla?.apos_obs || '');
     }
   };
+    const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
 
   const handleGuardar = async () => {
     const result = await guardarObservacion({
@@ -52,14 +64,14 @@ export default function ObservacionModal({ cod_apos, onClose, onSuccess }) {
   return (
     <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl">
       {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 bg-green-700 text-white rounded-t-lg">
+      <div className="flex items-center justify-between px-6 py-4 bg-blue-700 text-white rounded-t-lg">
         <div className="flex items-center gap-2">
           <FileText size={20} />
           <h2 className="text-lg font-bold">Observar trámite de apostilla</h2>
         </div>
         <button
           onClick={onClose}
-          className="p-1 hover:bg-green-800 rounded-full transition-colors"
+          className="p-1 hover:bg-blue-800 rounded-full transition-colors"
         >
           <X size={20} />
         </button>
@@ -67,7 +79,7 @@ export default function ObservacionModal({ cod_apos, onClose, onSuccess }) {
 
       {/* Body */}
       <div className="p-6">
-        <div className="bg-green-700 text-white text-center py-2 rounded-lg mb-6">
+        <div className="bg-blue-700 text-white text-center py-2 rounded-lg mb-6">
           <h6 className="font-semibold">Formulario para observar trámite de apostilla</h6>
         </div>
 
@@ -85,7 +97,7 @@ export default function ObservacionModal({ cod_apos, onClose, onSuccess }) {
           <DataRow 
             label="Fecha ingreso" 
             value={tramite_apostilla?.apos_fecha_ingreso 
-              ? new Date(tramite_apostilla.apos_fecha_ingreso).toLocaleDateString('es-ES')
+              ? formatearFecha(tramite_apostilla.apos_fecha_ingreso)
               : '-'
             } 
           />

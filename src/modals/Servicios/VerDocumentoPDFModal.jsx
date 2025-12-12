@@ -5,11 +5,18 @@ import { toast } from "../../utils/toast";
 import { TIPO_DOCUMENTO } from "../../Constants/tramiteDatos";
 
 // convierte "2022-03-31" → "31/03/2022"
-const formatFecha = (f) => {
-    if (!f) return "";
-    const d = new Date(f);
-    return d.toLocaleDateString("es-BO");
-};
+   const formatFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
 
 export default function ModalVerDocumentoPDF({ cod_dtra, onClose }) {
     const { verDocumentoPDF } = useDocleg();

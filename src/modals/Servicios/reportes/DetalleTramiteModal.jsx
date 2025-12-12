@@ -58,11 +58,19 @@ export default function DetalleTramiteModal ({ onClose, cod_dtra }){
     return operaciones[operacion] || operacion;
   };
 
-  const formatearFecha = (fecha) => {
-    if (!fecha) return '';
-    const date = new Date(fecha);
-    return date.toLocaleDateString('es-BO');
-  };
+    const formatearFecha = (fecha) => {
+        if (!fecha) return "";
+
+        const [year, month, day] = fecha.split("-");
+        const date = new Date(Number(year), Number(month) - 1, Number(day));
+
+        return date.toLocaleDateString("es-BO", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        });
+    };
+
 
   const formatearFechaHora = (fecha) => {
     if (!fecha) return '';

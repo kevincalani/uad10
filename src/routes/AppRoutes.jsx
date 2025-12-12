@@ -72,6 +72,7 @@ import Dependientes from '../pages/admin/Dependientes';
 //REPORTE
 import ReporteTareas from '../pages/admin/ReporteTareas'
 import RegistroPeriodico from '../pages/admin/RegistroPeriodico'
+import EnConstruction from '../components/common/EnConstruccion';
 
 
 export default function AppRoutes() {
@@ -108,12 +109,15 @@ export default function AppRoutes() {
             
             {/* SERVICIOS */}
             <Route path="/servicios/configurar-tramites" element={<ConfigurarTramites />} />
+            {/* ✨ TRÁMITES DE LEGALIZACIÓN CON FECHA Y BÚSQUEDA */}
             <Route path="/servicios/tramites" element={<Tramites />} />
+            <Route path="/servicios/tramites/:fecha" element={<Tramites />} />
+            <Route path="/servicios/buscar-tramite-legalizacion/:numero" element={<Tramites />} />
             <Route path="/servicios/entrega" element={<EntregaTramites />} />
             <Route path="/servicios/reportes" element={<ReportesServicios />} />
 
             {/* APOSTILLA */}
-            {/* ✨ RUTAS CON FECHA OPCIONAL */}
+            {/* ✨ TRÁMITES DE APOSTILLA CON FECHA OPCIONAL */}
             <Route path="/apostilla/tramites" element={<TramitesApostilla />} />
             <Route path="/apostilla/tramites/:fecha" element={<TramitesApostilla />} />
             <Route path="/apostilla/configurar" element={<ConfigurarApostilla />} />
@@ -150,7 +154,7 @@ export default function AppRoutes() {
             <Route path="/administracion/reporte/periodico" element={<RegistroPeriodico />} />
 
             {/*404 Route */}
-            <Route path="*" element={<h1>404 | Página no encontrada</h1>} />
+            <Route path="*" element={<EnConstruction pageName='No Encontrada'/>} />
 
           </Route>
         </Route>
