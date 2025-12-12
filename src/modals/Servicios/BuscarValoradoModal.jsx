@@ -1,7 +1,7 @@
 // 📁 modals/BuscarValoradoModal.jsx
 import React, { useEffect, useState } from "react";
-import api from "../api/axios";
-import { toast } from "../utils/toast";
+import api from "../../api/axios";
+import { toast } from "../../utils/toast";
 import { X } from "lucide-react";
 
 

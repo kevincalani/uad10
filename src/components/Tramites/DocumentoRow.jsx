@@ -3,15 +3,15 @@ import {
     CircleCheck, CircleMinus, Trash2, Eye, FilePenLine, 
     FileCode, ArrowLeftCircle, FileText
 } from 'lucide-react';
-import { useModal } from '../hooks/useModal';
-import SitraModal from '../modals/servicios/SitraModal';
-import ObservarTramiteModal from '../modals/servicios/ObservarTramiteModal';
-import GlosaLegalizacionModal from '../modals/servicios/GlosaLegalizacionModal';
-import VerDocumentoPDFModal from '../modals/servicios/VerDocumentoPDFModal';
-import EliminarDoclegModal from '../modals/servicios/EliminarDocLegModal';
-import VerGlosaModal from '../modals/servicios/VerGlosaModal';
-import CorregirDoclegModal from '../modals/servicios/CorregirDocLegModal';
-import RegistrarBusquedaModal from '../modals/servicios/RegistrarBusquedaModal';
+import { useModal } from '../../hooks/useModal';
+import SitraModal from '../../modals/servicios/SitraModal';
+import ObservarTramiteModal from '../../modals/servicios/ObservarTramiteModal';
+import GlosaLegalizacionModal from '../../modals/servicios/GlosaLegalizacionModal';
+import VerDocumentoPDFModal from '../../modals/servicios/VerDocumentoPDFModal';
+import EliminarDoclegModal from '../../modals/servicios/EliminarDocLegModal';
+import VerGlosaModal from '../../modals/servicios/VerGlosaModal';
+import CorregirDoclegModal from '../../modals/servicios/CorregirDocLegModal';
+import RegistrarBusquedaModal from '../../modals/servicios/RegistrarBusquedaModal';
 
 export default function DocumentoRow({
     doc,

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, Trash2, CircleQuestionMark, CircleQuestionMarkIcon } from 'lucide-react';
-import { toast } from '../../utils/toast';
-import { TIPO_TRAMITE, TRAMITE_COLORS } from '../../Constants/tramiteDatos';
-import { useTramitesLegalizacion } from '../../hooks/useTramitesLegalizacion';
+import { toast } from '../../../utils/toast';
+import { TIPO_TRAMITE, TRAMITE_COLORS } from '../../../Constants/tramiteDatos';
+import { useTramitesLegalizacion } from '../../../hooks/useTramitesLegalizacion';
 
 export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
     const { cargarFormularioEliminarTramite, eliminarTramite } = useTramitesLegalizacion();

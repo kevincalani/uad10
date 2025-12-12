@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import { HeroUIProvider } from "@heroui/react"; // ✅ Importar provider
 import "./index.css";
 import App from "./App.jsx";
-import { ModalProvider } from "./Hooks/useModal.jsx";
+import { ModalProvider } from "./hooks/useModal.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>

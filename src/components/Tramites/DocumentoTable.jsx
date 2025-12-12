@@ -1,8 +1,8 @@
 import React from 'react';
 import DocumentoRow from './DocumentoRow';
-import AddDocumentoForm from '../components/Forms/AddDocumentoForm';
-import useDocleg from '../hooks/useDocLeg';
-import { toast } from '../utils/toast';
+import AddDocumentoForm from '../Forms/AddDocumentoForm';
+import useDocleg from '../../hooks/useDocLeg';
+import { toast } from '../../utils/toast';
 
 export default function DocumentoTable({
     documentos,
