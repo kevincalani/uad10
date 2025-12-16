@@ -1,17 +1,19 @@
 // 📁 src/modals/servicios/ModalObservaciones.jsx
 import React, { useEffect, useState } from "react";
-import { X,Eye } from "lucide-react";
-import useDocleg from "../../hooks/useDocLeg";
-import { toast } from "../../utils/toast";
+import { X, Eye, Save } from "lucide-react";
+import { toast } from "../../../utils/toast";
+import useDocleg from "../../../hooks/useDocLeg";
 
 export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
 
     const { getObservaciones, saveObservacion } = useDocleg();
 
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
     const [doc, setDoc] = useState(null);
     const [obs, setObs] = useState("");
     const [falso, setFalso] = useState(false);
+    const [initialFalso, setInitialFalso] = useState(false); // 🔥 NUEVO: guardar estado inicial
 
     // 🔥 Cargar datos iniciales desde el backend
     useEffect(() => {
@@ -21,8 +23,11 @@ export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
 
                 setDoc(data);
                 setObs(data.dtra_obs ?? "");
-                setFalso(data.dtra_falso === "t");
+                const isFalso = data.dtra_falso === "t";
+                setFalso(isFalso);
+                setInitialFalso(isFalso); // 🔥 NUEVO: guardar valor inicial
             } catch (err) {
+                console.log(err);
                 toast.error("Error cargando observaciones");
             } finally {
                 setLoading(false);
@@ -33,6 +38,7 @@ export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
     }, [cod_dtra]);
 
     const handleSave = async () => {
+        setSaving(true);
         try {
             await saveObservacion({
                 cod_dtra,
@@ -44,8 +50,10 @@ export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
             if (fetchData) fetchData(); // refrescar tabla documentos
             onClose();
         } catch (err) {
-            console.log(err)
+            console.log(err);
             toast.error("No se pudo guardar la observación");
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -58,12 +66,12 @@ export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl">
+        <div className="bg-white rounded-lg shadow-lg w-2xl">
 
             {/* HEADER */}
             <div className="bg-red-600 text-white flex justify-between items-center px-4 py-3 rounded-t">
                 <h3 className="text-lg font-bold flex items-center gap-2">
-                    <Eye/> Observar
+                    <Eye /> Observar
                 </h3>
                 <X size={22} className="cursor-pointer hover:text-gray-300" onClick={onClose} />
             </div>
@@ -87,57 +95,36 @@ export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
                             </td>
                         </tr>
 
-                        {falso ? (
-                            <>
-                                {/* Modo bloqueado */}
-                                <tr>
-                                    <th className="text-right text-red-600 font-semibold pr-3">
-                                        Observación:
-                                    </th>
-                                    <td className="border-b border-gray-400 py-1">
-                                        {doc?.dtra_obs}
-                                    </td>
-                                </tr>
+                        {/* 🔥 CAMBIO: Usar initialFalso para determinar el modo */}
+                        <tr>
+                            <th className="text-right text-red-600 font-semibold pr-3">
+                                Observación:
+                            </th>
+                            <td className="border-b border-gray-400 py-2">
+                                <textarea
+                                    value={obs}
+                                    onChange={(e) => setObs(e.target.value)}
+                                    className="w-full border border-gray-400 rounded p-2 text-sm disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                    disabled={saving || initialFalso}
+                                    readOnly={initialFalso}
+                                />
+                            </td>
+                        </tr>
 
-                                <tr>
-                                    <th className="text-right text-red-600 font-semibold pr-3">
-                                        Bloqueado:
-                                    </th>
-                                    <td className="border-b border-gray-400 py-1">
-                                        <i className="fas fa-check text-red-600"></i>
-                                    </td>
-                                </tr>
-                            </>
-                        ) : (
-                            <>
-                                {/* Modo editable */}
-                                <tr>
-                                    <th className="text-right text-red-600 font-semibold pr-3">
-                                        Observación:
-                                    </th>
-                                    <td className="border-b border-gray-400 py-2">
-                                        <textarea
-                                            value={obs}
-                                            onChange={(e) => setObs(e.target.value)}
-                                            className="w-full border border-gray-400 rounded p-2 text-sm"
-                                        />
-                                    </td>
-                                </tr>
-
-                                <tr>
-                                    <th className="text-right text-red-600 font-semibold pr-3">
-                                        Bloquear:
-                                    </th>
-                                    <td className="border-b border-gray-400 py-2">
-                                        <input
-                                            type="checkbox"
-                                            checked={falso}
-                                            onChange={(e) => setFalso(e.target.checked)}
-                                        />
-                                    </td>
-                                </tr>
-                            </>
-                        )}
+                        <tr>
+                            <th className="text-right text-red-600 font-semibold pr-3">
+                                Bloquear:
+                            </th>
+                            <td className="border-b border-gray-400 py-2">
+                                <input
+                                    type="checkbox"
+                                    checked={falso}
+                                    onChange={(e) => setFalso(e.target.checked)}
+                                    disabled={saving || initialFalso}
+                                    className={initialFalso ? "cursor-not-allowed" : "cursor-pointer"}
+                                />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
@@ -150,18 +137,22 @@ export default function ObservarTramiteModal({ cod_dtra, onClose, fetchData }) {
             {/* FOOTER */}
             <div className="bg-gray-100 px-4 py-3 flex justify-end gap-2 rounded-b border-t border-gray-300">
                 <button
-                    className="px-3 py-1 text-base bg-gray-300 rounded hover:bg-gray-400"
+                    className="px-3 py-1 text-base bg-gray-300 rounded hover:bg-gray-400 disabled:opacity-50 disabled:cursor-not-allowed"
                     onClick={onClose}
+                    disabled={saving}
                 >
                     Cerrar
                 </button>
 
-                {!falso && (
+                {/* 🔥 CAMBIO: Usar initialFalso para mostrar/ocultar el botón */}
+                {!initialFalso && (
                     <button
-                        className="px-3 py-1 text-base bg-red-600 text-white rounded hover:bg-red-700"
+                        className="px-3 py-1 text-base bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                         onClick={handleSave}
+                        disabled={saving}
                     >
-                        Guardar
+                        <Save size={16} />
+                        {saving ? "Guardando..." : "Guardar"}
                     </button>
                 )}
             </div>

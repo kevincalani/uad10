@@ -123,7 +123,7 @@ export default function DocumentoTable({
                             <div className="flex justify-end mt-2 flex-shrink-0">
                                 <button
                                     onClick={() => setIsAddDocumentoFormVisible(true)}
-                                    className="bg-blue-600 text-white py-1 px-4 text-sm rounded font-medium hover:bg-blue-700 transition"
+                                    className="bg-blue-600 text-white py-1 px-4 text-sm rounded font-medium hover:bg-blue-700 transition cursor-pointer"
                                 >
                                     + Trámite
                                 </button>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, FileText, AlertCircle, Printer } from 'lucide-react';
-import useDocLeg from '../../hooks/useDocLeg';
-import { toast } from '../../utils/toast';
+import useDocLeg from '../../../hooks/useDocLeg';
+import { toast } from '../../../utils/toast';
 
 export default function VerGlosaModal({ cod_dtra, onClose, onSuccess }) {
     const { configurarImpresionPDF, cambiarPosicionPDF, generarPDF } = useDocLeg();
@@ -109,7 +109,7 @@ export default function VerGlosaModal({ cod_dtra, onClose, onSuccess }) {
     }
 
     return (
-        <div className="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div className="bg-white rounded-lg shadow-2xl w-4xl max-h-[90vh] overflow-hidden flex flex-col">
             {/* Header - bg-verde-oscuro */}
             <div className="bg-blue-700 text-white px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold flex items-center gap-2">

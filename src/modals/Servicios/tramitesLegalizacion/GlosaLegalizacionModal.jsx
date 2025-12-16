@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Editor } from '@tinymce/tinymce-react';
 import { X, FileText, User, Calendar, Save, FileDown, AlertCircle } from 'lucide-react';
 import {QRCodeSVG} from 'qrcode.react';
-import useDocleg from '../../hooks/useDocLeg';
-import { toast } from '../../utils/toast';
+import useDocleg from '../../../hooks/useDocLeg';
+import { toast } from '../../../utils/toast';
 
 export default function GlosaLegalizacionModal({ cod_dtra, onClose, onSuccess }) {
     const {

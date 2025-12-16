@@ -25,7 +25,7 @@ import { useModal } from "../../hooks/useModal";
 import EditLegalizacionModal from "../../modals/EditLegalizacionModal";
 import CambiarTipoTramiteModal from "../../modals/servicios/tramitesLegalizacion/CambiarTipoTramiteModal";
 import EntregaModal from "../../modals/servicios/entrega/EntregaModal";
-import EliminarTramiteModal from "../../modals/servicios/EliminarTramiteModal";
+import EliminarTramiteModal from "../../modals/Servicios/tramitesLegalizacion/EliminarTramiteModal";
 
 export default function LegalizacionesTable({
   tramites,
@@ -436,7 +436,10 @@ export default function LegalizacionesTable({
         </TableHeader>
         <TableBody items={items} emptyContent="No hay trámites para esta fecha">
           {(item) => (
-            <TableRow key={item.cod_tra} className="hover:bg-gray-50">
+            <TableRow 
+              key={item.cod_tra} 
+              className={`${item.tra_anulado === 't' ? 'bg-red-200 hover:bg-gray-200' : 'hover:bg-gray-200'}`}
+              >
               {(columnKey) => (
                 <TableCell>
                   {renderCell(item, columnKey, items.indexOf(item))}

@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, Search, CheckCircle, CircleQuestionMark } from 'lucide-react';
-import useConfrontacion from '../../hooks/useConfrontacion';
-import { toast } from '../../utils/toast';
-import { TIPO_DOCUMENTO } from '../../Constants/tramiteDatos';
+import useConfrontacion from '../../../hooks/useConfrontacion';
+import { toast } from '../../../utils/toast';
+import { TIPO_DOCUMENTO } from '../../../Constants/tramiteDatos';
 
 export default function RegistrarBusquedaModal({ cod_dtra, onClose, onSuccess }) {
     const { cargarBusquedaEncontrado, guardarBusquedaEncontrado } = useConfrontacion();

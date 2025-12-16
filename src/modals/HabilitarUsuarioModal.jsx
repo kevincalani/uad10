@@ -31,7 +31,7 @@ export default function HabilitarUsuarioModal({ onClose, usuario, onSuccess }) {
   };
 
   return (
-    <div className="text-gray-800 w-[480px] mx-auto">
+    <div className="text-gray-800 w-[480px] mx-auto bg-white rounded-lg">
       {/* 🔴 Header */}
       <div className="flex justify-between items-center bg-red-600 p-3 rounded-t-lg">
         <div className="flex items-center gap-2 text-lg text-white font-semibold">

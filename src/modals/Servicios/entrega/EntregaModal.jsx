@@ -4,7 +4,8 @@ import { useTramitesLegalizacion } from '../../../hooks/useTramitesLegalizacion'
 import { toast } from '../../../utils/toast';
 import { useModal } from '../../../hooks/useModal';
 import ConfirmarEntregaModal from './ConfirmarEntregaModal';
-import VerDocumentoPDFModal from '../VerDocumentoPDFModal';
+import VerDocumentoPDFModal from '../tramitesLegalizacion/VerDocumentoPDFModal';
+
 
 export default function PanelEntregaModal({ cod_tra, onClose, onSuccess }) {
     const {

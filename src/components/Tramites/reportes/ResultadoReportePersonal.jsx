@@ -3,7 +3,7 @@ import React from 'react';
 import { useModal } from '../../../hooks/useModal';
 import DetalleTramiteModal from '../../../modals/servicios/reportes/DetalleTramiteModal';
 import { CircleArrowRight, Eye, FileText } from 'lucide-react';
-import ObservarTramiteModal from '../../../modals/servicios/ObservarTramiteModal';
+import ObservarTramiteModal from '../../../modals/servicios/tramitesLegalizacion/ObservarTramiteModal';
 import useDocleg from '../../../hooks/useDocLeg';
 
 export default function ResultadoReportePersonal({ resultado, formData, onRegenerar }) {

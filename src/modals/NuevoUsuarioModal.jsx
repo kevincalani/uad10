@@ -38,7 +38,7 @@ export default function NuevoUsuarioModal({ onClose, onSuccess }) {
         data.append(key, value);
       });
 
-      const response = await api.post("/api/usuarios/guardar", data, {
+      await api.post("/api/usuarios/guardar", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -57,7 +57,7 @@ export default function NuevoUsuarioModal({ onClose, onSuccess }) {
   };
 
   return (
-    <div className=" bg-white max-w-full">
+    <div className=" bg-white max-w-full rounded-lg">
       {/* HEADER */}
       <div className="flex justify-between bg-blue-700 rounded-t-lg items-center border-b border-gray-50 p-3 mb-3">
         <div className="flex items-center gap-2 text-white font-bold text-base">

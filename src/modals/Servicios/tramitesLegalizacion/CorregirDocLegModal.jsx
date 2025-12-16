@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, Edit3, XCircle, CircleQuestionMark } from 'lucide-react';
-import useDocLeg from '../../hooks/useDocLeg';
-import { toast } from '../../utils/toast';
+import useDocLeg from '../../../hooks/useDocLeg';
+import { toast } from '../../../utils/toast';
 
 export default function CorregirDoclegModal({ cod_dtra, onClose, onSuccess }) {
     const { cargarDatosCorreccion, corregirDocumento } = useDocLeg();
@@ -100,7 +100,7 @@ export default function CorregirDoclegModal({ cod_dtra, onClose, onSuccess }) {
             <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                     <XCircle  className="w-6 h-6" />
-                    Eliminar trámite
+                    Editar Trámite
                 </h2>
                 <button
                     onClick={onClose}

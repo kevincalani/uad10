@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useApostilla } from '../../hooks/useApostilla';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { AlertTriangle, Info } from 'lucide-react';
 
 export default function EliminarApostillaModal ({ onClose, cod_lis, onSuccess }) {
   const { loading, verificarEliminarDocumento, eliminarDocumento } = useApostilla();
@@ -30,7 +31,7 @@ export default function EliminarApostillaModal ({ onClose, cod_lis, onSuccess })
 
   if (loading || !datos) {
     return (
-      <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl p-8">
+      <div className="bg-white rounded-lg shadow-2xl w-3xl p-8">
         <LoadingSpinner />
       </div>
     );
@@ -41,15 +42,7 @@ export default function EliminarApostillaModal ({ onClose, cod_lis, onSuccess })
       {/* Header */}
       <div className="bg-red-600 px-6 py-4 flex items-center justify-between">
         <h5 className="text-white text-xl font-bold flex items-center">
-          <img 
-            src="/img/icon/eliminar.png" 
-            alt="Eliminar" 
-            className="w-6 h-6 mr-2"
-            onError={(e) => {
-              e.target.style.display = 'none';
-            }}
-          />
-          <i className="fas fa-trash-alt mr-2"></i>
+          <AlertTriangle className='mr-2'/>
           Eliminar trámite de apostilla
         </h5>
         <button
@@ -103,7 +96,7 @@ export default function EliminarApostillaModal ({ onClose, cod_lis, onSuccess })
 
               {/* Icono de pregunta */}
               <div className="text-red-600">
-                <i className="fas fa-question-circle text-6xl"></i>
+                <Info className='mr-2' size={32}/>
               </div>
             </div>
 
@@ -130,7 +123,7 @@ export default function EliminarApostillaModal ({ onClose, cod_lis, onSuccess })
       </div>
 
       {/* Footer */}
-      <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t">
+      <div className="bg-gray-50 px-6 py-4 flex justify-end gap-3 border-t border-gray-300">
         <button
           type="button"
           onClick={onClose}

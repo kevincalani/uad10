@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { X, Eye } from "lucide-react";
-import useDocleg from "../../hooks/useDocLeg";
-import { toast } from "../../utils/toast";
-import { TIPO_DOCUMENTO } from "../../Constants/tramiteDatos";
+import { toast } from "../../../utils/toast";
+import { TIPO_DOCUMENTO } from "../../../Constants/tramiteDatos";
+import useDocleg from "../../../hooks/useDocLeg";
 
 // convierte "2022-03-31" → "31/03/2022"
    const formatFecha = (fecha) => {
@@ -18,7 +18,7 @@ import { TIPO_DOCUMENTO } from "../../Constants/tramiteDatos";
         });
     };
 
-export default function ModalVerDocumentoPDF({ cod_dtra, onClose }) {
+export default function VerDocumentoPDFModal({ cod_dtra, onClose }) {
     const { verDocumentoPDF } = useDocleg();
 
     const [loading, setLoading] = useState(true);

@@ -4,14 +4,14 @@ import {
     FileCode, ArrowLeftCircle, FileText
 } from 'lucide-react';
 import { useModal } from '../../hooks/useModal';
-import SitraModal from '../../modals/servicios/SitraModal';
-import ObservarTramiteModal from '../../modals/servicios/ObservarTramiteModal';
-import GlosaLegalizacionModal from '../../modals/servicios/GlosaLegalizacionModal';
-import VerDocumentoPDFModal from '../../modals/servicios/VerDocumentoPDFModal';
-import EliminarDoclegModal from '../../modals/servicios/EliminarDocLegModal';
-import VerGlosaModal from '../../modals/servicios/VerGlosaModal';
-import CorregirDoclegModal from '../../modals/servicios/CorregirDocLegModal';
-import RegistrarBusquedaModal from '../../modals/servicios/RegistrarBusquedaModal';
+import ObservarTramiteModal from '../../modals/servicios/tramitesLegalizacion/ObservarTramiteModal';
+import GlosaLegalizacionModal from '../../modals/servicios/tramitesLegalizacion/GlosaLegalizacionModal';
+import VerDocumentoPDFModal from '../../modals/servicios/tramitesLegalizacion/VerDocumentoPDFModal';
+import EliminarDoclegModal from '../../modals/servicios/tramitesLegalizacion/EliminarDocLegModal';
+import VerGlosaModal from '../../modals/servicios/tramitesLegalizacion/VerGlosaModal';
+import CorregirDoclegModal from '../../modals/servicios/tramitesLegalizacion/CorregirDocLegModal';
+import RegistrarBusquedaModal from '../../modals/servicios/tramitesLegalizacion/RegistrarBusquedaModal';
+import SitraModal from '../../modals/Servicios/tramitesLegalizacion/SitraModal';
 
 export default function DocumentoRow({
     doc,
@@ -232,7 +232,7 @@ export default function DocumentoRow({
                     {botones.map((b) => (
                         <button
                             key={b.key}
-                            className={`p-2 bg-white rounded-full shadow-md hover:bg-gray-200 transition ${b.className ?? ""}`}
+                            className={`p-2 bg-white rounded-full shadow-md hover:bg-gray-200 transition cursor-pointer ${b.className ?? ""}`}
                             onClick={b.onClick}
                             title={b.title}
                         >

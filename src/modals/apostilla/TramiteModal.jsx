@@ -20,7 +20,6 @@ export default function TramiteModal({ cod_apos = 0, onClose, onSuccess }) {
   } = useApostilla();
 
   const {
-    loading: loadingPersona,
     cargarPersona,
     cargarApoderadoPorCi
   } = usePersona();
@@ -179,7 +178,7 @@ export default function TramiteModal({ cod_apos = 0, onClose, onSuccess }) {
     setMostrarFormularioApoderado(true);
   };
 
-  const loading = loadingApostilla || loadingPersona;
+  const loading = loadingApostilla;
 
   return (
     <div className="w-full max-w-7xl bg-white rounded-lg shadow-xl">

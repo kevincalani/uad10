@@ -7,8 +7,9 @@ import { useTramitesLegalizacion } from "../../hooks/useTramitesLegalizacion";
 import TramiteActionButton from "../../components/TramiteActionButton";
 import LegalizacionesTable from "../../components/Tramites/LegalizacionesTable";
 import { toastTramite } from "../../utils/toastTramite";
-import BuscarValoradoModal from "../../modals/BuscarValoradoModal";
 import { toast } from "../../utils/toast";
+import BuscarValoradoModal from "../../modals/Servicios/BuscarValoradoModal";
+import { Can } from "../../hooks/usePermission";
 
 const formatDate = (input) => {
     if (!input) return "";
@@ -257,6 +258,7 @@ export default function Tramites() {
                             </div>
 
                             {/* Botones de acción */}
+                            <Can permission={"crear traleg - srv"}>
                             <div className="flex flex-wrap gap-2">
                                 {ADD_TYPES.map((type) => (
                                     <TramiteActionButton
@@ -269,6 +271,7 @@ export default function Tramites() {
                                     </TramiteActionButton>
                                 ))}
                             </div>
+                            </Can>
                         </div>
 
                         {/* PARTE DERECHA: Buscadores */}

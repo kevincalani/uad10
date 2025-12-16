@@ -34,7 +34,7 @@ export default function EliminarTramiteModal({ cod_apos, onClose, onSuccess }) {
 
   if (loading || !datos) {
     return (
-      <div className="w-full max-w-2xl bg-white rounded-lg shadow-xl">
+      <div className="w-3xl bg-white rounded-lg shadow-xl">
         <div className="p-8">
           <LoadingSpinner size="lg" />
         </div>

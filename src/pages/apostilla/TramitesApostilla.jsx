@@ -182,8 +182,6 @@ export default function TramitesApostilla() {
   };
 
   const handleFirmar = async (cod_apos) => {
-    if (!confirm("¿Está seguro de firmar este trámite?")) return;
-
     const result = await firmarTramite(cod_apos);
     if (result) {
       await actualizarTablaTramites(selectedDate);

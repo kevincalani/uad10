@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useDocleg from "../../hooks/useDocLeg";
+import useDocleg from "../../../hooks/useDocLeg";
 import { CircleCheck, CircleMinus } from "lucide-react";
 
 

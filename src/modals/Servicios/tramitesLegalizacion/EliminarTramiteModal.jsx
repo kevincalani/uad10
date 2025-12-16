@@ -125,7 +125,7 @@ export default function EliminarTramiteModal({ cod_tra, onClose, onSuccess }) {
     const tipoTramite = TIPO_TRAMITE[tramita.tra_tipo_tramite];
 
     return (
-        <div className="bg-white rounded-lg shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col">
+        <div className="bg-white rounded-lg shadow-2xl w-3xl overflow-hidden flex flex-col">
             {/* Header - bg-danger */}
             <div className="bg-red-600 text-white px-6 py-4 flex justify-between items-center">
                 <h2 className="text-xl font-bold flex items-center gap-2">

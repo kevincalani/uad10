@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { X, BookText } from "lucide-react";
 import DatosPersonalesForm from "../components/Forms/DatosPersonalesForm";
 import DatosApoderadoForm from "../components/Forms/DatosApoderadoForm";
-import DocumentoTable from "../components/DocumentoTable";
-import { useModal } from "../hooks/useModal";
 import { usePersona } from "../hooks/usePersona";
 import api from "../api/axios";
 import { toast } from "../utils/toast";
+import DocumentoTable from "../components/Tramites/DocumentoTable";
+import { TIPO_TRAMITE } from "../Constants/tramiteDatos";
 
 export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite,onClose, recargarTramites }) {
     if (!tramiteData) return null;
@@ -23,7 +23,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
     const [confrontacion,setConfrontacion] = useState([]);
     const [isApoderadoFormVisible, setIsApoderadoFormVisible] = useState(false);
     const [isAddDocumentoFormVisible, setIsAddDocumentoFormVisible] = useState(false);
-
+    const [title, setTitle] = useState();
     const [datosPersonales, setDatosPersonales] = useState({
         ci: tramiteData.per_ci || "",
         pasaporte: tramiteData.per_pasaporte || "",
@@ -62,6 +62,8 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
                         });
                         setIsDatosPersonalesSaved(!!data.tramite.per_nombre);
                     }
+                    //Titulo
+                    setTitle(TIPO_TRAMITE[data.tramite.tra_tipo_tramite])
                     //CONFRONTACION
                     setConfrontacion(data.confrontacion)
                     // DOCUMENTOS
@@ -197,9 +199,9 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
         <div className="bg-white rounded-lg shadow-2xl w-full max-w-6xl h-[95vh] overflow-y-auto">
 
             {/* HEADER */}
-            <div className="bg-blue-600 text-white p-4 flex justify-between items-center">
+            <div className="bg-blue-600 text-white p-4 flex justify-between items-center uppercase">
                 <h3 className="text-xl font-semibold flex items-center">
-                    <BookText size={32} className="mr-3" /> LEGALIZACIÓN
+                    <BookText size={32} className="mr-3" /> {title}
                 </h3>
                 <X size={24} className="cursor-pointer" onClick={onClose} />
             </div>
@@ -207,7 +209,7 @@ export default function EditLegalizacionModal({ tramiteData, guardarDatosTramite
             {/* BODY */}
             <div className="p-6 flex-grow overflow-y-auto">
                 <h2 className="text-2xl font-bold text-center mb-6">
-                    Formulario Para Editar Legalización
+                    Formulario Para Editar {title}
                 </h2>
 
                 <div className="flex flex-col lg:flex-row gap-6">

@@ -370,8 +370,8 @@ export const useApostilla = () => {
   const eliminarTramite = async (cod_apos) => {
     setLoading(true);
     try {
-      const response = await api.delete('/api/apostilla/eliminar-tramite', {
-        data: { ca: cod_apos }
+      const response = await api.post('/api/apostilla/eliminar-tramite', {
+        ca: cod_apos 
       });
       if (response.data.success) {
         toast.success(response.data.message);
@@ -393,7 +393,7 @@ export const useApostilla = () => {
   const firmarTramite = async (cod_apos) => {
     setLoading(true);
     try {
-      const response = await api.put(`/api/apostilla/firmar-tramite/${cod_apos}`);
+      const response = await api.get(`/api/apostilla/firmar-tramite/${cod_apos}`);
       if (response.data.success) {
         toast.success(response.data.message);
         return response.data.data;

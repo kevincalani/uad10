@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
           setPermissions(response.data.permissions || []);
           
           console.log("✅ Sesión verificada. Usuario:", response.data.user?.name || response.data.name);
-          console.log("🔑 Permisos cargados:", (response.data.permissions || []).length);
+          console.log("🔑 Permisos cargados:", (response.data.permissions || []));
         }
       } catch (error) {
         // La petición a /api/user fallará (401) si no hay sesión. Es el comportamiento esperado.

@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { X, XCircle } from "lucide-react";
-import { toast } from "../../utils/toast";
-import api from "../../api/axios";
-import useDocleg from "../../hooks/useDocLeg";
+import { toast } from "../../../utils/toast";
+import api from "../../../api/axios";
+import useDocleg from "../../../hooks/useDocLeg";
 
 export default function EliminarDoclegModal({ cod_dtra, onClose, fetchData }) {
     const { eliminarDocumento } = useDocleg();
